@@ -871,7 +871,7 @@ namespace DDV
 
        
 
-        public void Write1BaseToBMPUncompressed4X(int intStart, int intEnd, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
+        public void Write1BaseToBMPUncompressed4X(int intStart, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
         {
 
     
@@ -1012,10 +1012,11 @@ namespace DDV
 
         }
 
-     
-         
+
+
 
         public int iLineLength = 100;
+        bool useTiledLayout = true;
 
 		public string T="0";
 		public string A="1";
@@ -1258,13 +1259,27 @@ namespace DDV
             //int x = 100+((((total / (y/intMagnification)) / (iLineLength*intMagnification)) * 4) + (total / (y/intMagnification)) + ((iLineLength+4)*intMagnification)) * intMagnification;
 
             int iPaddingBetweenColumns = 4;
+            int paddingBetweenRows = 40; 
+            int columnMaxLines = 1000;
+            int nColumnsPerTile = 100;
+
             int iColumnWidth = (iLineLength * intMagnification) + iPaddingBetweenColumns;
-            MessageBoxShow("iColumnWidth: " + iColumnWidth);
-            int iNucleotidesPerColumn = iLineLength * y / intMagnification;
-            MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
+            int iNucleotidesPerColumn = iLineLength * y / intMagnification; //TODO: change y from pixels to nucleotides so that the user doesn't need intMagnification
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
+            int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
+
+            if (useTiledLayout)
+            {
+                iNucleotidesPerColumn = iLineLength * columnMaxLines;
+                numColumns = Math.Min(nColumnsPerTile, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
+                x = (numColumns * iColumnWidth) - iPaddingBetweenColumns;
+                int numRows = (int)Math.Ceiling((double)total / (numColumns * iNucleotidesPerColumn));
+                y = (numRows * (columnMaxLines * intMagnification + paddingBetweenRows));
+            }
+
+            MessageBoxShow("iColumnWidth: " + iColumnWidth);
+            MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
             MessageBoxShow("numColumns: " + numColumns);
-            int x = (numColumns * iColumnWidth) -iPaddingBetweenColumns; //last column has no padding.
             MessageBoxShow("x: " + x);
 
             if ((x > Math.Pow(2, 16)))
@@ -1314,19 +1329,30 @@ namespace DDV
             workerBMPPainter.DoWork += (u, args) =>
             {
                 BackgroundWorker worker = u as BackgroundWorker;
+
+                
+
                 //----------------------------convert data to pixels---------------------------------
                 int boundX = b.Width;
                 int boundY = b.Height - 1;
-                int pixelsInThisRow = 0;
-                
+                int nucleotidesInThisLine = 0;
+
                 counter = 0;
                 bool end = false;
                 string firstLetter = null;
 
                 int x_pointer = 0;
                 int y_pointer = 0;
-                int rowBeginning = x_pointer;
+                int lineBeginning = x_pointer;
                 int progress = 0;
+
+                //---Variables only used by Tiled Layout---
+                //int columnMaxLines = 1000;
+                int lineNumberInColumn = 0;
+                //int nColumnsPerTile = 100;
+                int columnNumberInTile = 0;
+                int rowTop = 0; //the y value of the top of each super row
+
 
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
 
@@ -1355,35 +1381,73 @@ namespace DDV
                             read = CleanInputFile(read);
                             read = ConvertToDigits(read);
 
-                            for (int c = 0; c < read.Length; c++)
+                            //TODO: put these layouts in their own methods
+                            if (!useTiledLayout)
                             {
-                                Write1BaseToBMPUncompressed4X(c, c + 1, ref b, x_pointer, y_pointer, ref bmd);
-                                x_pointer += intMagnification; //increment one pixel size to the right
-                                pixelsInThisRow += 1;
+                                //------------Classic Long column Layout--------------/
+                                for (int c = 0; c < read.Length; c++)
+                                {
+                                    Write1BaseToBMPUncompressed4X(c, ref b, x_pointer, y_pointer, ref bmd);
+                                    x_pointer += intMagnification; //increment one pixel size to the right
+                                    nucleotidesInThisLine += 1;
 
-                                if (pixelsInThisRow >= iLineLength) // carriage return                   
-                                { 
-                                    pixelsInThisRow = 0;
-                                    x_pointer = rowBeginning; 
-                                    y_pointer += intMagnification;
-                                    
-                                    if (y_pointer >= boundY)
+                                    if (nucleotidesInThisLine >= iLineLength) // carriage return                   
                                     {
-                                        x_pointer += (iLineLength * intMagnification) + iPaddingBetweenColumns;
-                                        rowBeginning = x_pointer;
-                                        y_pointer = 0;
-                                    }
+                                        nucleotidesInThisLine = 0;
+                                        x_pointer = lineBeginning;
+                                        y_pointer += intMagnification;
 
-                                    if (x_pointer >= boundX)
-                                    {                                        
-                                        counter++;
-                                        end = true;
-                                        //this would be an unexpected error, throw an exception
-                                        throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format, with 70 nucleotides per line. ");
+                                        if (y_pointer >= boundY)
+                                        {
+                                            x_pointer += (iLineLength * intMagnification) + iPaddingBetweenColumns;
+                                            lineBeginning = x_pointer;
+                                            y_pointer = 0;
+                                        }
+
+                                        if (x_pointer >= boundX)
+                                        {
+                                            counter++;
+                                            end = true;
+                                            //this would be an unexpected error, throw an exception
+                                            throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format, with 70 nucleotides per line. ");
+                                        }
                                     }
                                 }
                             }
+                            else
+                            {
+                                //----------------------------New Tiled Layout style----------------------------------
+                                for (int c = 0; c < read.Length; c++)
+                                {
+                                    lineBeginning = columnNumberInTile * (iLineLength * intMagnification + iPaddingBetweenColumns);
+                                    Write1BaseToBMPUncompressed4X(c, ref b, 
+                                        lineBeginning + nucleotidesInThisLine * intMagnification, //x
+                                        rowTop + lineNumberInColumn * intMagnification, //y 
+                                        ref bmd);
+                                    
+                                    nucleotidesInThisLine += 1;
 
+                                    if (nucleotidesInThisLine >= iLineLength) // carriage return                   
+                                    {
+                                        nucleotidesInThisLine = 0;
+                                        lineNumberInColumn++;
+
+                                        if(lineNumberInColumn >= columnMaxLines)
+                                        { //increment to the next column
+                                            columnNumberInTile++;
+                                            lineNumberInColumn = 0;
+
+                                            if(columnNumberInTile >= nColumnsPerTile)
+                                            { //start a new super row
+                                                columnNumberInTile = 0;
+                                                rowTop += columnMaxLines * intMagnification + paddingBetweenRows;
+
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
                         }
 
                     }
@@ -1391,8 +1455,9 @@ namespace DDV
 
                 //close the sequence file
                 streamFASTAFile.Close();
-               
+
                 //----------------------------end of convert data to pixels--------------------------
+                
             };
             workerBMPPainter.RunWorkerAsync();
             workerBMPPainter.RunWorkerCompleted += (u, args) =>
