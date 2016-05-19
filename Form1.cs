@@ -1013,30 +1013,9 @@ namespace DDV
         }
 
      
-    
-        public void WriteToBMPUncompressed4X(int intStart, int intEnd, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
-        {
-            
-            for (int i = 0; i < 10; i++)
-            {
-                Write1BaseToBMPUncompressed4X(intStart + i, intStart + i + 1, ref Tex, x + (i*2), y, ref bmd);
-            }
-        }
+         
 
-        public void WriteToBMPVariableLengthUncompressed4X(int intStart, int intEnd, ref Bitmap Tex, int x, int y, int iLength, ref BitmapData bmd)
-        {
-            
-
-            for (int i = 0; i < iLength; i++)
-            {
-                Write1BaseToBMPUncompressed4X(intStart + i, intStart + i + 1, ref Tex, x + (i * 2), y, ref bmd);
-            }
-        }
-
-
-       
-
-        public int iLineLength = 70;
+        public int iLineLength = 100;
 
 		public string T="0";
 		public string A="1";
@@ -1191,13 +1170,7 @@ namespace DDV
             lblDataLength.Text = "Nucleotides:" + DataLengthCounter.ToString();
             lblDataLength.Text = lblDataLength.Text + " | Line Length: " + iActualLineLength.ToString();
             lblDataLength.Refresh();
-            if (iLineLength.ToString() != iActualLineLength.ToString())
-            {
-                MessageBoxShow("Error: Line length in FASTA file does not equal to "+iLineLength.ToString());
-                MessageBoxShow("This software requires FASTA file to use line length " + iLineLength.ToString());
-                streamFASTAFile.Close();
-                return (0);
-            }
+
             MessageBoxShow("Retrieved basic sequence properties from FASTA.");
             streamFASTAFile.Close();
             return (DataLengthCounter);
@@ -1291,7 +1264,7 @@ namespace DDV
             MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             MessageBoxShow("numColumns: " + numColumns);
-            int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
+            int x = (numColumns * iColumnWidth) -iPaddingBetweenColumns; //last column has no padding.
             MessageBoxShow("x: " + x);
 
             if ((x > Math.Pow(2, 16)))
@@ -1344,16 +1317,15 @@ namespace DDV
                 //----------------------------convert data to pixels---------------------------------
                 int boundX = b.Width;
                 int boundY = b.Height - 1;
-                //int intMagnification = 2;
-
-
-                int i = 0;
+                int pixelsInThisRow = 0;
+                
                 counter = 0;
                 bool end = false;
                 string firstLetter = null;
 
                 int x_pointer = 0;
                 int y_pointer = 0;
+                int rowBeginning = x_pointer;
                 int progress = 0;
 
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
@@ -1383,48 +1355,34 @@ namespace DDV
                             read = CleanInputFile(read);
                             read = ConvertToDigits(read);
 
-
-                            //7 times 10 = 1 line
-                            for (int j = 1; j <= (iLineLength / 10); j++)
+                            for (int c = 0; c < read.Length; c++)
                             {
-                                //read in multiples of 10
-                                if (read.Length >= (j * 10))
-                                {
-                                    //Tex.Write(strFront);
-                                    //split further into 3 
-                                    WriteToBMPUncompressed4X((j - 1) * 10, j * 10, ref b, x_pointer, y_pointer, ref bmd);
-                                    x_pointer = x_pointer + 10 * intMagnification;
-                                    //DataLengthCounter=DataLengthCounter+24;
+                                Write1BaseToBMPUncompressed4X(c, c + 1, ref b, x_pointer, y_pointer, ref bmd);
+                                x_pointer += intMagnification; //increment one pixel size to the right
+                                pixelsInThisRow += 1;
+
+                                if (pixelsInThisRow >= iLineLength) // carriage return                   
+                                { 
+                                    pixelsInThisRow = 0;
+                                    x_pointer = rowBeginning; 
+                                    y_pointer += intMagnification;
+                                    
+                                    if (y_pointer >= boundY)
+                                    {
+                                        x_pointer += (iLineLength * intMagnification) + iPaddingBetweenColumns;
+                                        rowBeginning = x_pointer;
+                                        y_pointer = 0;
+                                    }
+
+                                    if (x_pointer >= boundX)
+                                    {                                        
+                                        counter++;
+                                        end = true;
+                                        //this would be an unexpected error, throw an exception
+                                        throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format, with 70 nucleotides per line. ");
+                                    }
                                 }
-                                else if (EndOfSequence == "")
-                                {
-                                    EndOfSequence = ConvertToTGACN(read.Substring((j - 1) * 10, read.Length - ((j - 1) * 10)));
-                                    WriteToBMPVariableLengthUncompressed4X((j - 1) * 10, j * 10, ref b, x_pointer, y_pointer, EndOfSequence.Length, ref bmd);
-                                    x_pointer = x_pointer + EndOfSequence.Length * intMagnification;
-                                    break;
-                                }
-
                             }
-                            x_pointer = x_pointer - iLineLength * intMagnification;
-
-
-                            i++;
-                            y_pointer = y_pointer + intMagnification;
-                            if (y_pointer >= boundY)
-                            {
-                                x_pointer = x_pointer + (iLineLength * intMagnification) + 4;
-                                y_pointer = 0;
-                            }
-
-                            if (x_pointer >= boundX)
-                            {
-                                x_pointer = 0;
-                                counter++;
-                                end = true;
-                                //this would be an unexpected error, throw an exception
-                                throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format, with 70 nucleotides per line. ");
-                            }
-
 
                         }
 
