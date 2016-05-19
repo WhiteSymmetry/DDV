@@ -113,6 +113,8 @@ namespace DDV
         private Label label3;
         private Label label15;
         private Label lblSourceSequence;
+        private TextBox txtBoxColumnWidth;
+        private Label label16;
 
 
         protected const string _newline = "\r\n";
@@ -219,6 +221,8 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -579,7 +583,7 @@ namespace DDV
             // chckIncludeDensity
             // 
             this.chckIncludeDensity.AutoSize = true;
-            this.chckIncludeDensity.Location = new System.Drawing.Point(125, 74);
+            this.chckIncludeDensity.Location = new System.Drawing.Point(122, 94);
             this.chckIncludeDensity.Name = "chckIncludeDensity";
             this.chckIncludeDensity.Size = new System.Drawing.Size(138, 17);
             this.chckIncludeDensity.TabIndex = 40;
@@ -619,7 +623,7 @@ namespace DDV
             // 
             // txtBoxY
             // 
-            this.txtBoxY.Location = new System.Drawing.Point(125, 105);
+            this.txtBoxY.Location = new System.Drawing.Point(266, 94);
             this.txtBoxY.Name = "txtBoxY";
             this.txtBoxY.Size = new System.Drawing.Size(100, 20);
             this.txtBoxY.TabIndex = 30;
@@ -641,7 +645,7 @@ namespace DDV
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(122, 89);
+            this.label1.Location = new System.Drawing.Point(263, 78);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 31;
@@ -689,6 +693,8 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.txtBoxColumnWidth);
+            this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.label14);
             this.groupBox4.Controls.Add(this.label12);
             this.groupBox4.Controls.Add(this.chckIncludeDensity);
@@ -706,6 +712,24 @@ namespace DDV
             this.groupBox4.TabIndex = 41;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(369, 79);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(85, 13);
+            this.label16.TabIndex = 44;
+            this.label16.Text = "Column Width";
+            // 
+            // txtBoxColumnWidth
+            // 
+            this.txtBoxColumnWidth.Location = new System.Drawing.Point(372, 94);
+            this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
+            this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
+            this.txtBoxColumnWidth.TabIndex = 45;
+            this.txtBoxColumnWidth.Text = "100";
             // 
             // Form1
             // 
@@ -1319,11 +1343,22 @@ namespace DDV
                 MessageBox.Show("Please put only numbers in Image height");
             }
 
+            int iColumnWidth = 0;
+            try
+            {
+                iColumnWidth = Convert.ToInt32(txtBoxColumnWidth.Text);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Please put only numbers in Image height");
+            }
+
             //int x = (((total / y) / 60 * 2)) + (total / y) + 64 * 2;
             //int x = 100+((((total / (y/intMagnification)) / (iLineLength*intMagnification)) * 4) + (total / (y/intMagnification)) + ((iLineLength+4)*intMagnification)) * intMagnification;
 
             int iPaddingBetweenColumns = 4;
-            int iColumnWidth = (iLineLength * intMagnification) + iPaddingBetweenColumns;
+            //iColumnWidth = (iLineLength * intMagnification) + iPaddingBetweenColumns;
+            // TODO: Fix column width with any padding needed
             MessageBoxShow("iColumnWidth: " + iColumnWidth);
             int iNucleotidesPerColumn = iLineLength * y / intMagnification;
             MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
@@ -1796,7 +1831,6 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
         //renames "embed.html" file to index.html
         private void button12_Click(object sender, EventArgs e)
         {
-            MessageBoxClear();
             // Set cursor as hourglass
             Cursor.Current = Cursors.WaitCursor;
 
