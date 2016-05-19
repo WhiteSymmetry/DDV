@@ -42,11 +42,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 namespace DDV
 {
-
-	
-
 	public class Form1 : System.Windows.Forms.Form
     {
+        public string[] layoutStyles = new string[] {"Full Height Columns (Original)", "Tiled"};
+
         private IContainer components;
 		private System.Windows.Forms.OpenFileDialog fDlgSourceSequence;
         private Random RandomClass = new Random();
@@ -115,6 +114,8 @@ namespace DDV
         private Label lblSourceSequence;
         private TextBox txtBoxColumnWidth;
         private Label label16;
+        private ComboBox layoutSelector;
+        private Label label17;
 
 
         protected const string _newline = "\r\n";
@@ -127,6 +128,10 @@ namespace DDV
 			InitializeComponent();
 			m_strSourceFile="";
             m_strSourceBitmapFile = "";
+
+            // Modify ui element attributes after initialization
+            this.layoutSelector.DataSource = layoutStyles;
+            this.layoutSelector.SelectedIndex = 0;
 
             btnProcessBitmapDeepZoom.Enabled = false;
             checkEnvironment();
@@ -221,8 +226,10 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label16 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.layoutSelector = new System.Windows.Forms.ComboBox();
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -583,9 +590,10 @@ namespace DDV
             // chckIncludeDensity
             // 
             this.chckIncludeDensity.AutoSize = true;
-            this.chckIncludeDensity.Location = new System.Drawing.Point(122, 94);
+            this.chckIncludeDensity.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chckIncludeDensity.Location = new System.Drawing.Point(231, 119);
             this.chckIncludeDensity.Name = "chckIncludeDensity";
-            this.chckIncludeDensity.Size = new System.Drawing.Size(138, 17);
+            this.chckIncludeDensity.Size = new System.Drawing.Size(161, 17);
             this.chckIncludeDensity.TabIndex = 40;
             this.chckIncludeDensity.Text = "Include Density Service";
             this.chckIncludeDensity.UseVisualStyleBackColor = true;
@@ -606,7 +614,7 @@ namespace DDV
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(122, 134);
+            this.label2.Location = new System.Drawing.Point(122, 148);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(99, 13);
             this.label2.TabIndex = 32;
@@ -614,7 +622,7 @@ namespace DDV
             // 
             // textBoxTileSize
             // 
-            this.textBoxTileSize.Location = new System.Drawing.Point(125, 150);
+            this.textBoxTileSize.Location = new System.Drawing.Point(125, 164);
             this.textBoxTileSize.Name = "textBoxTileSize";
             this.textBoxTileSize.Size = new System.Drawing.Size(100, 20);
             this.textBoxTileSize.TabIndex = 31;
@@ -623,7 +631,7 @@ namespace DDV
             // 
             // txtBoxY
             // 
-            this.txtBoxY.Location = new System.Drawing.Point(266, 94);
+            this.txtBoxY.Location = new System.Drawing.Point(125, 80);
             this.txtBoxY.Name = "txtBoxY";
             this.txtBoxY.Size = new System.Drawing.Size(100, 20);
             this.txtBoxY.TabIndex = 30;
@@ -645,7 +653,7 @@ namespace DDV
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(263, 78);
+            this.label1.Location = new System.Drawing.Point(122, 64);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 31;
@@ -693,6 +701,8 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.label17);
+            this.groupBox4.Controls.Add(this.layoutSelector);
             this.groupBox4.Controls.Add(this.txtBoxColumnWidth);
             this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.label14);
@@ -713,23 +723,41 @@ namespace DDV
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
             // 
-            // label16
+            // label17
             // 
-            this.label16.AutoSize = true;
-            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(369, 79);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(85, 13);
-            this.label16.TabIndex = 44;
-            this.label16.Text = "Column Width";
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label17.Location = new System.Drawing.Point(228, 64);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(45, 13);
+            this.label17.TabIndex = 47;
+            this.label17.Text = "Layout";
+            // 
+            // layoutSelector
+            // 
+            this.layoutSelector.FormattingEnabled = true;
+            this.layoutSelector.Location = new System.Drawing.Point(231, 80);
+            this.layoutSelector.Name = "layoutSelector";
+            this.layoutSelector.Size = new System.Drawing.Size(161, 21);
+            this.layoutSelector.TabIndex = 46;
             // 
             // txtBoxColumnWidth
             // 
-            this.txtBoxColumnWidth.Location = new System.Drawing.Point(372, 94);
+            this.txtBoxColumnWidth.Location = new System.Drawing.Point(125, 117);
             this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
             this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
             this.txtBoxColumnWidth.TabIndex = 45;
             this.txtBoxColumnWidth.Text = "100";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(122, 102);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(85, 13);
+            this.label16.TabIndex = 44;
+            this.label16.Text = "Column Width";
             // 
             // Form1
             // 
