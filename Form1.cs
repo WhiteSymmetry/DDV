@@ -729,7 +729,7 @@ namespace DDV
             this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
             this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
             this.txtBoxColumnWidth.TabIndex = 45;
-            this.txtBoxColumnWidth.Text = "100";
+            this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
             //
             // Form1
             // 
@@ -1104,7 +1104,7 @@ namespace DDV
 
 
 
-        public int iLineLength = 100;
+        public int columnWidthInNucleotides = 100;
         bool useTiledLayout = true;
 
 		public string T="0";
@@ -1344,10 +1344,9 @@ namespace DDV
                 MessageBox.Show("Please put only numbers in Image height");
             }
 
-            int iColumnWidth = 0;
             try
             {
-                iColumnWidth = Convert.ToInt32(txtBoxColumnWidth.Text);
+                columnWidthInNucleotides = Convert.ToInt32(txtBoxColumnWidth.Text);
             }
             catch (Exception)
             {
@@ -1362,14 +1361,14 @@ namespace DDV
             int columnMaxLines = 1000;
             int nColumnsPerTile = 100;
 
-            int iColumnWidth = (iLineLength * intMagnification) + iPaddingBetweenColumns;
-            int iNucleotidesPerColumn = iLineLength * y / intMagnification; //TODO: change y from pixels to nucleotides so that the user doesn't need intMagnification
+            int iColumnWidth = (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
+            int iNucleotidesPerColumn = columnWidthInNucleotides * y / intMagnification; //TODO: change y from pixels to nucleotides so that the user doesn't need intMagnification
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
 
             if (useTiledLayout)
             {
-                iNucleotidesPerColumn = iLineLength * columnMaxLines;
+                iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
                 numColumns = Math.Min(nColumnsPerTile, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
                 x = (numColumns * iColumnWidth) - iPaddingBetweenColumns;
                 int numRows = (int)Math.Ceiling((double)total / (numColumns * iNucleotidesPerColumn));
@@ -1490,7 +1489,7 @@ namespace DDV
                                     x_pointer += intMagnification; //increment one pixel size to the right
                                     nucleotidesInThisLine += 1;
 
-                                    if (nucleotidesInThisLine >= iLineLength) // carriage return
+                                    if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
                                     {
                                         nucleotidesInThisLine = 0;
                                         x_pointer = lineBeginning;
@@ -1498,7 +1497,7 @@ namespace DDV
 
                                         if (y_pointer >= boundY)
                                         {
-                                            x_pointer += (iLineLength * intMagnification) + iPaddingBetweenColumns;
+                                            x_pointer += (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
                                             lineBeginning = x_pointer;
                                             y_pointer = 0;
                                         }
@@ -1518,7 +1517,7 @@ namespace DDV
                                 //----------------------------New Tiled Layout style----------------------------------
                                 for (int c = 0; c < read.Length; c++)
                                 {
-                                    lineBeginning = columnNumberInTile * (iLineLength * intMagnification + iPaddingBetweenColumns);
+                                    lineBeginning = columnNumberInTile * (columnWidthInNucleotides * intMagnification + iPaddingBetweenColumns);
                                     Write1BaseToBMPUncompressed4X(c, ref b,
                                         lineBeginning + nucleotidesInThisLine * intMagnification, //x
                                         rowTop + lineNumberInColumn * intMagnification, //y
@@ -1526,7 +1525,7 @@ namespace DDV
 
                                     nucleotidesInThisLine += 1;
 
-                                    if (nucleotidesInThisLine >= iLineLength) // carriage return
+                                    if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
                                     {
                                         nucleotidesInThisLine = 0;
                                         lineNumberInColumn++;
