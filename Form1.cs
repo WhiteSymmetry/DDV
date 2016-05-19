@@ -1330,7 +1330,6 @@ namespace DDV
             // Set cursor as hourglass
             Cursor.Current = Cursors.WaitCursor;
 
-            resultLogTextBox.Clear();
             EndOfSequence = "";
 
             string strFastaStats = "";
