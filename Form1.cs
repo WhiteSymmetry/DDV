@@ -1133,7 +1133,6 @@ namespace DDV
 
 
         public int columnWidthInNucleotides = 100;
-        bool useTiledLayout = true;
 
 		public string T="0";
 		public string A="1";
@@ -1394,7 +1393,7 @@ namespace DDV
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
 
-            if (useTiledLayout)
+            if (layoutSelector.SelectedIndex == 1)  // 1 is the Tiled option
             {
                 iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
                 numColumns = Math.Min(nColumnsPerTile, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
@@ -1456,7 +1455,7 @@ namespace DDV
             {
                 BackgroundWorker worker = u as BackgroundWorker;
 
-
+                int selectedIndex = (int)args.Argument;
 
                 //----------------------------convert data to pixels---------------------------------
                 int boundX = b.Width;
@@ -1508,7 +1507,7 @@ namespace DDV
                             read = ConvertToDigits(read);
 
                             //TODO: put these layouts in their own methods
-                            if (!useTiledLayout)
+                            if (selectedIndex == 0)  // 0 is the Full Height Columns (Original) option
                             {
                                 //------------Classic Long column Layout--------------/
                                 for (int c = 0; c < read.Length; c++)
@@ -1540,7 +1539,7 @@ namespace DDV
                                     }
                                 }
                             }
-                            else
+                            else if (selectedIndex == 1)  // 1 is the Tiled option
                             {
                                 //----------------------------New Tiled Layout style----------------------------------
                                 for (int c = 0; c < read.Length; c++)
@@ -1585,7 +1584,7 @@ namespace DDV
                 //----------------------------end of convert data to pixels--------------------------
 
             };
-            workerBMPPainter.RunWorkerAsync();
+            workerBMPPainter.RunWorkerAsync(layoutSelector.SelectedIndex);
             workerBMPPainter.RunWorkerCompleted += (u, args) =>
             {
                 MessageBoxShow("Completed mapping DNA to pixels.  Saving result...");
