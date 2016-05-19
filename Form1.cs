@@ -132,6 +132,7 @@ namespace DDV
             // Modify ui element attributes after initialization
             this.layoutSelector.DataSource = layoutStyles;
             this.layoutSelector.SelectedIndex = 0;
+            this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
 
             btnProcessBitmapDeepZoom.Enabled = false;
             checkEnvironment();
@@ -236,7 +237,7 @@ namespace DDV
             this.menuStrip1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
-            //
+            // 
             // btnBrowseSelectFASTA
             // 
             this.btnBrowseSelectFASTA.BackColor = System.Drawing.Color.LightSkyBlue;
@@ -269,16 +270,16 @@ namespace DDV
             this.groupBox1.Text = "Gene Sequence Source File";
             // 
             // label15
-            //
+            // 
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(44, 102);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(78, 13);
             this.label15.TabIndex = 41;
             this.label15.Text = "Sequence File:";
-            //
+            // 
             // label11
-            //
+            // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.Location = new System.Drawing.Point(8, 16);
@@ -286,16 +287,16 @@ namespace DDV
             this.label11.Size = new System.Drawing.Size(33, 25);
             this.label11.TabIndex = 40;
             this.label11.Text = "1)";
-            //
+            // 
             // label10
-            //
+            // 
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(230, 57);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(23, 13);
             this.label10.TabIndex = 39;
             this.label10.Text = "OR";
-            //
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -334,12 +335,12 @@ namespace DDV
             this.txtGI.TabIndex = 35;
             // 
             // lblSourceSequence
-            //
+            // 
             this.lblSourceSequence.Location = new System.Drawing.Point(122, 102);
             this.lblSourceSequence.Name = "lblSourceSequence";
             this.lblSourceSequence.Size = new System.Drawing.Size(370, 54);
             this.lblSourceSequence.TabIndex = 6;
-            //
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -392,41 +393,41 @@ namespace DDV
             this.groupBox2.Text = "Sequence Properties";
             // 
             // label9
-            //
+            // 
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(8, 193);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(71, 13);
             this.label9.TabIndex = 40;
             this.label9.Text = "FASTA Stats:";
-            //
+            // 
             // label6
-            //
+            // 
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(8, 134);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(176, 13);
             this.label6.TabIndex = 39;
             this.label6.Text = "Number of Base Pairs/Data Length:";
-            //
+            // 
             // label4
-            //
+            // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(8, 75);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(46, 13);
             this.label4.TabIndex = 38;
             this.label4.Text = "RefSeq:";
-            //
+            // 
             // label3
-            //
+            // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(6, 16);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(90, 13);
             this.label3.TabIndex = 37;
             this.label3.Text = "Sequence Name:";
-            //
+            // 
             // txtBoxFASTAStats
             // 
             this.txtBoxFASTAStats.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -494,7 +495,7 @@ namespace DDV
             this.resultLogTextBox.TabIndex = 29;
             this.resultLogTextBox.Text = "";
             this.resultLogTextBox.TextChanged += new System.EventHandler(this.resultLogTextBox_TextChanged);
-            //
+            // 
             // btnFinalDestinationFolder
             // 
             this.btnFinalDestinationFolder.BackColor = System.Drawing.Color.LightSkyBlue;
@@ -566,9 +567,9 @@ namespace DDV
             this.label14.Size = new System.Drawing.Size(33, 25);
             this.label14.TabIndex = 43;
             this.label14.Text = "4)";
-            //
+            // 
             // label13
-            //
+            // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.Location = new System.Drawing.Point(8, 74);
@@ -576,9 +577,9 @@ namespace DDV
             this.label13.Size = new System.Drawing.Size(33, 25);
             this.label13.TabIndex = 42;
             this.label13.Text = "3)";
-            //
+            // 
             // label12
-            //
+            // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.Location = new System.Drawing.Point(8, 16);
@@ -597,7 +598,7 @@ namespace DDV
             this.chckIncludeDensity.TabIndex = 40;
             this.chckIncludeDensity.Text = "Include Density Service";
             this.chckIncludeDensity.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnReadSequenceProperties
             // 
             this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
@@ -609,7 +610,7 @@ namespace DDV
             this.btnReadSequenceProperties.Text = "Read Sequence Properties";
             this.btnReadSequenceProperties.UseVisualStyleBackColor = false;
             this.btnReadSequenceProperties.Click += new System.EventHandler(this.button1_Click);
-            //
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -628,7 +629,7 @@ namespace DDV
             this.textBoxTileSize.TabIndex = 31;
             this.textBoxTileSize.Text = "144";
             this.toolTip1.SetToolTip(this.textBoxTileSize, "Recommended: 144 for bacteria, 256 for human");
-            //
+            // 
             // txtBoxY
             // 
             this.txtBoxY.Location = new System.Drawing.Point(125, 80);
@@ -637,7 +638,7 @@ namespace DDV
             this.txtBoxY.TabIndex = 30;
             this.txtBoxY.Text = "3000";
             this.toolTip1.SetToolTip(this.txtBoxY, "Recommended: 3000 for bacteria, 20000 for human");
-            //
+            // 
             // btnProcessBitmapDeepZoom
             // 
             this.btnProcessBitmapDeepZoom.BackColor = System.Drawing.Color.LightSkyBlue;
@@ -670,7 +671,7 @@ namespace DDV
             this.btnGenerateImage.Text = "Generate Image and Interface";
             this.btnGenerateImage.UseVisualStyleBackColor = false;
             this.btnGenerateImage.Click += new System.EventHandler(this.button9_Click);
-            //
+            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -698,7 +699,7 @@ namespace DDV
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // groupBox4
-            //
+            // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.groupBox4.Controls.Add(this.label17);
@@ -722,9 +723,9 @@ namespace DDV
             this.groupBox4.TabIndex = 41;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
-            //
+            // 
             // label17
-            //
+            // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label17.Location = new System.Drawing.Point(228, 64);
@@ -732,17 +733,24 @@ namespace DDV
             this.label17.Size = new System.Drawing.Size(45, 13);
             this.label17.TabIndex = 47;
             this.label17.Text = "Layout";
-            //
+            // 
             // layoutSelector
-            //
+            // 
             this.layoutSelector.FormattingEnabled = true;
             this.layoutSelector.Location = new System.Drawing.Point(231, 80);
             this.layoutSelector.Name = "layoutSelector";
             this.layoutSelector.Size = new System.Drawing.Size(161, 21);
             this.layoutSelector.TabIndex = 46;
-            //
+            // 
+            // txtBoxColumnWidth
+            // 
+            this.txtBoxColumnWidth.Location = new System.Drawing.Point(125, 116);
+            this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
+            this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
+            this.txtBoxColumnWidth.TabIndex = 45;
+            // 
             // label16
-            //
+            // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label16.Location = new System.Drawing.Point(122, 102);
@@ -750,15 +758,7 @@ namespace DDV
             this.label16.Size = new System.Drawing.Size(85, 13);
             this.label16.TabIndex = 44;
             this.label16.Text = "Column Width";
-            //
-            // txtBoxColumnWidth
-            //
-            this.txtBoxColumnWidth.Location = new System.Drawing.Point(372, 94);
-            this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
-            this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
-            this.txtBoxColumnWidth.TabIndex = 45;
-            this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
-            //
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
