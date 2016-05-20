@@ -118,6 +118,10 @@ namespace DDV
         private GroupBox groupBox2;
         private TextBox txtBoxNucleotidesPerRow;
         private Label label18;
+        private Label label20;
+        private TextBox txtBoxSequenceNameOverride;
+        private ComboBox outputNaming;
+        private Label label19;
 
 
         protected const string _newline = "\r\n";
@@ -136,6 +140,7 @@ namespace DDV
             this.layoutSelector.SelectedIndex = FULL_COLUMN_LAYOUT;
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
             this.txtBoxNucleotidesPerRow.Text = nucleotidesPerRow.ToString();
+            this.outputNaming.SelectedIndex = 0;
 
             btnProcessBitmapDeepZoom.Enabled = false;
             checkEnvironment();
@@ -236,6 +241,10 @@ namespace DDV
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label18 = new System.Windows.Forms.Label();
             this.txtBoxNucleotidesPerRow = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.outputNaming = new System.Windows.Forms.ComboBox();
+            this.txtBoxSequenceNameOverride = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -258,6 +267,8 @@ namespace DDV
             // 
             this.groupBox1.AutoSize = true;
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox1.Controls.Add(this.label20);
+            this.groupBox1.Controls.Add(this.txtBoxSequenceNameOverride);
             this.groupBox1.Controls.Add(this.label15);
             this.groupBox1.Controls.Add(this.label11);
             this.groupBox1.Controls.Add(this.label10);
@@ -591,9 +602,9 @@ namespace DDV
             // 
             this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
             this.btnReadSequenceProperties.Enabled = false;
-            this.btnReadSequenceProperties.Location = new System.Drawing.Point(47, 153);
+            this.btnReadSequenceProperties.Location = new System.Drawing.Point(333, 163);
             this.btnReadSequenceProperties.Name = "btnReadSequenceProperties";
-            this.btnReadSequenceProperties.Size = new System.Drawing.Size(70, 52);
+            this.btnReadSequenceProperties.Size = new System.Drawing.Size(151, 30);
             this.btnReadSequenceProperties.TabIndex = 32;
             this.btnReadSequenceProperties.Text = "Read Sequence Properties";
             this.btnReadSequenceProperties.UseVisualStyleBackColor = false;
@@ -652,7 +663,7 @@ namespace DDV
             // 
             this.btnGenerateImage.BackColor = System.Drawing.Color.LightSkyBlue;
             this.btnGenerateImage.Enabled = false;
-            this.btnGenerateImage.Location = new System.Drawing.Point(47, 149);
+            this.btnGenerateImage.Location = new System.Drawing.Point(177, 156);
             this.btnGenerateImage.Name = "btnGenerateImage";
             this.btnGenerateImage.Size = new System.Drawing.Size(184, 30);
             this.btnGenerateImage.TabIndex = 26;
@@ -690,6 +701,8 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.outputNaming);
+            this.groupBox4.Controls.Add(this.label19);
             this.groupBox4.Controls.Add(this.txtBoxNucleotidesPerRow);
             this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.label17);
@@ -783,6 +796,44 @@ namespace DDV
             this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
             this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
             this.txtBoxNucleotidesPerRow.TabIndex = 49;
+            //
+            // label19
+            //
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(47, 146);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(91, 13);
+            this.label19.TabIndex = 50;
+            this.label19.Text = "Output Naming";
+            //
+            // outputNaming
+            //
+            this.outputNaming.FormattingEnabled = true;
+            this.outputNaming.Items.AddRange(new object[] {
+            "GI",
+            "Name"});
+            this.outputNaming.Location = new System.Drawing.Point(50, 162);
+            this.outputNaming.Name = "outputNaming";
+            this.outputNaming.Size = new System.Drawing.Size(121, 21);
+            this.outputNaming.TabIndex = 51;
+            //
+            // txtBoxSequenceNameOverride
+            //
+            this.txtBoxSequenceNameOverride.Location = new System.Drawing.Point(50, 169);
+            this.txtBoxSequenceNameOverride.Name = "txtBoxSequenceNameOverride";
+            this.txtBoxSequenceNameOverride.Size = new System.Drawing.Size(277, 20);
+            this.txtBoxSequenceNameOverride.TabIndex = 42;
+            //
+            // label20
+            //
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(47, 153);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(152, 13);
+            this.label20.TabIndex = 43;
+            this.label20.Text = "Sequence Name Override";
             //
             // Form1
             // 
@@ -1257,8 +1308,15 @@ namespace DDV
                         if (i > 1) { end = true; }
                         else
                         {
-                            sequenceName = read;
-                            sequenceName = sequenceName.Substring(1, sequenceName.Length - 1);
+                            if (txtBoxSequenceNameOverride.Text == "")
+                            {
+                                sequenceName = read;
+                                sequenceName = sequenceName.Substring(1, sequenceName.Length - 1);
+                            }
+                            else
+                            {
+                                sequenceName = txtBoxSequenceNameOverride.Text;
+                            }
                             lblSequenceName.Text = sequenceName;
                             lblSequenceName.Refresh();
                             //ref|NC_007414.1|
@@ -1642,13 +1700,20 @@ namespace DDV
                 b.UnlockBits(bmd);
                 bmd = null;
                 string strResultFileName = "";
-                if (gi != "")
+                if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
                 {
-                    strResultFileName = gi + ".png";
+                    if (gi != "")
+                    {
+                        strResultFileName = gi + ".png";
+                    }
+                    else
+                    {
+                        strResultFileName = DDVseqID + ".png";
+                    }
                 }
-                else
+                else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
                 {
-                    strResultFileName = DDVseqID + ".png";
+                    strResultFileName = sequenceName + ".png";
                 }
 
                 //if file exists, delete
@@ -1842,6 +1907,18 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
         //Generates Bitmap from Data
         private void button9_Click(object sender, EventArgs e)
         {
+            if (File.Exists(m_strFinalDestinationFolder + "\\embed.html"))
+            {
+                File.Delete(m_strFinalDestinationFolder + "\\embed.html");
+            }
+            foreach (string filePath in Directory.GetFiles(m_strFinalDestinationFolder))
+            {
+                if (filePath.EndsWith(".png"))
+                {
+                    File.Delete(filePath);
+                }
+            }
+
             try
             {
                 InitializeMakeBitmap();
@@ -2133,8 +2210,15 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
 
                 //moving generated folders 
                 strSource = @Directory.GetCurrentDirectory() + "\\output\\" + fNameNoExtension;
-                if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi; }
-                else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID; }
+                if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
+                {
+                    if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi; }
+                    else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID; }
+                }
+                else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+                {
+                    strDestination = finalDestinationPath + "dnadata\\" + sequenceName;
+                }
                 MessageBoxShow("Moving Results" + strSource + " to " + strDestination);
                 MoveDirectory(strSource, strDestination);
 
@@ -2144,8 +2228,15 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
 
                 //moving [img] folder into place
                 strSource = @Directory.GetCurrentDirectory() + "\\img";
-                if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\img"; }
-                else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\img"; }
+                if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
+                {
+                    if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\img"; }
+                    else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\img"; }
+                }
+                else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+                {
+                    strDestination = finalDestinationPath + "dnadata\\" + sequenceName + "\\img";
+                }
                 MessageBoxShow("Copying images" + strSource + " to " + strDestination);
                 if (!(Directory.Exists(strDestination)))
                 {
@@ -2206,8 +2297,15 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 strSource = fPathName + "\\sequence.fasta";
                 if (File.Exists(strSource))
                 {
-                    if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\sequence.fasta"; }
-                    else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\sequence.fasta"; }
+                    if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
+                    {
+                        if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\sequence.fasta"; }
+                        else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\sequence.fasta"; }
+                    }
+                    else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+                    {
+                        strDestination = finalDestinationPath + "dnadata\\" + sequenceName + "\\sequence.fasta";
+                    }
                     MessageBoxShow("Copying " + strSource + " to " + strDestination);
                     File.Copy(strSource, strDestination, true);
                 }
@@ -2216,8 +2314,15 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 strSource = fPathName + "\\sequence-info.xml";
                 if (File.Exists(strSource))
                 {
-                    if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\sequence-info.xml"; }
-                    else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\sequence-info.xml"; }
+                    if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
+                    {
+                        if (gi != "") { strDestination = finalDestinationPath + "dnadata\\nuccore" + gi + "\\sequence-info.xml"; }
+                        else { strDestination = finalDestinationPath + "dnadata\\" + DDVseqID + "\\sequence-info.xml"; }
+                    }
+                    else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+                    {
+                        strDestination = finalDestinationPath + "dnadata\\" + sequenceName + "\\sequence-info.xml";
+                    }
                     MessageBoxShow("Moving " + strSource + " to " + strDestination);
                     File.Copy(strSource, strDestination, true);
                     File.Delete(strSource);
@@ -2627,8 +2732,10 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
             progressBar1.Value = 0;
             btnGenerateImage.Enabled = false;
             btnProcessBitmapDeepZoom.Enabled = false;
+            txtBoxSequenceNameOverride.Text = "";
 
             btnReadSequenceProperties.Enabled = true;
+            txtBoxSequenceNameOverride.Enabled = true;
             label15.Visible = true;
             lblSourceSequence.Visible = true;
         }
@@ -2662,7 +2769,11 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 btnGenerateImage.Enabled = false;
                 MessageBoxShow("Cannot generate image from this FASTA file.");
             }
-            else btnGenerateImage.Enabled = true;
+            else
+            {
+                btnGenerateImage.Enabled = true;
+                txtBoxSequenceNameOverride.Enabled = false;
+            }
             // Set cursor as default arrow
             Cursor.Current = Cursors.Default;
         }
