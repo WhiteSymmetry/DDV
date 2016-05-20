@@ -1421,6 +1421,7 @@ namespace DDV
 
             int iPaddingBetweenColumns = 4;
             int paddingBetweenRows = 40;
+            int paddingBetweenTiles = 400;
             int columnMaxLines = 1000;
 
             int iColumnWidth = (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
@@ -1428,15 +1429,17 @@ namespace DDV
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
             int nColumnsPerMegaRow = 100;
+            int rowsPerTile = 10;
 
             if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
             {
                 iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
-                nColumnsPerMegaRow = (int)Math.Ceiling((double)nucleotidesPerRow / iNucleotidesPerColumn);
+                nColumnsPerMegaRow = (int)Math.Round((double)nucleotidesPerRow / iNucleotidesPerColumn);
                 numColumns = Math.Min(nColumnsPerMegaRow, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
-                x = (numColumns * iColumnWidth) - iPaddingBetweenColumns;
                 int numRows = (int)Math.Ceiling((double)total / (numColumns * iNucleotidesPerColumn));
-                y = (numRows * (columnMaxLines * intMagnification + paddingBetweenRows));
+                y = (Math.Min(numRows, rowsPerTile) * (columnMaxLines * intMagnification + paddingBetweenRows));
+                int tileWidth = (numColumns * iColumnWidth) + paddingBetweenTiles;
+                x = tileWidth * (int)Math.Ceiling((double)numRows / rowsPerTile);// number of tiles needed
                 //TODO: use old y "Image Height" to determine when to start a new tile.
             }
 
@@ -1514,7 +1517,9 @@ namespace DDV
                 int lineNumberInColumn = 0;
                 //int nColumnsPerTile = 100;
                 int columnNumberInTile = 0;
-                int rowTop = 0; //the y value of the top of each super row
+                int rowNumber = 0; //the y value of the top of each super row
+                int rowHeight = (columnMaxLines * intMagnification + paddingBetweenRows);
+                int tileNumber = 0;
 
 
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
@@ -1562,7 +1567,7 @@ namespace DDV
 
                                         if (y_pointer >= boundY)
                                         {
-                                            x_pointer += (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
+                                            x_pointer += iColumnWidth;
                                             lineBeginning = x_pointer;
                                             y_pointer = 0;
                                         }
@@ -1582,10 +1587,11 @@ namespace DDV
                                 //----------------------------New Tiled Layout style----------------------------------
                                 for (int c = 0; c < read.Length; c++)
                                 {
-                                    lineBeginning = columnNumberInTile * (columnWidthInNucleotides * intMagnification + iPaddingBetweenColumns);
+                                    int tileBeginning = tileNumber * (nColumnsPerMegaRow * iColumnWidth + paddingBetweenTiles);
+                                    lineBeginning = columnNumberInTile * iColumnWidth + tileBeginning;
                                     Write1BaseToBMPUncompressed4X(c, ref b,
                                         lineBeginning + nucleotidesInThisLine * intMagnification, //x
-                                        rowTop + lineNumberInColumn * intMagnification, //y
+                                        rowNumber * rowHeight + lineNumberInColumn * intMagnification, //y
                                         ref bmd);
 
                                     nucleotidesInThisLine += 1;
@@ -1603,20 +1609,22 @@ namespace DDV
                                             if(columnNumberInTile >= nColumnsPerMegaRow)
                                             { //start a new super row
                                                 columnNumberInTile = 0;
-                                                rowTop += columnMaxLines * intMagnification + paddingBetweenRows;
+                                                rowNumber++;
 
-                                                //if(rowTop > rowHeight * 10)
-                                                //every 10 rows makes a tile, which is a total of 100Mbp square area
-                                                //tiles stack horizontally
-                                                    //a level past this would be 3x3 super tiles made from 9 tiles each and stacked in sets of 3x3
+                                                //if((rowNumber +1)* rowHeight > imageHeight) //not enough room left in image
+                                                if (rowNumber >= rowsPerTile)
+                                                {//every 10 rows makes a tile, which is a total of 100Mbp square area
+                                                    rowNumber = 0;
+                                                    tileNumber++;
+                                                    //tiles stack horizontally
+                                                        //a level past this would be 3x3 super tiles made from 9 tiles each and stacked in sets of 3x3
+                                                }
                                             }
                                         }
                                     }
                                 }
-
                             }
                         }
-
                     }
                 }
 
