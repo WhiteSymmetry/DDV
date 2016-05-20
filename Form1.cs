@@ -44,7 +44,7 @@ namespace DDV
 {
 	public class Form1 : System.Windows.Forms.Form
     {
-        public string[] layoutStyles = new string[] {"Full Height Columns (Original)", "Tiled"};
+        public string[] layoutStyles = new string[] {"Full Height Columns (Original)", "Tiled Layout"};
 
         private IContainer components;
 		private System.Windows.Forms.OpenFileDialog fDlgSourceSequence;
@@ -133,7 +133,7 @@ namespace DDV
 
             // Modify ui element attributes after initialization
             this.layoutSelector.DataSource = layoutStyles;
-            this.layoutSelector.SelectedIndex = 0;
+            this.layoutSelector.SelectedIndex = FULL_COLUMN_LAYOUT;
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
             this.txtBoxNucleotidesPerRow.Text = nucleotidesPerRow.ToString();
 
@@ -285,7 +285,7 @@ namespace DDV
             this.label15.TabIndex = 41;
             this.label15.Text = "Sequence File:";
             this.label15.Visible = false;
-            // 
+            //
             // label11
             // 
             this.label11.AutoSize = true;
@@ -349,7 +349,7 @@ namespace DDV
             this.lblSourceSequence.Size = new System.Drawing.Size(370, 54);
             this.lblSourceSequence.TabIndex = 6;
             this.lblSourceSequence.Visible = false;
-            // 
+            //
             // label8
             // 
             this.label8.AutoSize = true;
@@ -379,7 +379,7 @@ namespace DDV
             this.lblDataLength.Name = "lblDataLength";
             this.lblDataLength.Size = new System.Drawing.Size(255, 56);
             this.lblDataLength.TabIndex = 15;
-            // 
+            //
             // label9
             // 
             this.label9.AutoSize = true;
@@ -730,7 +730,7 @@ namespace DDV
             this.layoutSelector.Size = new System.Drawing.Size(161, 21);
             this.layoutSelector.TabIndex = 46;
             this.layoutSelector.SelectedIndexChanged += new System.EventHandler(this.layoutSelector_SelectedIndexChanged);
-            // 
+            //
             // txtBoxColumnWidth
             // 
             this.txtBoxColumnWidth.Enabled = false;
@@ -750,7 +750,7 @@ namespace DDV
             this.label16.Text = "Column Width";
             // 
             // groupBox2
-            // 
+            //
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.txtBoxFASTAStats);
             this.groupBox2.Controls.Add(this.label3);
@@ -765,9 +765,9 @@ namespace DDV
             this.groupBox2.TabIndex = 42;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
-            // 
+            //
             // label18
-            // 
+            //
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.Location = new System.Drawing.Point(47, 108);
@@ -775,15 +775,15 @@ namespace DDV
             this.label18.Size = new System.Drawing.Size(126, 13);
             this.label18.TabIndex = 48;
             this.label18.Text = "Nucleotides Per Row";
-            // 
+            //
             // txtBoxNucleotidesPerRow
-            // 
+            //
             this.txtBoxNucleotidesPerRow.Enabled = false;
             this.txtBoxNucleotidesPerRow.Location = new System.Drawing.Point(50, 123);
             this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
             this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
             this.txtBoxNucleotidesPerRow.TabIndex = 49;
-            // 
+            //
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1158,6 +1158,8 @@ namespace DDV
 
 
         public int columnWidthInNucleotides = 100;
+        public const int FULL_COLUMN_LAYOUT = 0;
+        public const int TILED_LAYOUT = 1;
         public int nucleotidesPerRow = 10000000;
 
 		public string T="0";
@@ -1420,20 +1422,22 @@ namespace DDV
             int iPaddingBetweenColumns = 4;
             int paddingBetweenRows = 40;
             int columnMaxLines = 1000;
-            int nColumnsPerTile = 100;
 
             int iColumnWidth = (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
-            int iNucleotidesPerColumn = columnWidthInNucleotides * y / intMagnification; //TODO: change y from pixels to nucleotides so that the user doesn't need intMagnification
+            int iNucleotidesPerColumn = columnWidthInNucleotides * y / intMagnification;
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
+            int nColumnsPerMegaRow = 100;
 
-            if (layoutSelector.SelectedIndex == 1)  // 1 is the Tiled option
+            if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
             {
                 iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
-                numColumns = Math.Min(nColumnsPerTile, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
+                nColumnsPerMegaRow = (int)Math.Ceiling((double)nucleotidesPerRow / iNucleotidesPerColumn);
+                numColumns = Math.Min(nColumnsPerMegaRow, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
                 x = (numColumns * iColumnWidth) - iPaddingBetweenColumns;
                 int numRows = (int)Math.Ceiling((double)total / (numColumns * iNucleotidesPerColumn));
                 y = (numRows * (columnMaxLines * intMagnification + paddingBetweenRows));
+                //TODO: use old y "Image Height" to determine when to start a new tile.
             }
 
             MessageBoxShow("iColumnWidth: " + iColumnWidth);
@@ -1541,7 +1545,7 @@ namespace DDV
                             read = ConvertToDigits(read);
 
                             //TODO: put these layouts in their own methods
-                            if (selectedIndex == 0)  // 0 is the Full Height Columns (Original) option
+                            if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
                             {
                                 //------------Classic Long column Layout--------------/
                                 for (int c = 0; c < read.Length; c++)
@@ -1573,7 +1577,7 @@ namespace DDV
                                     }
                                 }
                             }
-                            else if (selectedIndex == 1)  // 1 is the Tiled option
+                            else if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                             {
                                 //----------------------------New Tiled Layout style----------------------------------
                                 for (int c = 0; c < read.Length; c++)
@@ -1596,11 +1600,15 @@ namespace DDV
                                             columnNumberInTile++;
                                             lineNumberInColumn = 0;
 
-                                            if(columnNumberInTile >= nColumnsPerTile)
+                                            if(columnNumberInTile >= nColumnsPerMegaRow)
                                             { //start a new super row
                                                 columnNumberInTile = 0;
                                                 rowTop += columnMaxLines * intMagnification + paddingBetweenRows;
 
+                                                //if(rowTop > rowHeight * 10)
+                                                //every 10 rows makes a tile, which is a total of 100Mbp square area
+                                                //tiles stack horizontally
+                                                    //a level past this would be 3x3 super tiles made from 9 tiles each and stacked in sets of 3x3
                                             }
                                         }
                                     }
