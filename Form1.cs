@@ -50,8 +50,7 @@ namespace DDV
 		private System.Windows.Forms.OpenFileDialog fDlgSourceSequence;
         private Random RandomClass = new Random();
 		private System.Windows.Forms.Button btnBrowseSelectFASTA;
-		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Label lblDataLength;
 		private static string m_strSourceFile;
         private static string m_strSourceBitmapFile;
@@ -116,6 +115,9 @@ namespace DDV
         private Label label16;
         private ComboBox layoutSelector;
         private Label label17;
+        private GroupBox groupBox2;
+        private TextBox txtBoxNucleotidesPerRow;
+        private Label label18;
 
 
         protected const string _newline = "\r\n";
@@ -133,6 +135,7 @@ namespace DDV
             this.layoutSelector.DataSource = layoutStyles;
             this.layoutSelector.SelectedIndex = 0;
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
+            this.txtBoxNucleotidesPerRow.Text = nucleotidesPerRow.ToString();
 
             btnProcessBitmapDeepZoom.Enabled = false;
             checkEnvironment();
@@ -191,7 +194,6 @@ namespace DDV
             this.label8 = new System.Windows.Forms.Label();
             this.lblSourceBitmapFilename = new System.Windows.Forms.Label();
             this.lblDataLength = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -231,11 +233,14 @@ namespace DDV
             this.layoutSelector = new System.Windows.Forms.ComboBox();
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.txtBoxNucleotidesPerRow = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnBrowseSelectFASTA
@@ -258,13 +263,15 @@ namespace DDV
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.btnDownloadFASTA);
+            this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.txtGI);
             this.groupBox1.Controls.Add(this.lblSourceSequence);
             this.groupBox1.Controls.Add(this.btnBrowseSelectFASTA);
+            this.groupBox1.Controls.Add(this.btnReadSequenceProperties);
             this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(512, 178);
+            this.groupBox1.Size = new System.Drawing.Size(512, 224);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Gene Sequence Source File";
@@ -277,6 +284,7 @@ namespace DDV
             this.label15.Size = new System.Drawing.Size(78, 13);
             this.label15.TabIndex = 41;
             this.label15.Text = "Sequence File:";
+            this.label15.Visible = false;
             // 
             // label11
             // 
@@ -340,6 +348,7 @@ namespace DDV
             this.lblSourceSequence.Name = "lblSourceSequence";
             this.lblSourceSequence.Size = new System.Drawing.Size(370, 54);
             this.lblSourceSequence.TabIndex = 6;
+            this.lblSourceSequence.Visible = false;
             // 
             // label8
             // 
@@ -370,27 +379,6 @@ namespace DDV
             this.lblDataLength.Name = "lblDataLength";
             this.lblDataLength.Size = new System.Drawing.Size(255, 56);
             this.lblDataLength.TabIndex = 15;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.AutoSize = true;
-            this.groupBox2.Controls.Add(this.label9);
-            this.groupBox2.Controls.Add(this.label6);
-            this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.txtBoxFASTAStats);
-            this.groupBox2.Controls.Add(this.lblRefSeq);
-            this.groupBox2.Controls.Add(this.lblSequenceName);
-            this.groupBox2.Controls.Add(this.lblDataLength);
-            this.groupBox2.Location = new System.Drawing.Point(530, 211);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(466, 4802);
-            this.groupBox2.TabIndex = 16;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Sequence Properties";
             // 
             // label9
             // 
@@ -438,7 +426,7 @@ namespace DDV
             this.txtBoxFASTAStats.Location = new System.Drawing.Point(85, 193);
             this.txtBoxFASTAStats.Name = "txtBoxFASTAStats";
             this.txtBoxFASTAStats.ReadOnly = true;
-            this.txtBoxFASTAStats.Size = new System.Drawing.Size(360, 313);
+            this.txtBoxFASTAStats.Size = new System.Drawing.Size(365, 307);
             this.txtBoxFASTAStats.TabIndex = 35;
             this.txtBoxFASTAStats.Text = "";
             // 
@@ -462,7 +450,7 @@ namespace DDV
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(66, 431);
+            this.progressBar1.Location = new System.Drawing.Point(66, 560);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(458, 23);
             this.progressBar1.TabIndex = 21;
@@ -470,7 +458,7 @@ namespace DDV
             // lblProgressText
             // 
             this.lblProgressText.AutoSize = true;
-            this.lblProgressText.Location = new System.Drawing.Point(32, 460);
+            this.lblProgressText.Location = new System.Drawing.Point(32, 589);
             this.lblProgressText.Name = "lblProgressText";
             this.lblProgressText.Size = new System.Drawing.Size(28, 13);
             this.lblProgressText.TabIndex = 24;
@@ -478,7 +466,7 @@ namespace DDV
             // 
             // lblDNAViewer
             // 
-            this.lblDNAViewer.Location = new System.Drawing.Point(9, 431);
+            this.lblDNAViewer.Location = new System.Drawing.Point(9, 560);
             this.lblDNAViewer.Name = "lblDNAViewer";
             this.lblDNAViewer.Size = new System.Drawing.Size(51, 15);
             this.lblDNAViewer.TabIndex = 25;
@@ -488,10 +476,10 @@ namespace DDV
             // 
             this.resultLogTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.resultLogTextBox.Location = new System.Drawing.Point(66, 460);
+            this.resultLogTextBox.Location = new System.Drawing.Point(66, 589);
             this.resultLogTextBox.Name = "resultLogTextBox";
             this.resultLogTextBox.ReadOnly = true;
-            this.resultLogTextBox.Size = new System.Drawing.Size(458, 257);
+            this.resultLogTextBox.Size = new System.Drawing.Size(458, 128);
             this.resultLogTextBox.TabIndex = 29;
             this.resultLogTextBox.Text = "";
             this.resultLogTextBox.TextChanged += new System.EventHandler(this.resultLogTextBox_TextChanged);
@@ -562,7 +550,7 @@ namespace DDV
             // 
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(8, 134);
+            this.label14.Location = new System.Drawing.Point(8, 203);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(33, 25);
             this.label14.TabIndex = 43;
@@ -572,7 +560,7 @@ namespace DDV
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(8, 74);
+            this.label13.Location = new System.Drawing.Point(8, 29);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(33, 25);
             this.label13.TabIndex = 42;
@@ -582,7 +570,7 @@ namespace DDV
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(8, 16);
+            this.label12.Location = new System.Drawing.Point(8, 153);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(33, 25);
             this.label12.TabIndex = 41;
@@ -592,7 +580,7 @@ namespace DDV
             // 
             this.chckIncludeDensity.AutoSize = true;
             this.chckIncludeDensity.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chckIncludeDensity.Location = new System.Drawing.Point(231, 119);
+            this.chckIncludeDensity.Location = new System.Drawing.Point(323, 47);
             this.chckIncludeDensity.Name = "chckIncludeDensity";
             this.chckIncludeDensity.Size = new System.Drawing.Size(161, 17);
             this.chckIncludeDensity.TabIndex = 40;
@@ -603,7 +591,7 @@ namespace DDV
             // 
             this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
             this.btnReadSequenceProperties.Enabled = false;
-            this.btnReadSequenceProperties.Location = new System.Drawing.Point(47, 16);
+            this.btnReadSequenceProperties.Location = new System.Drawing.Point(47, 153);
             this.btnReadSequenceProperties.Name = "btnReadSequenceProperties";
             this.btnReadSequenceProperties.Size = new System.Drawing.Size(70, 52);
             this.btnReadSequenceProperties.TabIndex = 32;
@@ -615,7 +603,7 @@ namespace DDV
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(122, 148);
+            this.label2.Location = new System.Drawing.Point(47, 203);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(99, 13);
             this.label2.TabIndex = 32;
@@ -623,7 +611,7 @@ namespace DDV
             // 
             // textBoxTileSize
             // 
-            this.textBoxTileSize.Location = new System.Drawing.Point(125, 164);
+            this.textBoxTileSize.Location = new System.Drawing.Point(50, 219);
             this.textBoxTileSize.Name = "textBoxTileSize";
             this.textBoxTileSize.Size = new System.Drawing.Size(100, 20);
             this.textBoxTileSize.TabIndex = 31;
@@ -632,7 +620,7 @@ namespace DDV
             // 
             // txtBoxY
             // 
-            this.txtBoxY.Location = new System.Drawing.Point(125, 80);
+            this.txtBoxY.Location = new System.Drawing.Point(217, 45);
             this.txtBoxY.Name = "txtBoxY";
             this.txtBoxY.Size = new System.Drawing.Size(100, 20);
             this.txtBoxY.TabIndex = 30;
@@ -642,9 +630,9 @@ namespace DDV
             // btnProcessBitmapDeepZoom
             // 
             this.btnProcessBitmapDeepZoom.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnProcessBitmapDeepZoom.Location = new System.Drawing.Point(47, 134);
+            this.btnProcessBitmapDeepZoom.Location = new System.Drawing.Point(50, 245);
             this.btnProcessBitmapDeepZoom.Name = "btnProcessBitmapDeepZoom";
-            this.btnProcessBitmapDeepZoom.Size = new System.Drawing.Size(69, 64);
+            this.btnProcessBitmapDeepZoom.Size = new System.Drawing.Size(181, 30);
             this.btnProcessBitmapDeepZoom.TabIndex = 30;
             this.btnProcessBitmapDeepZoom.Text = "Process Image with Deep Zoom";
             this.btnProcessBitmapDeepZoom.UseVisualStyleBackColor = false;
@@ -654,7 +642,7 @@ namespace DDV
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(122, 64);
+            this.label1.Location = new System.Drawing.Point(214, 29);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 31;
@@ -664,9 +652,9 @@ namespace DDV
             // 
             this.btnGenerateImage.BackColor = System.Drawing.Color.LightSkyBlue;
             this.btnGenerateImage.Enabled = false;
-            this.btnGenerateImage.Location = new System.Drawing.Point(47, 74);
+            this.btnGenerateImage.Location = new System.Drawing.Point(47, 149);
             this.btnGenerateImage.Name = "btnGenerateImage";
-            this.btnGenerateImage.Size = new System.Drawing.Size(69, 54);
+            this.btnGenerateImage.Size = new System.Drawing.Size(184, 30);
             this.btnGenerateImage.TabIndex = 26;
             this.btnGenerateImage.Text = "Generate Image and Interface";
             this.btnGenerateImage.UseVisualStyleBackColor = false;
@@ -702,24 +690,24 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.txtBoxNucleotidesPerRow);
+            this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.layoutSelector);
             this.groupBox4.Controls.Add(this.txtBoxColumnWidth);
             this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.label14);
-            this.groupBox4.Controls.Add(this.label12);
             this.groupBox4.Controls.Add(this.chckIncludeDensity);
             this.groupBox4.Controls.Add(this.label2);
             this.groupBox4.Controls.Add(this.btnProcessBitmapDeepZoom);
             this.groupBox4.Controls.Add(this.textBoxTileSize);
-            this.groupBox4.Controls.Add(this.btnReadSequenceProperties);
             this.groupBox4.Controls.Add(this.label13);
             this.groupBox4.Controls.Add(this.btnGenerateImage);
             this.groupBox4.Controls.Add(this.txtBoxY);
             this.groupBox4.Controls.Add(this.label1);
-            this.groupBox4.Location = new System.Drawing.Point(12, 211);
+            this.groupBox4.Location = new System.Drawing.Point(12, 257);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(512, 217);
+            this.groupBox4.Size = new System.Drawing.Size(512, 297);
             this.groupBox4.TabIndex = 41;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
@@ -728,7 +716,7 @@ namespace DDV
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label17.Location = new System.Drawing.Point(228, 64);
+            this.label17.Location = new System.Drawing.Point(47, 29);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(45, 13);
             this.label17.TabIndex = 47;
@@ -737,14 +725,16 @@ namespace DDV
             // layoutSelector
             // 
             this.layoutSelector.FormattingEnabled = true;
-            this.layoutSelector.Location = new System.Drawing.Point(231, 80);
+            this.layoutSelector.Location = new System.Drawing.Point(50, 45);
             this.layoutSelector.Name = "layoutSelector";
             this.layoutSelector.Size = new System.Drawing.Size(161, 21);
             this.layoutSelector.TabIndex = 46;
+            this.layoutSelector.SelectedIndexChanged += new System.EventHandler(this.layoutSelector_SelectedIndexChanged);
             // 
             // txtBoxColumnWidth
             // 
-            this.txtBoxColumnWidth.Location = new System.Drawing.Point(125, 116);
+            this.txtBoxColumnWidth.Enabled = false;
+            this.txtBoxColumnWidth.Location = new System.Drawing.Point(50, 85);
             this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
             this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
             this.txtBoxColumnWidth.TabIndex = 45;
@@ -753,25 +743,60 @@ namespace DDV
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(122, 102);
+            this.label16.Location = new System.Drawing.Point(47, 69);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(85, 13);
             this.label16.TabIndex = 44;
             this.label16.Text = "Column Width";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.label9);
+            this.groupBox2.Controls.Add(this.txtBoxFASTAStats);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Controls.Add(this.lblDataLength);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.lblSequenceName);
+            this.groupBox2.Controls.Add(this.lblRefSeq);
+            this.groupBox2.Location = new System.Drawing.Point(530, 211);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(466, 506);
+            this.groupBox2.TabIndex = 42;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Sequence Properties";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(47, 108);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(126, 13);
+            this.label18.TabIndex = 48;
+            this.label18.Text = "Nucleotides Per Row";
+            // 
+            // txtBoxNucleotidesPerRow
+            // 
+            this.txtBoxNucleotidesPerRow.Enabled = false;
+            this.txtBoxNucleotidesPerRow.Location = new System.Drawing.Point(50, 123);
+            this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
+            this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
+            this.txtBoxNucleotidesPerRow.TabIndex = 49;
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.resultLogTextBox);
             this.Controls.Add(this.lblDNAViewer);
             this.Controls.Add(this.lblProgressText);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.resultLogTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
@@ -780,14 +805,14 @@ namespace DDV
             this.Text = "DNA Data Visualization Generator";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1133,6 +1158,7 @@ namespace DDV
 
 
         public int columnWidthInNucleotides = 100;
+        public int nucleotidesPerRow = 10000000;
 
 		public string T="0";
 		public string A="1";
@@ -1377,6 +1403,15 @@ namespace DDV
             catch (Exception)
             {
                 MessageBox.Show("Please put only numbers in Image height");
+            }
+
+            try
+            {
+                nucleotidesPerRow = Convert.ToInt32(txtBoxNucleotidesPerRow.Text);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Please put only numbers in Nucleotides Per Row");
             }
 
             //int x = (((total / y) / 60 * 2)) + (total / y) + 64 * 2;
@@ -2574,9 +2609,12 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
             txtBoxFASTAStats.Text = "";
             lblRefSeq.Text = "";
             progressBar1.Value = 0;
+            btnGenerateImage.Enabled = false;
+            btnProcessBitmapDeepZoom.Enabled = false;
 
-            btnGenerateImage.Enabled = true;
             btnReadSequenceProperties.Enabled = true;
+            label15.Visible = true;
+            lblSourceSequence.Visible = true;
         }
 
         private void BitmapClear()
@@ -2608,6 +2646,7 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 btnGenerateImage.Enabled = false;
                 MessageBoxShow("Cannot generate image from this FASTA file.");
             }
+            else btnGenerateImage.Enabled = true;
             // Set cursor as default arrow
             Cursor.Current = Cursors.Default;
         }
@@ -2865,6 +2904,20 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
         {
             resultLogTextBox.SelectionStart = resultLogTextBox.Text.Length;
             resultLogTextBox.ScrollToCaret();
+        }
+
+        private void layoutSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (layoutSelector.SelectedIndex == 0)  // 0 is Full Height Columns (Original)
+            {
+                txtBoxColumnWidth.Enabled = false;
+                txtBoxNucleotidesPerRow.Enabled = false;
+            }
+            else if (layoutSelector.SelectedIndex == 1)  // 1 is Tiled
+            {
+                txtBoxColumnWidth.Enabled = true;
+                txtBoxNucleotidesPerRow.Enabled = true;
+            }
         }
 	}
 }
