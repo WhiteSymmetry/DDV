@@ -647,7 +647,7 @@ namespace DDV
             this.btnProcessBitmapDeepZoom.TabIndex = 30;
             this.btnProcessBitmapDeepZoom.Text = "Process Image with Deep Zoom";
             this.btnProcessBitmapDeepZoom.UseVisualStyleBackColor = false;
-            this.btnProcessBitmapDeepZoom.Click += new System.EventHandler(this.button12_Click);
+            this.btnProcessBitmapDeepZoom.Click += new System.EventHandler(this.process_deep_zoom);
             // 
             // label1
             // 
@@ -1475,7 +1475,7 @@ namespace DDV
             }
 
             //int x = (((total / y) / 60 * 2)) + (total / y) + 64 * 2;
-            //int x = 100+((((total / (y/intMagnification)) / (iLineLength*intMagnification)) * 4) + (total / (y/intMagnification)) + ((iLineLength+4)*intMagnification)) * intMagnification;
+            //int x = 100+((((total / (y/intMagnification)) / (columnWidthInNucleotides*intMagnification)) * 4) + (total / (y/intMagnification)) + ((columnWidthInNucleotides+4)*intMagnification)) * intMagnification;
 
             int iPaddingBetweenColumns = 4;
             int paddingBetweenRows = 40;
@@ -1635,7 +1635,7 @@ namespace DDV
                                             counter++;
                                             end = true;
                                             //this would be an unexpected error, throw an exception
-                                            throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format, with 70 nucleotides per line. ");
+                                            throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format.");
                                         }
                                     }
                                 }
@@ -1779,28 +1779,23 @@ namespace DDV
 <html lang='en'>
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-<title>DNA Data Visualization : " + sequenceName +
-                @"</title>
+<title>DNA Data Visualization : " + sequenceName + @"</title>
 <script src='../../openseadragon.min.js' type='text/javascript'></script>
 <script type='text/javascript' src='../../jquery-1.7.min.js'></script>
 <script src='../../openseadragon-scalebar.js' type='text/javascript'></script>
 
 <script type='text/javascript'>
-	        var originalImageWidth= " + x + ";" +
-                @"
-            var originalImageHeight= " + y + ";" +
-                @"
+	        var originalImageWidth= " + x + @";
+            var originalImageHeight= " + y + @";
             var pixelSize = 2;
             var ColumnPadding = 4;
-            var iLineLength = 70;
-            var usa='refseq_fetch:" + refseq + "';" +
-                @"          
-            var ipTotal = " + ipTotal + ";" +
-                @"
-            var direct_data_file='sequence.fasta';" +
-                @"
-            var direct_data_file_length=" + direct_data_file_length + ";" +
-                @"
+            var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
+            var layoutSelector = " + layoutSelector.SelectedIndex + @";
+
+            var usa='refseq_fetch:" + refseq + @"';          
+            var ipTotal = " + ipTotal + @";
+            var direct_data_file='sequence.fasta';
+            var direct_data_file_length=" + direct_data_file_length + @";
             var sbegin='1';
             var send=ipTotal.toString(); 
             </script>
@@ -2046,7 +2041,7 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
         //Tile size default is 256, but user can change it using txtTileSize
         //After it is complete, it moves all of the files into proper subfolders
         //renames "embed.html" file to index.html
-        private void button12_Click(object sender, EventArgs e)
+        private void process_deep_zoom(object sender, EventArgs e)
         {
             // Set cursor as hourglass
             Cursor.Current = Cursors.WaitCursor;

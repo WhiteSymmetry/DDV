@@ -4,8 +4,8 @@
             var ColumnNumber = 0;
             var ColumnRemainder = "-";
             var PositionInColumn = "-";
-            var ColumnWidthNoPadding= iLineLength * pixelSize;
-            var iNucleotidesPerColumn = iLineLength * originalImageHeight / pixelSize;
+            var ColumnWidthNoPadding= columnWidthInNucleotides * pixelSize;
+            var iNucleotidesPerColumn = columnWidthInNucleotides * originalImageHeight / pixelSize;
             var ColumnWidth = ColumnPadding + ColumnWidthNoPadding;
             var originalAspectRatio = originalImageHeight/originalImageWidth;
             var Nucleotide = "-";
@@ -112,7 +112,7 @@
                 	ColumnRemainder = nucNumX % ColumnWidth;
                 	
                 	PositionInColumn = Math.floor(ColumnRemainder / pixelSize) + 1;
-                	NucleotideY = iLineLength * Math.floor(nucNumY/pixelSize);
+                	NucleotideY = columnWidthInNucleotides * Math.floor(nucNumY/pixelSize);
                 	
 									if ((ColumnRemainder <= ColumnWidth) && (ColumnRemainder >= ColumnWidthNoPadding )){
 										ColumnNumber = "-";
@@ -136,19 +136,19 @@
                 if (sequence_data_viewer_initialized){
                     var lineNumber="-";
                     if ($.isNumeric(Nucleotide)){
-                    	 lineNumber=Math.floor (Nucleotide  /iLineLength);
-                    	 remainder=Nucleotide % iLineLength;
+                    	 lineNumber=Math.floor (Nucleotide  /columnWidthInNucleotides);
+                    	 remainder=Nucleotide % columnWidthInNucleotides;
                     	 if (lineNumber>0){
                     	 	theSequence=theSequenceSplit[lineNumber-1]+theSequenceSplit[lineNumber]+theSequenceSplit[lineNumber+1];
-                    	 	tempTo=((lineNumber+2)*iLineLength);
+                    	 	tempTo=((lineNumber+2)*columnWidthInNucleotides);
                     	 	if (ipTotal < tempTo){tempTo=ipTotal;}
-                    	 	fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: ("+((lineNumber-1)*iLineLength+1)+" - "+tempTo+")";
+                    	 	fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: ("+((lineNumber-1)*columnWidthInNucleotides+1)+" - "+tempTo+")";
                     	 	mySequence.setSequence(theSequence,fragmentid);
-                    	 	mySequence.setSelection(remainder+iLineLength, remainder+iLineLength);
+                    	 	mySequence.setSelection(remainder+columnWidthInNucleotides, remainder+columnWidthInNucleotides);
                     		}
                     		else{
                     		theSequence=theSequenceSplit[lineNumber]+theSequenceSplit[lineNumber+1];
-                    		fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: "+((lineNumber)*iLineLength+1)+" - "+((lineNumber+2)*iLineLength)+")";
+                    		fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: "+((lineNumber)*columnWidthInNucleotides+1)+" - "+((lineNumber+2)*columnWidthInNucleotides)+")";
                     	 	mySequence.setSequence(theSequence,fragmentid);
                     		 mySequence.setSelection(remainder, remainder);
                     		}
@@ -313,13 +313,13 @@
 												  step_G += (item.match(/G/g) || []).length;
 													step_C += (item.match(/C/g) || []).length;
 													
-  											if (((index*iLineLength) > sbegin) && ((index*iLineLength) < send) && ((index*iLineLength) % gc_skew_window == 0)){
+  											if (((index*columnWidthInNucleotides) > sbegin) && ((index*columnWidthInNucleotides) < send) && ((index*columnWidthInNucleotides) % gc_skew_window == 0)){
   												
   												if ((step_G + step_C)==0){step_GC_skew=0;}
   												else {step_GC_skew = (step_G - step_C)/(step_G + step_C);}
   												step_G=0;
   												step_C=0;
-													return ({'x':(index*iLineLength),'y':step_GC_skew}); 
+													return ({'x':(index*columnWidthInNucleotides),'y':step_GC_skew}); 
 												}
 												else {
 													return null;
