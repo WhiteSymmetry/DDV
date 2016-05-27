@@ -87,7 +87,7 @@ namespace DDV
             {
                 destination += '/';
             }
-            destination += this.dest_folder;
+            destination += "dnadata/" + this.dest_folder;
 
             sshCp.To(this.interface_folder, destination, true);
 
