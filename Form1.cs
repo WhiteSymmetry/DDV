@@ -841,6 +841,7 @@ namespace DDV
             // btnUploadInterface
             // 
             this.btnUploadInterface.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnUploadInterface.Enabled = false;
             this.btnUploadInterface.Location = new System.Drawing.Point(11, 53);
             this.btnUploadInterface.Name = "btnUploadInterface";
             this.btnUploadInterface.Size = new System.Drawing.Size(151, 27);
