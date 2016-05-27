@@ -121,6 +121,24 @@ index_from_screen(x, y){
             return index_from_xy;
         }
 
+        /** Similar to position_on_screen(index) but it instead returns the largest x and y values that the layout will need from
+         * any index in between 0 and last_index.
+         */ 
+        public int[] max_dimensions(int last_index)
+        {
+            int[] xy = new int[] { 0, 0 };
+            for (int i = 0; i < this.levels.Count; ++i)
+            {
+                LayoutLevel level = this.levels[i];
+                int part = i % 2;
+                int coordinate_in_chunk = Math.Min((int)(Math.Ceiling( (double)last_index / level.chunk_size)), level.modulo);  //how many of these will you need up to a full modulo worth
+                if (coordinate_in_chunk > 1) { 
+                    xy[part] = Math.Max(xy[part], level.thickness * coordinate_in_chunk); // not cumulative, just take the max size for either x or y
+                }
+            }
+            return xy;
+        }
+
     }
 
 

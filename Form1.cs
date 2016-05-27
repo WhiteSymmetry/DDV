@@ -1478,27 +1478,17 @@ namespace DDV
             //int x = 100+((((total / (y/intMagnification)) / (columnWidthInNucleotides*intMagnification)) * 4) + (total / (y/intMagnification)) + ((columnWidthInNucleotides+4)*intMagnification)) * intMagnification;
 
             int iPaddingBetweenColumns = 4;
-            int paddingBetweenRows = 40;
-            int paddingBetweenTiles = 400;
-            int columnMaxLines = 1000;
 
             int iColumnWidth = (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
             int iNucleotidesPerColumn = columnWidthInNucleotides * y / intMagnification;
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
-            int nColumnsPerMegaRow = 100;
-            int rowsPerTile = 10;
 
             if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // New layout added by Josiah Seaman
-            { //TODO: refactor to use layers method
-                iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
-                nColumnsPerMegaRow = (int)Math.Round((double)nucleotidesPerRow / iNucleotidesPerColumn);
-                numColumns = Math.Min(nColumnsPerMegaRow, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
-                int numRows = (int)Math.Ceiling((double)total / (numColumns * iNucleotidesPerColumn));
-                y = (Math.Min(numRows, rowsPerTile) * (columnMaxLines * intMagnification + paddingBetweenRows));
-                int tileWidth = (numColumns * iColumnWidth) + paddingBetweenTiles;
-                x = tileWidth * (int)Math.Ceiling((double)numRows / rowsPerTile);// number of tiles needed
-                //TODO: use old y "Image Height" to determine when to start a new tile.
+            {
+                int[] xy = new DDVLayoutManager().max_dimensions(total); //xy point of last pixel, gives us the largest boundaries
+                x = xy[0];
+                y = xy[1];
             }
 
             MessageBoxShow("iColumnWidth: " + iColumnWidth);
@@ -1636,7 +1626,7 @@ namespace DDV
                                 //----------------------------New Tiled Layout style----------------------------------
                                 int[] xy = {0,0};
                                 for (int c = 0; c < read.Length; c++)
-                                {
+                                {                                    
                                     xy = tile_layout.position_on_screen(counter++);
                                     Write1BaseToBMPUncompressed4X(c, ref b, xy[0], xy[1], ref bmd);
                                 }
@@ -1670,9 +1660,10 @@ namespace DDV
                         strResultFileName = DDVseqID + ".png";
                     }
                 }
-                else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+                else if (outputNaming.SelectedIndex == 1 && txtBoxSequenceNameOverride.Text != "")  // 1 is Name naming
                 {
-                    strResultFileName = sequenceName + ".png";  //txtBoxSequenceNameOverride.Text
+                    sequenceName = txtBoxSequenceNameOverride.Text;
+                    strResultFileName = sequenceName + ".png";  
                 }
 
                 //if file exists, delete
