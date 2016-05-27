@@ -1742,10 +1742,12 @@ namespace DDV
 <script type='text/javascript'>
 	        var originalImageWidth= " + x + @";
             var originalImageHeight= " + y + @";
-            var pixelSize = 2;
-            var ColumnPadding = 4;
+            var pixelSize = " + intMagnification + @";
+            var ColumnPadding = " + iPaddingBetweenColumns + @";
             var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
+            var layout_levels = " + new DDVLayoutManager().toString() + @";
+            console.log(layout_levels);
 
             var usa='refseq_fetch:" + refseq + @"';          
             var ipTotal = " + ipTotal + @";

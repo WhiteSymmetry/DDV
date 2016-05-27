@@ -30,7 +30,7 @@
 								    });
 								viewer.scalebar({
 		                type: OpenSeadragon.ScalebarType.MAP,
-		                pixelsPerMeter:2,
+		                pixelsPerMeter:    pixelSize,
 		                minWidth: "70px",
 		                location: OpenSeadragon.ScalebarLocation.BOTTOM_LEFT,
 		                xOffset: 5,

@@ -89,16 +89,16 @@ index_from_screen(x, y){
         public DDVLayoutManager()
         {
             levels = new List<LayoutLevel>();
-            /**  name       modulo size    padding  thickness (derived)
-                ---------    ----  -----   -------   ----------------
-                XInColumn    100  1        0           1
-                LineInColumn 1000 100nt    0           1
-                ColumnInRow  100  100KB    4           104    100 * 1 + 4
-                RowInTile    10   10MB     40          1040   1000 * 1 + 40
-                XInTile      3    100MB    400         10800  (100 * 104) + 400
-                YInTile      4    300MB    1600        12000  (10*1040) + 1600
-                TileColumn   9    1.2GB    6400        38800  (3 * 10800) + 6400
-                TileRow      inf  10.8GB   25600       73600  (4 * 12000) + 25600
+            /**  name       modulo size    padding and thickness are derived
+                ---------    ----  -----
+                XInColumn    100  1
+                LineInColumn 1000 100nt
+                ColumnInRow  100  100KB
+                RowInTile    10   10MB
+                XInTile      3    100MB
+                YInTile      4    300MB
+                TileColumn   9    1.2GB
+                TileRow      inf  10.8GB
              */
             levels.Add(new LayoutLevel("XInColumn",    100, 1, 0, 1));
             levels.Add(new LayoutLevel("LineInColumn", 1000, 100, 0, 1));
@@ -154,6 +154,18 @@ index_from_screen(x, y){
                 }
             }
             return xy;
+        }
+
+        public string toString()
+        {
+            string json = "[";
+            foreach( LayoutLevel level in this.levels)
+            {
+                json += "{" + "modulo: " + level.modulo + ", chunk_size:" + level.chunk_size + ", padding: " + level.padding + ", thickness: " + level.thickness + "},";
+            }
+            json = json.Substring(0, json.Length - 1) + "]";  // no last comma
+                            
+            return json;
         }
 
     }
