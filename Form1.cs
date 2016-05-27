@@ -1432,7 +1432,7 @@ namespace DDV
             progressBar1.Value = 0;
             progressBar1.Update();
             progressBar1.Refresh();
-            int counter = 0;
+            long counter = 0;
             if (m_strSourceFile == "") { MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file"+m_strSourceFile+". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             FileInfo TheFile = new FileInfo(m_strSourceFile);

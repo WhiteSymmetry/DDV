@@ -85,8 +85,8 @@ index_from_screen(x, y){
                 RowInTile    10   10MB     40          1040   1000 * 1 + 40
                 XInTile      3    100MB    400         10800  (100 * 104) + 400
                 YInTile      4    300MB    1600        12000  (10*1040) + 1600
-                TileColumn   4    1200MB   6400        38800  (3 * 10800) + 6400
-                TileRow      3    4800MB   25600       73600  (4 * 12000) + 25600
+                TileColumn   9    1.2GB    6400        38800  (3 * 10800) + 6400
+                TileRow      inf  10.8GB   25600       73600  (4 * 12000) + 25600
              */
             levels.Add(new LayoutLevel("XInColumn", 100, 1, 0, 1));
             levels.Add(new LayoutLevel("LineInColumn", 1000, 100, 0, 1));
@@ -94,8 +94,8 @@ index_from_screen(x, y){
             levels.Add(new LayoutLevel("RowInTile", 10, 10000000, 40, 1040));
             levels.Add(new LayoutLevel("XInTile", 3, 100000000, 400, 10800));
             levels.Add(new LayoutLevel("YInTile", 4, 300000000, 1600, 12000));
-            levels.Add(new LayoutLevel("TileColumn", 4, 1200000000, 6400, 38800));
-            levels.Add(new LayoutLevel("TileRow", 3, 4800000000, 25600, 73600));
+            levels.Add(new LayoutLevel("TileColumn", 9, 1200000000, 6400, 38800));
+            levels.Add(new LayoutLevel("TileRow", 999, 10800000000, 25600, 73600));
         }
 
         public int[] position_on_screen(long index)
