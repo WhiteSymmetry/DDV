@@ -59,8 +59,9 @@ index_from_screen(x, y){
     /** Simple POD object for Levels table **/
     class LayoutLevel
     {
-        public int modulo, chunk_size, padding, thickness;
-        public LayoutLevel(string name, int modulo, int chunk_size, int padding, int thickness)
+        public int modulo, padding, thickness;
+        public long chunk_size;
+        public LayoutLevel(string name, int modulo, long chunk_size, int padding, int thickness)
         {
             this.modulo = modulo;
             this.chunk_size = chunk_size;
@@ -82,33 +83,37 @@ index_from_screen(x, y){
                 LineInColumn 1000 100nt    0           1
                 ColumnInRow  100  100KB    4           104    100 * 1 + 4
                 RowInTile    10   10MB     40          1040   1000 * 1 + 40
-                Tile X       3    300MB    400         10800  (100 * 104) + 400
-                Tile Y       4    1200MB   1600        12000   (10*1040) + 1600
+                XInTile      3    100MB    400         10800  (100 * 104) + 400
+                YInTile      4    300MB    1600        12000  (10*1040) + 1600
+                TileColumn   4    1200MB   6400        38800  (3 * 10800) + 6400
+                TileRow      3    4800MB   25600       73600  (4 * 12000) + 25600
              */
             levels.Add(new LayoutLevel("XInColumn", 100, 1, 0, 1));
             levels.Add(new LayoutLevel("LineInColumn", 1000, 100, 0, 1));
             levels.Add(new LayoutLevel("ColumnInRow", 100, 100000, 4, 104));
             levels.Add(new LayoutLevel("RowInTile", 10, 10000000, 40, 1040));
-            levels.Add(new LayoutLevel("Tile X", 3, 300000000, 400, 10800 ));
-            levels.Add(new LayoutLevel("Tile Y", 4, 1200000000, 1600, 12000));
+            levels.Add(new LayoutLevel("XInTile", 3, 100000000, 400, 10800));
+            levels.Add(new LayoutLevel("YInTile", 4, 300000000, 1600, 12000));
+            levels.Add(new LayoutLevel("TileColumn", 4, 1200000000, 6400, 38800));
+            levels.Add(new LayoutLevel("TileRow", 3, 4800000000, 25600, 73600));
         }
 
-        public int[] position_on_screen(int index)
+        public int[] position_on_screen(long index)
         {
 	        int[] xy = new int[]{0, 0};
 	        for (int i = 0; i < this.levels.Count; ++i)
             {
                 LayoutLevel level = this.levels[i];
 		        int part = i % 2;
-                int coordinate_in_chunk = (int)(index / level.chunk_size) % level.modulo;
+                int coordinate_in_chunk = ((int)(index / level.chunk_size)) % level.modulo;
 		        xy[part] += level.thickness * coordinate_in_chunk;
             }
             return xy;
         }
 
-        public int index_from_screen(int x, int y)
+        public long index_from_screen(int x, int y)
         {
-	        int index_from_xy = 0;
+	        long index_from_xy = 0;
 	        int[] xy_remaining = {x, y}; 
 	        for (int i = this.levels.Count-1; i >= 0; --i) //reverse
             {
@@ -124,14 +129,14 @@ index_from_screen(x, y){
         /** Similar to position_on_screen(index) but it instead returns the largest x and y values that the layout will need from
          * any index in between 0 and last_index.
          */ 
-        public int[] max_dimensions(int last_index)
+        public int[] max_dimensions(long last_index)
         {
             int[] xy = new int[] { 0, 0 };
             for (int i = 0; i < this.levels.Count; ++i)
             {
                 LayoutLevel level = this.levels[i];
                 int part = i % 2;
-                int coordinate_in_chunk = Math.Min((int)(Math.Ceiling( (double)last_index / level.chunk_size)), level.modulo);  //how many of these will you need up to a full modulo worth
+                int coordinate_in_chunk = Math.Min((int)(Math.Ceiling(last_index / (double)level.chunk_size)), level.modulo);  //how many of these will you need up to a full modulo worth
                 if (coordinate_in_chunk > 1) { 
                     xy[part] = Math.Max(xy[part], level.thickness * coordinate_in_chunk); // not cumulative, just take the max size for either x or y
                 }
