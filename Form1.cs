@@ -3067,8 +3067,8 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
             {
                 if (gi != "") 
                 { 
-                    strDestination = m_strFinalDestinationFolder + "dnadata\\" + gi;
-                    folder = gi;
+                    strDestination = m_strFinalDestinationFolder + "dnadata\\nuccore" + gi;
+                    folder = "nuccore" + gi;
                 }
                 else 
                 { 
