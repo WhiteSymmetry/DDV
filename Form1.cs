@@ -137,10 +137,10 @@ namespace DDV
 
             // Modify ui element attributes after initialization
             this.layoutSelector.DataSource = layoutStyles;
-            this.layoutSelector.SelectedIndex = FULL_COLUMN_LAYOUT;
+            this.layoutSelector.SelectedIndex = TILED_LAYOUT;
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
             this.txtBoxNucleotidesPerRow.Text = nucleotidesPerRow.ToString();
-            this.outputNaming.SelectedIndex = 0;
+            this.outputNaming.SelectedIndex = 1;
 
             btnProcessBitmapDeepZoom.Enabled = false;
             checkEnvironment();
@@ -1495,16 +1495,6 @@ namespace DDV
             MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
             MessageBoxShow("numColumns: " + numColumns);
             MessageBoxShow("x: " + x);
-
-            if ((x > Math.Pow(2, 16)))
-            {
-                throw new System.Exception("Width of image (x) would be greater than 65536 (2^16). \n Try setting a larger Image height for this data so that the image width becomes smaller.");
-            }
-            if ((y > Math.Pow(2, 16)))
-            {
-                throw new System.Exception("Image height is set to be greater than the maximum 65536 (2^16). Try setting a smaller height for this data and try again.");
-        
-            }
 
 
             // Bitmap B = new Bitmap(x, y);

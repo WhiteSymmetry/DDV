@@ -9,13 +9,15 @@ namespace DDV
 *   right manner using the following numbers:
      
  name       modulo size    padding  thickness (derived)
----------    ----  -----   -------   ----------------
-XInColumn    100  1        0           1
-LineInColumn 1000 100nt    0           1
-ColumnInRow  100  100KB    4           104    100 * 1 + 4
-RowInTile    10   10MB     40          1040   1000 * 1 + 40
-Tile X       3    300MB    400         10800  (100 * 104) + 400
-Tile Y       4    1200MB   1600        12000   (10*1040) + 1600
+---------   -----  -----   -------   ----------------
+XInColumn    100   1        0           1
+LineInColumn 1000  100nt    0           1
+ColumnInRow  100   100KB    4           104    100 * 1 + 4
+RowInTile    10    10MB     40          1040   1000 * 1 + 40
+XInTile      3     100MB    400         10800  (100 * 104) + 400
+YInTile      4     300MB    1600        12000  (10*1040) + 1600
+TileColumn   9     1.2GB    6400        38800  (3 * 10800) + 6400
+TileRow      inf   10.8GB   25600       73600  (4 * 12000) + 25600
 
 
 Example Problem:  Index: 751,270,123
@@ -68,6 +70,16 @@ index_from_screen(x, y){
             this.padding = padding;
             this.thickness = thickness;
         }
+
+        public LayoutLevel(string name, int modulo, List<LayoutLevel> levels)
+        {
+            this.modulo = modulo;
+            LayoutLevel child = levels[levels.Count - 1];
+            this.chunk_size =  child.modulo * child.chunk_size;
+            this.padding = 6 * (int)Math.Pow(3, levels.Count - 2); // third level (count=2) should be 6, then 18
+            LayoutLevel lastParallel = levels[levels.Count - 2];
+            this.thickness = lastParallel.modulo * lastParallel.thickness + padding;
+        }
     }
 
 
@@ -88,14 +100,14 @@ index_from_screen(x, y){
                 TileColumn   9    1.2GB    6400        38800  (3 * 10800) + 6400
                 TileRow      inf  10.8GB   25600       73600  (4 * 12000) + 25600
              */
-            levels.Add(new LayoutLevel("XInColumn", 100, 1, 0, 1));
+            levels.Add(new LayoutLevel("XInColumn",    100, 1, 0, 1));
             levels.Add(new LayoutLevel("LineInColumn", 1000, 100, 0, 1));
-            levels.Add(new LayoutLevel("ColumnInRow", 100, 100000, 4, 104));
-            levels.Add(new LayoutLevel("RowInTile", 10, 10000000, 40, 1040));
-            levels.Add(new LayoutLevel("XInTile", 3, 100000000, 400, 10800));
-            levels.Add(new LayoutLevel("YInTile", 4, 300000000, 1600, 12000));
-            levels.Add(new LayoutLevel("TileColumn", 9, 1200000000, 6400, 38800));
-            levels.Add(new LayoutLevel("TileRow", 999, 10800000000, 25600, 73600));
+            levels.Add(new LayoutLevel("ColumnInRow",  100, levels));
+            levels.Add(new LayoutLevel("RowInTile",    10,  levels));
+            levels.Add(new LayoutLevel("XInTile",      3,   levels));
+            levels.Add(new LayoutLevel("YInTile",      4,   levels));
+            levels.Add(new LayoutLevel("TileColumn",   9,   levels));
+            levels.Add(new LayoutLevel("TileRow",      999, levels));
         }
 
         public int[] position_on_screen(long index)
