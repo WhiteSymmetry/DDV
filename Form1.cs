@@ -1199,9 +1199,9 @@ namespace DDV
 
             
             UnsafeSetPixel(x, y, bytePaletteIndex, ref bmd);
-            UnsafeSetPixel(x, y+1, bytePaletteIndex, ref bmd);
-            UnsafeSetPixel(x+1, y+1, bytePaletteIndex, ref bmd);
-            UnsafeSetPixel(x+1, y, bytePaletteIndex, ref bmd);
+            //UnsafeSetPixel(x, y+1, bytePaletteIndex, ref bmd);
+            //UnsafeSetPixel(x+1, y+1, bytePaletteIndex, ref bmd);
+            //UnsafeSetPixel(x+1, y, bytePaletteIndex, ref bmd);
 
         }
 
@@ -1419,7 +1419,7 @@ namespace DDV
             EndOfSequence = "";
 
             string strFastaStats = "";
-            int intMagnification = 2;
+            int intMagnification = 1;
 
             iT = 0; iA = 0; iG = 0; iC = 0; iR = 0; iY = 0; iS = 0; iW = 0; iK = 0; iM = 0; iB = 0;
             iD = 0; iH = 0; iV = 0; iN = 0;
@@ -1489,8 +1489,8 @@ namespace DDV
             int nColumnsPerMegaRow = 100;
             int rowsPerTile = 10;
 
-            if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
-            {
+            if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // New layout added by Josiah Seaman
+            { //TODO: refactor to use layers method
                 iNucleotidesPerColumn = columnWidthInNucleotides * columnMaxLines;
                 nColumnsPerMegaRow = (int)Math.Round((double)nucleotidesPerRow / iNucleotidesPerColumn);
                 numColumns = Math.Min(nColumnsPerMegaRow, (int)Math.Ceiling((double)total / iNucleotidesPerColumn));
@@ -1570,16 +1570,7 @@ namespace DDV
                 int lineBeginning = x_pointer;
                 int progress = 0;
 
-                //---Variables only used by Tiled Layout---
-                //int columnMaxLines = 1000;
-                int lineNumberInColumn = 0;
-                //int nColumnsPerTile = 100;
-                int columnNumberInTile = 0;
-                int rowNumber = 0; //the y value of the top of each super row
-                int rowHeight = (columnMaxLines * intMagnification + paddingBetweenRows);
-                int tileNumber = 0;
-
-
+                DDVLayoutManager tile_layout = new DDVLayoutManager();
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
 
                 progress = progress + 1;
@@ -1643,43 +1634,11 @@ namespace DDV
                             else if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                             {
                                 //----------------------------New Tiled Layout style----------------------------------
+                                int[] xy = {0,0};
                                 for (int c = 0; c < read.Length; c++)
                                 {
-                                    int tileBeginning = tileNumber * (nColumnsPerMegaRow * iColumnWidth + paddingBetweenTiles);
-                                    lineBeginning = columnNumberInTile * iColumnWidth + tileBeginning;
-                                    Write1BaseToBMPUncompressed4X(c, ref b,
-                                        lineBeginning + nucleotidesInThisLine * intMagnification, //x
-                                        rowNumber * rowHeight + lineNumberInColumn * intMagnification, //y
-                                        ref bmd);
-
-                                    nucleotidesInThisLine += 1;
-
-                                    if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
-                                    {
-                                        nucleotidesInThisLine = 0;
-                                        lineNumberInColumn++;
-
-                                        if(lineNumberInColumn >= columnMaxLines)
-                                        { //increment to the next column
-                                            columnNumberInTile++;
-                                            lineNumberInColumn = 0;
-
-                                            if(columnNumberInTile >= nColumnsPerMegaRow)
-                                            { //start a new super row
-                                                columnNumberInTile = 0;
-                                                rowNumber++;
-
-                                                //if((rowNumber +1)* rowHeight > imageHeight) //not enough room left in image
-                                                if (rowNumber >= rowsPerTile)
-                                                {//every 10 rows makes a tile, which is a total of 100Mbp square area
-                                                    rowNumber = 0;
-                                                    tileNumber++;
-                                                    //tiles stack horizontally
-                                                        //a level past this would be 3x3 super tiles made from 9 tiles each and stacked in sets of 3x3
-                                                }
-                                            }
-                                        }
-                                    }
+                                    xy = tile_layout.position_on_screen(counter++);
+                                    Write1BaseToBMPUncompressed4X(c, ref b, xy[0], xy[1], ref bmd);
                                 }
                             }
                         }
@@ -1713,7 +1672,7 @@ namespace DDV
                 }
                 else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
                 {
-                    strResultFileName = sequenceName + ".png";
+                    strResultFileName = sequenceName + ".png";  //txtBoxSequenceNameOverride.Text
                 }
 
                 //if file exists, delete
