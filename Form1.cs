@@ -1735,7 +1735,7 @@ namespace DDV
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 <title>DNA Data Visualization : " + sequenceName + @"</title>
-<script src='../../openseadragon.min.js' type='text/javascript'></script>
+<script src='../../openseadragon.js' type='text/javascript'></script>
 <script type='text/javascript' src='../../jquery-1.7.min.js'></script>
 <script src='../../openseadragon-scalebar.js' type='text/javascript'></script>
 
@@ -2206,6 +2206,24 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.min.js"; ;
                 strDestination = finalDestinationPath + "openseadragon.min.js";
+                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
+                CopyFileWithReplaceIfNewer(strSource, strDestination);
+                progressBar1.Value += 1;
+                progressBar1.Update();
+                progressBar1.Refresh();
+
+                //copy shared files into output folder
+                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.js"; ;
+                strDestination = finalDestinationPath + "openseadragon.js";
+                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
+                CopyFileWithReplaceIfNewer(strSource, strDestination);
+                progressBar1.Value += 1;
+                progressBar1.Update();
+                progressBar1.Refresh();
+
+                //copy shared files into output folder
+                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.js.map"; ;
+                strDestination = finalDestinationPath + "openseadragon.js.map";
                 MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
                 CopyFileWithReplaceIfNewer(strSource, strDestination);
                 progressBar1.Value += 1;
