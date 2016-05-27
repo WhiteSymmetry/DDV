@@ -122,6 +122,7 @@ namespace DDV
         private TextBox txtBoxSequenceNameOverride;
         private ComboBox outputNaming;
         private Label label19;
+        private Button btnUploadInterface;
 
 
         protected const string _newline = "\r\n";
@@ -188,14 +189,18 @@ namespace DDV
             this.fDlgSourceSequence = new System.Windows.Forms.OpenFileDialog();
             this.btnBrowseSelectFASTA = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.txtBoxSequenceNameOverride = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.btnDownloadFASTA = new System.Windows.Forms.Button();
+            this.label12 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.txtGI = new System.Windows.Forms.TextBox();
             this.lblSourceSequence = new System.Windows.Forms.Label();
+            this.btnReadSequenceProperties = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.lblSourceBitmapFilename = new System.Windows.Forms.Label();
             this.lblDataLength = new System.Windows.Forms.Label();
@@ -219,9 +224,7 @@ namespace DDV
             this.lblOutputPath = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
             this.chckIncludeDensity = new System.Windows.Forms.CheckBox();
-            this.btnReadSequenceProperties = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxTileSize = new System.Windows.Forms.TextBox();
             this.txtBoxY = new System.Windows.Forms.TextBox();
@@ -234,17 +237,16 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.outputNaming = new System.Windows.Forms.ComboBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txtBoxNucleotidesPerRow = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.layoutSelector = new System.Windows.Forms.ComboBox();
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.txtBoxNucleotidesPerRow = new System.Windows.Forms.TextBox();
-            this.label19 = new System.Windows.Forms.Label();
-            this.outputNaming = new System.Windows.Forms.ComboBox();
-            this.txtBoxSequenceNameOverride = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
+            this.btnUploadInterface = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -287,6 +289,23 @@ namespace DDV
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Gene Sequence Source File";
             // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(47, 153);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(152, 13);
+            this.label20.TabIndex = 43;
+            this.label20.Text = "Sequence Name Override";
+            // 
+            // txtBoxSequenceNameOverride
+            // 
+            this.txtBoxSequenceNameOverride.Location = new System.Drawing.Point(50, 169);
+            this.txtBoxSequenceNameOverride.Name = "txtBoxSequenceNameOverride";
+            this.txtBoxSequenceNameOverride.Size = new System.Drawing.Size(277, 20);
+            this.txtBoxSequenceNameOverride.TabIndex = 42;
+            // 
             // label15
             // 
             this.label15.AutoSize = true;
@@ -296,7 +315,7 @@ namespace DDV
             this.label15.TabIndex = 41;
             this.label15.Text = "Sequence File:";
             this.label15.Visible = false;
-            //
+            // 
             // label11
             // 
             this.label11.AutoSize = true;
@@ -337,6 +356,16 @@ namespace DDV
             this.btnDownloadFASTA.UseVisualStyleBackColor = false;
             this.btnDownloadFASTA.Click += new System.EventHandler(this.button13_Click);
             // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(8, 153);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(33, 25);
+            this.label12.TabIndex = 41;
+            this.label12.Text = "2)";
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -360,11 +389,23 @@ namespace DDV
             this.lblSourceSequence.Size = new System.Drawing.Size(370, 54);
             this.lblSourceSequence.TabIndex = 6;
             this.lblSourceSequence.Visible = false;
-            //
+            // 
+            // btnReadSequenceProperties
+            // 
+            this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnReadSequenceProperties.Enabled = false;
+            this.btnReadSequenceProperties.Location = new System.Drawing.Point(333, 163);
+            this.btnReadSequenceProperties.Name = "btnReadSequenceProperties";
+            this.btnReadSequenceProperties.Size = new System.Drawing.Size(151, 30);
+            this.btnReadSequenceProperties.TabIndex = 32;
+            this.btnReadSequenceProperties.Text = "Read Sequence Properties";
+            this.btnReadSequenceProperties.UseVisualStyleBackColor = false;
+            this.btnReadSequenceProperties.Click += new System.EventHandler(this.button1_Click);
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(8, 102);
+            this.label8.Location = new System.Drawing.Point(18, 132);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(55, 13);
             this.label8.TabIndex = 39;
@@ -376,9 +417,9 @@ namespace DDV
             // 
             this.lblSourceBitmapFilename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblSourceBitmapFilename.Location = new System.Drawing.Point(69, 102);
+            this.lblSourceBitmapFilename.Location = new System.Drawing.Point(79, 132);
             this.lblSourceBitmapFilename.Name = "lblSourceBitmapFilename";
-            this.lblSourceBitmapFilename.Size = new System.Drawing.Size(381, 54);
+            this.lblSourceBitmapFilename.Size = new System.Drawing.Size(381, 43);
             this.lblSourceBitmapFilename.TabIndex = 38;
             this.lblSourceBitmapFilename.Visible = false;
             // 
@@ -390,7 +431,7 @@ namespace DDV
             this.lblDataLength.Name = "lblDataLength";
             this.lblDataLength.Size = new System.Drawing.Size(255, 56);
             this.lblDataLength.TabIndex = 15;
-            //
+            // 
             // label9
             // 
             this.label9.AutoSize = true;
@@ -498,7 +539,7 @@ namespace DDV
             // btnFinalDestinationFolder
             // 
             this.btnFinalDestinationFolder.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnFinalDestinationFolder.Location = new System.Drawing.Point(11, 50);
+            this.btnFinalDestinationFolder.Location = new System.Drawing.Point(11, 86);
             this.btnFinalDestinationFolder.Name = "btnFinalDestinationFolder";
             this.btnFinalDestinationFolder.Size = new System.Drawing.Size(122, 27);
             this.btnFinalDestinationFolder.TabIndex = 32;
@@ -510,6 +551,7 @@ namespace DDV
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.btnUploadInterface);
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this.lblSourceBitmapFilename);
             this.groupBox3.Controls.Add(this.lnkLatestInterface);
@@ -530,10 +572,10 @@ namespace DDV
             this.lnkLatestInterface.Location = new System.Drawing.Point(213, 19);
             this.lnkLatestInterface.MaximumSize = new System.Drawing.Size(245, 25);
             this.lnkLatestInterface.Name = "lnkLatestInterface";
-            this.lnkLatestInterface.Size = new System.Drawing.Size(80, 13);
+            this.lnkLatestInterface.Size = new System.Drawing.Size(110, 13);
             this.lnkLatestInterface.TabIndex = 42;
             this.lnkLatestInterface.TabStop = true;
-            this.lnkLatestInterface.Text = "Latest interface";
+            this.lnkLatestInterface.Text = "Open Latest Interface";
             this.lnkLatestInterface.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkLatestInterface_LinkClicked);
             // 
             // btnGeneratedIntefaces
@@ -552,9 +594,9 @@ namespace DDV
             // 
             this.lblOutputPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblOutputPath.Location = new System.Drawing.Point(139, 50);
+            this.lblOutputPath.Location = new System.Drawing.Point(139, 83);
             this.lblOutputPath.Name = "lblOutputPath";
-            this.lblOutputPath.Size = new System.Drawing.Size(311, 49);
+            this.lblOutputPath.Size = new System.Drawing.Size(321, 49);
             this.lblOutputPath.TabIndex = 40;
             // 
             // label14
@@ -577,16 +619,6 @@ namespace DDV
             this.label13.TabIndex = 42;
             this.label13.Text = "3)";
             // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(8, 153);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(33, 25);
-            this.label12.TabIndex = 41;
-            this.label12.Text = "2)";
-            // 
             // chckIncludeDensity
             // 
             this.chckIncludeDensity.AutoSize = true;
@@ -597,18 +629,6 @@ namespace DDV
             this.chckIncludeDensity.TabIndex = 40;
             this.chckIncludeDensity.Text = "Include Density Service";
             this.chckIncludeDensity.UseVisualStyleBackColor = true;
-            // 
-            // btnReadSequenceProperties
-            // 
-            this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnReadSequenceProperties.Enabled = false;
-            this.btnReadSequenceProperties.Location = new System.Drawing.Point(333, 163);
-            this.btnReadSequenceProperties.Name = "btnReadSequenceProperties";
-            this.btnReadSequenceProperties.Size = new System.Drawing.Size(151, 30);
-            this.btnReadSequenceProperties.TabIndex = 32;
-            this.btnReadSequenceProperties.Text = "Read Sequence Properties";
-            this.btnReadSequenceProperties.UseVisualStyleBackColor = false;
-            this.btnReadSequenceProperties.Click += new System.EventHandler(this.button1_Click);
             // 
             // label2
             // 
@@ -725,6 +745,45 @@ namespace DDV
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
             // 
+            // outputNaming
+            // 
+            this.outputNaming.FormattingEnabled = true;
+            this.outputNaming.Items.AddRange(new object[] {
+            "GI",
+            "Name"});
+            this.outputNaming.Location = new System.Drawing.Point(50, 162);
+            this.outputNaming.Name = "outputNaming";
+            this.outputNaming.Size = new System.Drawing.Size(121, 21);
+            this.outputNaming.TabIndex = 51;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(47, 146);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(91, 13);
+            this.label19.TabIndex = 50;
+            this.label19.Text = "Output Naming";
+            // 
+            // txtBoxNucleotidesPerRow
+            // 
+            this.txtBoxNucleotidesPerRow.Enabled = false;
+            this.txtBoxNucleotidesPerRow.Location = new System.Drawing.Point(50, 123);
+            this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
+            this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
+            this.txtBoxNucleotidesPerRow.TabIndex = 49;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(47, 108);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(126, 13);
+            this.label18.TabIndex = 48;
+            this.label18.Text = "Nucleotides Per Row";
+            // 
             // label17
             // 
             this.label17.AutoSize = true;
@@ -743,7 +802,7 @@ namespace DDV
             this.layoutSelector.Size = new System.Drawing.Size(161, 21);
             this.layoutSelector.TabIndex = 46;
             this.layoutSelector.SelectedIndexChanged += new System.EventHandler(this.layoutSelector_SelectedIndexChanged);
-            //
+            // 
             // txtBoxColumnWidth
             // 
             this.txtBoxColumnWidth.Enabled = false;
@@ -763,7 +822,7 @@ namespace DDV
             this.label16.Text = "Column Width";
             // 
             // groupBox2
-            //
+            // 
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.txtBoxFASTAStats);
             this.groupBox2.Controls.Add(this.label3);
@@ -778,63 +837,19 @@ namespace DDV
             this.groupBox2.TabIndex = 42;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
-            //
-            // label18
-            //
-            this.label18.AutoSize = true;
-            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(47, 108);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(126, 13);
-            this.label18.TabIndex = 48;
-            this.label18.Text = "Nucleotides Per Row";
-            //
-            // txtBoxNucleotidesPerRow
-            //
-            this.txtBoxNucleotidesPerRow.Enabled = false;
-            this.txtBoxNucleotidesPerRow.Location = new System.Drawing.Point(50, 123);
-            this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
-            this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
-            this.txtBoxNucleotidesPerRow.TabIndex = 49;
-            //
-            // label19
-            //
-            this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(47, 146);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(91, 13);
-            this.label19.TabIndex = 50;
-            this.label19.Text = "Output Naming";
-            //
-            // outputNaming
-            //
-            this.outputNaming.FormattingEnabled = true;
-            this.outputNaming.Items.AddRange(new object[] {
-            "GI",
-            "Name"});
-            this.outputNaming.Location = new System.Drawing.Point(50, 162);
-            this.outputNaming.Name = "outputNaming";
-            this.outputNaming.Size = new System.Drawing.Size(121, 21);
-            this.outputNaming.TabIndex = 51;
-            //
-            // txtBoxSequenceNameOverride
-            //
-            this.txtBoxSequenceNameOverride.Location = new System.Drawing.Point(50, 169);
-            this.txtBoxSequenceNameOverride.Name = "txtBoxSequenceNameOverride";
-            this.txtBoxSequenceNameOverride.Size = new System.Drawing.Size(277, 20);
-            this.txtBoxSequenceNameOverride.TabIndex = 42;
-            //
-            // label20
-            //
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.Location = new System.Drawing.Point(47, 153);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(152, 13);
-            this.label20.TabIndex = 43;
-            this.label20.Text = "Sequence Name Override";
-            //
+            // 
+            // btnUploadInterface
+            // 
+            this.btnUploadInterface.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnUploadInterface.Enabled = false;
+            this.btnUploadInterface.Location = new System.Drawing.Point(11, 53);
+            this.btnUploadInterface.Name = "btnUploadInterface";
+            this.btnUploadInterface.Size = new System.Drawing.Size(151, 27);
+            this.btnUploadInterface.TabIndex = 43;
+            this.btnUploadInterface.Text = "Upload Latest Interface";
+            this.btnUploadInterface.UseVisualStyleBackColor = false;
+            this.btnUploadInterface.Click += new System.EventHandler(this.button1_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2490,6 +2505,7 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
                 MessageBoxShow("Opening Result "+strResultURL);
                 lnkLatestInterface.Text = strResultURL;
                 lnkLatestInterface.Enabled = true;
+                btnUploadInterface.Enabled = true;
                 try
                 {
                     System.Diagnostics.Process.Start(strResultURL);
@@ -2979,6 +2995,37 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
             {
                 txtBoxColumnWidth.Enabled = true;
                 txtBoxNucleotidesPerRow.Enabled = true;
+            }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            string strDestination = "";
+            string folder = "";
+
+            if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
+            {
+                if (gi != "") 
+                { 
+                    strDestination = m_strFinalDestinationFolder + "dnadata\\nuccore" + gi;
+                    folder = "nuccore" + gi;
+                }
+                else 
+                { 
+                    strDestination = m_strFinalDestinationFolder + "dnadata\\" + DDVseqID;
+                    folder = DDVseqID;
+                }
+            }
+            else if (outputNaming.SelectedIndex == 1)  // 1 is Name naming
+            {
+                strDestination = m_strFinalDestinationFolder + "dnadata\\" + sequenceName;
+                folder = sequenceName;
+            }
+
+            if (strDestination != "")
+            {
+                Form3 frm = new Form3(strDestination, folder);
+                frm.Show();
             }
         }
 	}
