@@ -107,6 +107,9 @@ namespace DDV
 
         private void sshCp_OnTransferProgress(string src, string dst, int transferredBytes, int totalBytes, string message)
         {
+            progressBar1.Value += 1;
+            progressBar1.Update();
+            progressBar1.Refresh();
         }
 
         private void sshCp_OnTransferEnd(string src, string dst, int transferredBytes, int totalBytes, string message)
