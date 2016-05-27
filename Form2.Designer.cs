@@ -102,7 +102,7 @@
             this.label6.Size = new System.Drawing.Size(397, 13);
             this.label6.TabIndex = 5;
             this.label6.Text = "The following software is included in the distribution under its own respective t" +
-                "erms:";
+    "erms:";
             // 
             // label7
             // 
@@ -272,6 +272,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1DDVversion);
             this.Name = "Form2";
+            this.ShowIcon = false;
             this.Text = "About this software";
             this.ResumeLayout(false);
             this.PerformLayout();
