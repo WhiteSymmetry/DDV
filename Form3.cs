@@ -92,11 +92,13 @@ namespace DDV
             sshCp.To(this.interface_folder, destination, true);
 
             sshCp.Close();
+
+            MessageBox.Show("Transfer complete!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void sshCp_OnTransferStart(string src, string dst, int transferredBytes, int totalBytes, string message)
         {
-            progressBar1.Maximum = 100;
+            progressBar1.Maximum = 3000;
             progressBar1.Step = 1;
             progressBar1.Value = 0;
             progressBar1.Update();
@@ -105,14 +107,11 @@ namespace DDV
 
         private void sshCp_OnTransferProgress(string src, string dst, int transferredBytes, int totalBytes, string message)
         {
-            progressBar1.Value = (int)((transferredBytes / totalBytes ) * 100);
-            progressBar1.Update();
-            progressBar1.Refresh();
         }
 
         private void sshCp_OnTransferEnd(string src, string dst, int transferredBytes, int totalBytes, string message)
         {
-            progressBar1.Value = 100;
+            progressBar1.Value += 1;
             progressBar1.Update();
             progressBar1.Refresh();
         }
