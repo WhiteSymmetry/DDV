@@ -1703,7 +1703,7 @@ namespace DDV
             var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
             var layout_levels = " + new DDVLayoutManager().toString() + @";
-            console.log(layout_levels);
+            var includeDensity = " + chckIncludeDensity.Checked.ToString().ToLower() + @";
 
             var usa='refseq_fetch:" + refseq + @"';          
             var ipTotal = " + ipTotal + @";
@@ -1753,15 +1753,15 @@ namespace DDV
                 embedHTML = embedHTML + @"<img src='../../LEGEND-bg.png' /></div>
 
 <script type='text/javascript'>
-	        outputTable();";
-                if (chckIncludeDensity.Checked == true) { embedHTML = embedHTML + @"outputDensityUI();"; }
-                else { embedHTML = embedHTML + @"outputStatusResultUI();"; }
-                embedHTML = embedHTML + @"</script>
+	        outputTable();
+            if (includeDensity) { outputDensityUI();}
+            else { outputStatusResultUI();}
+</script>
 
 <div class='legend-details'>
 <h3>Data Source:</h3>
-
-<a href='sequence.fasta'>FASTA file</a><br />";
+<a href='sequence.fasta'>Download FASTA file</a>
+<br />";
 
 
                 if (gi != "")
@@ -1778,7 +1778,7 @@ Custom/local sequence (DDV seq ID): "+DDVseqID+"<br />";
                 embedHTML = embedHTML + @"
 
 <h3>Notes</h3>
-This DNA data visualization interface was generated with <a href='https://bitbucket.org/tneugebauer/ddv'>DDV</a><br />Date Visualization Created:" + DateTime.Now.ToString("d/MM/yyyy") + @"
+This DNA data visualization interface was generated with <a href='https://github.com/photomedia/DDV'>DDV</a><br />Date Visualization Created:" + DateTime.Now.ToString("d/MM/yyyy") + @"
 <script type='text/javascript'>
 	        otherCredits();
 </script>
