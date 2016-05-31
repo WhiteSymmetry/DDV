@@ -219,6 +219,7 @@ namespace DDV
             this.fDlgFinalDestination = new System.Windows.Forms.FolderBrowserDialog();
             this.btnFinalDestinationFolder = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnUploadInterface = new System.Windows.Forms.Button();
             this.lnkLatestInterface = new System.Windows.Forms.LinkLabel();
             this.btnGeneratedIntefaces = new System.Windows.Forms.Button();
             this.lblOutputPath = new System.Windows.Forms.Label();
@@ -246,7 +247,6 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnUploadInterface = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -565,6 +565,18 @@ namespace DDV
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Output";
             // 
+            // btnUploadInterface
+            // 
+            this.btnUploadInterface.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnUploadInterface.Enabled = false;
+            this.btnUploadInterface.Location = new System.Drawing.Point(11, 53);
+            this.btnUploadInterface.Name = "btnUploadInterface";
+            this.btnUploadInterface.Size = new System.Drawing.Size(151, 27);
+            this.btnUploadInterface.TabIndex = 43;
+            this.btnUploadInterface.Text = "Upload Latest Interface";
+            this.btnUploadInterface.UseVisualStyleBackColor = false;
+            this.btnUploadInterface.Click += new System.EventHandler(this.button1_Click_1);
+            // 
             // lnkLatestInterface
             // 
             this.lnkLatestInterface.AutoSize = true;
@@ -646,7 +658,7 @@ namespace DDV
             this.textBoxTileSize.Name = "textBoxTileSize";
             this.textBoxTileSize.Size = new System.Drawing.Size(100, 20);
             this.textBoxTileSize.TabIndex = 31;
-            this.textBoxTileSize.Text = "144";
+            this.textBoxTileSize.Text = "256";
             this.toolTip1.SetToolTip(this.textBoxTileSize, "Recommended: 144 for bacteria, 256 for human");
             // 
             // txtBoxY
@@ -837,18 +849,6 @@ namespace DDV
             this.groupBox2.TabIndex = 42;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
-            // 
-            // btnUploadInterface
-            // 
-            this.btnUploadInterface.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnUploadInterface.Enabled = false;
-            this.btnUploadInterface.Location = new System.Drawing.Point(11, 53);
-            this.btnUploadInterface.Name = "btnUploadInterface";
-            this.btnUploadInterface.Size = new System.Drawing.Size(151, 27);
-            this.btnUploadInterface.TabIndex = 43;
-            this.btnUploadInterface.Text = "Upload Latest Interface";
-            this.btnUploadInterface.UseVisualStyleBackColor = false;
-            this.btnUploadInterface.Click += new System.EventHandler(this.button1_Click_1);
             // 
             // Form1
             // 
@@ -3010,11 +3010,13 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
             {
                 txtBoxColumnWidth.Enabled = false;
                 txtBoxNucleotidesPerRow.Enabled = false;
+                txtBoxY.Enabled = true;
             }
             else if (layoutSelector.SelectedIndex == 1)  // 1 is Tiled
             {
                 txtBoxColumnWidth.Enabled = true;
                 txtBoxNucleotidesPerRow.Enabled = true;
+                txtBoxY.Enabled = false;
             }
         }
 
