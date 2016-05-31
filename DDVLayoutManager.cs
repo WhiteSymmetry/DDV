@@ -85,7 +85,7 @@ index_from_screen(x, y){
 
     class DDVLayoutManager
     {
-        List<LayoutLevel> levels;
+        public List<LayoutLevel> levels;
         public DDVLayoutManager()
         {
             levels = new List<LayoutLevel>();

@@ -116,8 +116,6 @@ namespace DDV
         private ComboBox layoutSelector;
         private Label label17;
         private GroupBox groupBox2;
-        private TextBox txtBoxNucleotidesPerRow;
-        private Label label18;
         private Label label20;
         private TextBox txtBoxSequenceNameOverride;
         private ComboBox outputNaming;
@@ -140,7 +138,6 @@ namespace DDV
             this.layoutSelector.DataSource = layoutStyles;
             this.layoutSelector.SelectedIndex = TILED_LAYOUT;
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
-            this.txtBoxNucleotidesPerRow.Text = nucleotidesPerRow.ToString();
             this.outputNaming.SelectedIndex = 1;
 
             btnProcessBitmapDeepZoom.Enabled = false;
@@ -240,8 +237,6 @@ namespace DDV
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.outputNaming = new System.Windows.Forms.ComboBox();
             this.label19 = new System.Windows.Forms.Label();
-            this.txtBoxNucleotidesPerRow = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.layoutSelector = new System.Windows.Forms.ComboBox();
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
@@ -502,7 +497,7 @@ namespace DDV
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(66, 560);
+            this.progressBar1.Location = new System.Drawing.Point(66, 515);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(458, 23);
             this.progressBar1.TabIndex = 21;
@@ -510,7 +505,7 @@ namespace DDV
             // lblProgressText
             // 
             this.lblProgressText.AutoSize = true;
-            this.lblProgressText.Location = new System.Drawing.Point(32, 589);
+            this.lblProgressText.Location = new System.Drawing.Point(32, 544);
             this.lblProgressText.Name = "lblProgressText";
             this.lblProgressText.Size = new System.Drawing.Size(28, 13);
             this.lblProgressText.TabIndex = 24;
@@ -518,7 +513,7 @@ namespace DDV
             // 
             // lblDNAViewer
             // 
-            this.lblDNAViewer.Location = new System.Drawing.Point(9, 560);
+            this.lblDNAViewer.Location = new System.Drawing.Point(9, 515);
             this.lblDNAViewer.Name = "lblDNAViewer";
             this.lblDNAViewer.Size = new System.Drawing.Size(51, 15);
             this.lblDNAViewer.TabIndex = 25;
@@ -528,10 +523,10 @@ namespace DDV
             // 
             this.resultLogTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.resultLogTextBox.Location = new System.Drawing.Point(66, 589);
+            this.resultLogTextBox.Location = new System.Drawing.Point(66, 544);
             this.resultLogTextBox.Name = "resultLogTextBox";
             this.resultLogTextBox.ReadOnly = true;
-            this.resultLogTextBox.Size = new System.Drawing.Size(458, 128);
+            this.resultLogTextBox.Size = new System.Drawing.Size(458, 173);
             this.resultLogTextBox.TabIndex = 29;
             this.resultLogTextBox.Text = "";
             this.resultLogTextBox.TextChanged += new System.EventHandler(this.resultLogTextBox_TextChanged);
@@ -615,7 +610,7 @@ namespace DDV
             // 
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(8, 203);
+            this.label14.Location = new System.Drawing.Point(6, 161);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(33, 25);
             this.label14.TabIndex = 43;
@@ -635,7 +630,7 @@ namespace DDV
             // 
             this.chckIncludeDensity.AutoSize = true;
             this.chckIncludeDensity.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chckIncludeDensity.Location = new System.Drawing.Point(323, 47);
+            this.chckIncludeDensity.Location = new System.Drawing.Point(50, 72);
             this.chckIncludeDensity.Name = "chckIncludeDensity";
             this.chckIncludeDensity.Size = new System.Drawing.Size(161, 17);
             this.chckIncludeDensity.TabIndex = 40;
@@ -646,7 +641,7 @@ namespace DDV
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(47, 203);
+            this.label2.Location = new System.Drawing.Point(45, 161);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(99, 13);
             this.label2.TabIndex = 32;
@@ -654,7 +649,7 @@ namespace DDV
             // 
             // textBoxTileSize
             // 
-            this.textBoxTileSize.Location = new System.Drawing.Point(50, 219);
+            this.textBoxTileSize.Location = new System.Drawing.Point(48, 177);
             this.textBoxTileSize.Name = "textBoxTileSize";
             this.textBoxTileSize.Size = new System.Drawing.Size(100, 20);
             this.textBoxTileSize.TabIndex = 31;
@@ -673,7 +668,7 @@ namespace DDV
             // btnProcessBitmapDeepZoom
             // 
             this.btnProcessBitmapDeepZoom.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnProcessBitmapDeepZoom.Location = new System.Drawing.Point(50, 245);
+            this.btnProcessBitmapDeepZoom.Location = new System.Drawing.Point(48, 203);
             this.btnProcessBitmapDeepZoom.Name = "btnProcessBitmapDeepZoom";
             this.btnProcessBitmapDeepZoom.Size = new System.Drawing.Size(181, 30);
             this.btnProcessBitmapDeepZoom.TabIndex = 30;
@@ -689,13 +684,13 @@ namespace DDV
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 31;
-            this.label1.Text = "Image Height";
+            this.label1.Text = "Column Height";
             // 
             // btnGenerateImage
             // 
             this.btnGenerateImage.BackColor = System.Drawing.Color.LightSkyBlue;
             this.btnGenerateImage.Enabled = false;
-            this.btnGenerateImage.Location = new System.Drawing.Point(177, 156);
+            this.btnGenerateImage.Location = new System.Drawing.Point(175, 114);
             this.btnGenerateImage.Name = "btnGenerateImage";
             this.btnGenerateImage.Size = new System.Drawing.Size(184, 30);
             this.btnGenerateImage.TabIndex = 26;
@@ -735,8 +730,6 @@ namespace DDV
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.groupBox4.Controls.Add(this.outputNaming);
             this.groupBox4.Controls.Add(this.label19);
-            this.groupBox4.Controls.Add(this.txtBoxNucleotidesPerRow);
-            this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.layoutSelector);
             this.groupBox4.Controls.Add(this.txtBoxColumnWidth);
@@ -752,7 +745,7 @@ namespace DDV
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Location = new System.Drawing.Point(12, 257);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(512, 297);
+            this.groupBox4.Size = new System.Drawing.Size(512, 252);
             this.groupBox4.TabIndex = 41;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
@@ -763,7 +756,7 @@ namespace DDV
             this.outputNaming.Items.AddRange(new object[] {
             "GI",
             "Name"});
-            this.outputNaming.Location = new System.Drawing.Point(50, 162);
+            this.outputNaming.Location = new System.Drawing.Point(48, 120);
             this.outputNaming.Name = "outputNaming";
             this.outputNaming.Size = new System.Drawing.Size(121, 21);
             this.outputNaming.TabIndex = 51;
@@ -772,29 +765,11 @@ namespace DDV
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(47, 146);
+            this.label19.Location = new System.Drawing.Point(45, 104);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(91, 13);
             this.label19.TabIndex = 50;
             this.label19.Text = "Output Naming";
-            // 
-            // txtBoxNucleotidesPerRow
-            // 
-            this.txtBoxNucleotidesPerRow.Enabled = false;
-            this.txtBoxNucleotidesPerRow.Location = new System.Drawing.Point(50, 123);
-            this.txtBoxNucleotidesPerRow.Name = "txtBoxNucleotidesPerRow";
-            this.txtBoxNucleotidesPerRow.Size = new System.Drawing.Size(100, 20);
-            this.txtBoxNucleotidesPerRow.TabIndex = 49;
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(47, 108);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(126, 13);
-            this.label18.TabIndex = 48;
-            this.label18.Text = "Nucleotides Per Row";
             // 
             // label17
             // 
@@ -818,16 +793,17 @@ namespace DDV
             // txtBoxColumnWidth
             // 
             this.txtBoxColumnWidth.Enabled = false;
-            this.txtBoxColumnWidth.Location = new System.Drawing.Point(50, 85);
+            this.txtBoxColumnWidth.Location = new System.Drawing.Point(333, 46);
             this.txtBoxColumnWidth.Name = "txtBoxColumnWidth";
             this.txtBoxColumnWidth.Size = new System.Drawing.Size(100, 20);
             this.txtBoxColumnWidth.TabIndex = 45;
+            this.txtBoxColumnWidth.Text = "100";
             // 
             // label16
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(47, 69);
+            this.label16.Location = new System.Drawing.Point(330, 29);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(85, 13);
             this.label16.TabIndex = 44;
@@ -1059,7 +1035,6 @@ namespace DDV
 
             pal.Entries[16] = Color.FromArgb(255, 0, 0, 0);//unknown - error
               
-          
             b.Palette = pal;
         }
 
@@ -1081,7 +1056,6 @@ namespace DDV
 
         public void Write1BaseToBMPUncompressed4X(int intStart, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
         {
-
     
             /*
              * R.................A or G 
@@ -1210,14 +1184,7 @@ namespace DDV
 
             }
 
-            //end
-
-            
             UnsafeSetPixel(x, y, bytePaletteIndex, ref bmd);
-            //UnsafeSetPixel(x, y+1, bytePaletteIndex, ref bmd);
-            //UnsafeSetPixel(x+1, y+1, bytePaletteIndex, ref bmd);
-            //UnsafeSetPixel(x+1, y, bytePaletteIndex, ref bmd);
-
         }
 
 
@@ -1226,7 +1193,6 @@ namespace DDV
         public int columnWidthInNucleotides = 100;
         public const int FULL_COLUMN_LAYOUT = 0;
         public const int TILED_LAYOUT = 1;
-        public int nucleotidesPerRow = 10000000;
 
 		public string T="0";
 		public string A="1";
@@ -1434,7 +1400,6 @@ namespace DDV
             EndOfSequence = "";
 
             string strFastaStats = "";
-            int intMagnification = 1;
 
             iT = 0; iA = 0; iG = 0; iC = 0; iR = 0; iY = 0; iS = 0; iW = 0; iK = 0; iM = 0; iB = 0;
             iD = 0; iH = 0; iV = 0; iN = 0;
@@ -1479,29 +1444,21 @@ namespace DDV
             {
                 MessageBox.Show("Please put only numbers in Image height");
             }
-
-            try
-            {
-                nucleotidesPerRow = Convert.ToInt32(txtBoxNucleotidesPerRow.Text);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Please put only numbers in Nucleotides Per Row");
-            }
-
+            
             //int x = (((total / y) / 60 * 2)) + (total / y) + 64 * 2;
             //int x = 100+((((total / (y/intMagnification)) / (columnWidthInNucleotides*intMagnification)) * 4) + (total / (y/intMagnification)) + ((columnWidthInNucleotides+4)*intMagnification)) * intMagnification;
 
-            int iPaddingBetweenColumns = 4;
-
-            int iColumnWidth = (columnWidthInNucleotides * intMagnification) + iPaddingBetweenColumns;
-            int iNucleotidesPerColumn = columnWidthInNucleotides * y / intMagnification;
+            int iPaddingBetweenColumns = 2;
+            int iColumnWidth = columnWidthInNucleotides + iPaddingBetweenColumns;
+            int iNucleotidesPerColumn = columnWidthInNucleotides * y;
             int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
 
             if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // New layout added by Josiah Seaman
             {
-                int[] xy = new DDVLayoutManager().max_dimensions(total); //xy point of last pixel, gives us the largest boundaries
+                DDVLayoutManager layout = new DDVLayoutManager();
+                int[] xy = layout.max_dimensions(total); //xy point of last pixel, gives us the largest boundaries
+                columnWidthInNucleotides = layout.levels[0].modulo; //override user input to ensure consistency.  Set these values in code
                 x = xy[0];
                 y = xy[1];
             }
@@ -1553,7 +1510,7 @@ namespace DDV
 
                 //----------------------------convert data to pixels---------------------------------
                 int boundX = b.Width;
-                int boundY = b.Height - 1;
+                int boundY = b.Height;
                 int nucleotidesInThisLine = 0;
 
                 counter = 0;
@@ -1600,14 +1557,14 @@ namespace DDV
                                 for (int c = 0; c < read.Length; c++)
                                 {
                                     Write1BaseToBMPUncompressed4X(c, ref b, x_pointer, y_pointer, ref bmd);
-                                    x_pointer += intMagnification; //increment one pixel size to the right
+                                    x_pointer++; //increment one pixel size to the right
                                     nucleotidesInThisLine += 1;
 
                                     if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
                                     {
                                         nucleotidesInThisLine = 0;
                                         x_pointer = lineBeginning;
-                                        y_pointer += intMagnification;
+                                        y_pointer++;
 
                                         if (y_pointer >= boundY)
                                         {
@@ -1742,7 +1699,6 @@ namespace DDV
 <script type='text/javascript'>
 	        var originalImageWidth= " + x + @";
             var originalImageHeight= " + y + @";
-            var pixelSize = " + intMagnification + @";
             var ColumnPadding = " + iPaddingBetweenColumns + @";
             var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
@@ -3008,14 +2964,12 @@ This DNA data visualization interface was generated with <a href='https://bitbuc
         {
             if (layoutSelector.SelectedIndex == 0)  // 0 is Full Height Columns (Original)
             {
-                txtBoxColumnWidth.Enabled = false;
-                txtBoxNucleotidesPerRow.Enabled = false;
+                txtBoxColumnWidth.Enabled = true;
                 txtBoxY.Enabled = true;
             }
             else if (layoutSelector.SelectedIndex == 1)  // 1 is Tiled
             {
-                txtBoxColumnWidth.Enabled = true;
-                txtBoxNucleotidesPerRow.Enabled = true;
+                txtBoxColumnWidth.Enabled = false; //edit these numbers directly in DDVLayoutManager.cs
                 txtBoxY.Enabled = false;
             }
         }
