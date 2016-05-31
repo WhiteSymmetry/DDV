@@ -14,7 +14,8 @@
             var nucNumY = 0;
             
             var mySequence;
-            var theSequenceSplit="";
+			var wholeSequence = "";
+			var theSequenceSplit = []; // used globally by density service
             var theSequence="";
             var fragmentid="";
             var sequence_data_loaded=0;
@@ -26,7 +27,7 @@
 								        prefixUrl: "img/",
 								        showNavigator: true,
 								        tileSources: ["GeneratedImages/dzc_output.xml" ],
-								        maxZoomPixelRatio: 6
+								        maxZoomPixelRatio: 20
 								    });
 								viewer.scalebar({
 		                type: OpenSeadragon.ScalebarType.MAP,
@@ -92,21 +93,20 @@
                 	nucNumX="-";
                 	Nucleotide = "-";
                 	pointerStatus = "Outside of Image (X)";
-                	
                 }
                 else {
-                	nucNumX=(point.x * originalImageWidth).toFixed(0);
+                	nucNumX=Math.round(point.x * originalImageWidth - 0.5);
                 }
-                
+
                 if ((point.y < 0) || (point.y > originalAspectRatio)){
                 	nucNumY="-";
                 	Nucleotide = "-";
                 	pointerStatus = "Outside of Image (Y)";
                 }
                 else {
-                	nucNumY=(point.y * originalImageWidth).toFixed(0);
+                	nucNumY = Math.round(point.y * originalImageWidth - 0.5);
                 }
-                
+
                 if ((nucNumX != "-")&&(nucNumY != "-")){
                 	ColumnNumber = Math.floor(nucNumX/ColumnWidth);
                 	ColumnRemainder = nucNumX % ColumnWidth;
@@ -133,38 +133,31 @@
                 document.getElementById("Nucleotide").innerHTML = Nucleotide; 
                 
                 //show sequence fragment
-                if (sequence_data_viewer_initialized){
-                    var lineNumber="-";
-                    if ($.isNumeric(Nucleotide)){
-                    	 lineNumber=Math.floor (Nucleotide  /columnWidthInNucleotides);
-                    	 remainder=Nucleotide % columnWidthInNucleotides;
-                    	 if (lineNumber>0){
-                    	 	theSequence=theSequenceSplit[lineNumber-1]+theSequenceSplit[lineNumber]+theSequenceSplit[lineNumber+1];
-                    	 	tempTo=((lineNumber+2)*columnWidthInNucleotides);
-                    	 	if (ipTotal < tempTo){tempTo=ipTotal;}
-                    	 	fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: ("+((lineNumber-1)*columnWidthInNucleotides+1)+" - "+tempTo+")";
-                    	 	mySequence.setSequence(theSequence,fragmentid);
-                    	 	mySequence.setSelection(remainder+columnWidthInNucleotides, remainder+columnWidthInNucleotides);
-                    		}
-                    		else{
-                    		theSequence=theSequenceSplit[lineNumber]+theSequenceSplit[lineNumber+1];
-                    		fragmentid= "Sequence fragment at ["+Nucleotide+"], showing: "+((lineNumber)*columnWidthInNucleotides+1)+" - "+((lineNumber+2)*columnWidthInNucleotides)+")";
-                    	 	mySequence.setSequence(theSequence,fragmentid);
-                    		 mySequence.setSelection(remainder, remainder);
-                    		}
-                    		
-                    		$('#SequenceFragmentInstruction').show();
-                    	 
-                    }
-                    else{
-  												mySequence.clearSequence("");
-  												theSequence="";
-  												fragmentid="";
-  												$('#SequenceFragmentInstruction').hide();
-                    }
-                  }
-                    
-            }
+				if (sequence_data_viewer_initialized) {
+					var lineNumber = "-";
+					if ($.isNumeric(Nucleotide)) {
+						lineNumber = Math.floor(Nucleotide / columnWidthInNucleotides);
+						var remainder = Nucleotide % columnWidthInNucleotides;
+						var start = Math.max(0, (lineNumber - 1) * columnWidthInNucleotides); // not before begin of seq
+						var stop = Math.min(ipTotal, (lineNumber + 2) * columnWidthInNucleotides); //+2 = +1 start then + width of column
+						theSequence = wholeSequence.substring(start, stop);
+						//user visible indices start at 1, not 0
+						fragmentid = "Sequence fragment at [" + Nucleotide + "], showing: (" + (start + 1) + " - " + (stop + 1) + ")";
+						mySequence.setSequence(theSequence, fragmentid);
+						mySequence.setSelection(remainder + columnWidthInNucleotides, remainder + columnWidthInNucleotides);
+
+						$('#SequenceFragmentInstruction').show();
+
+					}
+					else {
+						mySequence.clearSequence("");
+						theSequence = "";
+						fragmentid = "";
+						$('#SequenceFragmentInstruction').hide();
+					}
+				}
+
+			}
             
             function toString(point, useParens) {
                 var x = point.x;
@@ -239,13 +232,16 @@
 						}
             
             function initSequence (theSequence) {
-           		theSequenceSplit=theSequence.split("\n");
-           		theSequenceSplit.splice(0,1);
+            	theSequenceSplit = theSequence.split("\n");//for removing the newlines
+				if(theSequenceSplit[0][0] == ">"){ //not all files have a header line
+           			theSequenceSplit.splice(0,1); //deletes the header line from the fasta file
+				}
+				wholeSequence = theSequenceSplit.join('');
            		mySequence = new Biojs.Sequence({
 													sequence : "",
 													target : "SequenceFragmentFASTA",
 													format : 'FASTA',
-													columns : {size:70,spacedEach:0} ,
+													columns : {size:columnWidthInNucleotides, spacedEach:0} ,
 													formatSelectorVisible: false,
 													fontSize: '11px',
 											}); 
