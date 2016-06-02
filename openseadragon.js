@@ -13185,7 +13185,7 @@ function configureFromObject( tileSource, configuration ){
 
             bigCanvas.width = currentWidth;
             bigCanvas.height = currentHeight;
-			bigContext.imageSmoothingEnabled = false;
+			bigContext.imageSmoothingEnabled = true;
             bigContext.drawImage(this._image, 0, 0, currentWidth, currentHeight);
             // We cache the context of the highest level because the browser
             // is a lot faster at downsampling something it already has
@@ -13208,7 +13208,7 @@ function configureFromObject( tileSource, configuration ){
                 var smallContext = smallCanvas.getContext("2d");
                 smallCanvas.width = currentWidth;
                 smallCanvas.height = currentHeight;
-				smallContext.imageSmoothingEnabled = false;
+				smallContext.imageSmoothingEnabled = true;
                 smallContext.drawImage(bigCanvas, 0, 0, currentWidth, currentHeight);
 
                 levels.splice(0, 0, {
@@ -15904,7 +15904,7 @@ $.Tile.prototype = {
         // changes as we are rendering the image
         drawingHandler({context: context, tile: this, rendered: rendered});
 
-		context.imageSmoothingEnabled = false;
+		context.imageSmoothingEnabled = true;
         context.drawImage(
             rendered.canvas,
             0,
@@ -16887,7 +16887,7 @@ $.Drawer.prototype = {
             this.context.globalCompositeOperation = compositeOperation;
         }
         if (bounds) {
-			this.context.imageSmoothingEnabled = false;
+			this.context.imageSmoothingEnabled = true;
             this.context.drawImage(
                 this.sketchCanvas,
                 bounds.x,
@@ -20231,7 +20231,7 @@ ImageRecord.prototype = {
             canvas.width = this._image.width;
             canvas.height = this._image.height;
             this._renderedContext = canvas.getContext('2d');
-			this._renderedContext.imageSmoothingEnabled = false;
+			this._renderedContext.imageSmoothingEnabled = true;
             this._renderedContext.drawImage( this._image, 0, 0 );
             //since we are caching the prerendered image on a canvas
             //allow the image to not be held in memory

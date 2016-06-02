@@ -54,6 +54,7 @@ namespace DDV
 		private System.Windows.Forms.Label lblDataLength;
 		private static string m_strSourceFile;
         private static string m_strSourceBitmapFile;
+        public static bool ready_for_deep_zoom;
         private System.Windows.Forms.Label lblSequenceName;
         private SaveFileDialog saveDialog;
         public ProgressBar progressBar1;
@@ -84,13 +85,10 @@ namespace DDV
         private Label lblOutputPath;
         private Button btnGeneratedIntefaces;
         private LinkLabel lnkLatestInterface;
-        private Button btnReadSequenceProperties;
         private Label label2;
         private TextBox textBoxTileSize;
         private TextBox txtBoxY;
-        private Button btnProcessBitmapDeepZoom;
         private Label label1;
-        private Button btnGenerateImage;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolTip toolTip1;
@@ -121,6 +119,7 @@ namespace DDV
         private ComboBox outputNaming;
         private Label label19;
         private Button btnUploadInterface;
+        private Button button_generate_viz;
 
 
         protected const string _newline = "\r\n";
@@ -133,6 +132,7 @@ namespace DDV
 			InitializeComponent();
 			m_strSourceFile="";
             m_strSourceBitmapFile = "";
+            ready_for_deep_zoom = false;
 
             // Modify ui element attributes after initialization
             this.layoutSelector.DataSource = layoutStyles;
@@ -140,7 +140,7 @@ namespace DDV
             this.txtBoxColumnWidth.Text = columnWidthInNucleotides.ToString();
             this.outputNaming.SelectedIndex = 1;
 
-            btnProcessBitmapDeepZoom.Enabled = false;
+            button_generate_viz.Enabled = false;
             checkEnvironment();
             launchCivetweb();
             SetFinalDestinationFolder(@Directory.GetCurrentDirectory() + "\\output\\");
@@ -197,7 +197,6 @@ namespace DDV
             this.label5 = new System.Windows.Forms.Label();
             this.txtGI = new System.Windows.Forms.TextBox();
             this.lblSourceSequence = new System.Windows.Forms.Label();
-            this.btnReadSequenceProperties = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.lblSourceBitmapFilename = new System.Windows.Forms.Label();
             this.lblDataLength = new System.Windows.Forms.Label();
@@ -226,9 +225,7 @@ namespace DDV
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxTileSize = new System.Windows.Forms.TextBox();
             this.txtBoxY = new System.Windows.Forms.TextBox();
-            this.btnProcessBitmapDeepZoom = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnGenerateImage = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -242,6 +239,7 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_generate_viz = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -276,7 +274,6 @@ namespace DDV
             this.groupBox1.Controls.Add(this.txtGI);
             this.groupBox1.Controls.Add(this.lblSourceSequence);
             this.groupBox1.Controls.Add(this.btnBrowseSelectFASTA);
-            this.groupBox1.Controls.Add(this.btnReadSequenceProperties);
             this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(512, 224);
@@ -384,18 +381,6 @@ namespace DDV
             this.lblSourceSequence.Size = new System.Drawing.Size(370, 54);
             this.lblSourceSequence.TabIndex = 6;
             this.lblSourceSequence.Visible = false;
-            // 
-            // btnReadSequenceProperties
-            // 
-            this.btnReadSequenceProperties.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnReadSequenceProperties.Enabled = false;
-            this.btnReadSequenceProperties.Location = new System.Drawing.Point(333, 163);
-            this.btnReadSequenceProperties.Name = "btnReadSequenceProperties";
-            this.btnReadSequenceProperties.Size = new System.Drawing.Size(151, 30);
-            this.btnReadSequenceProperties.TabIndex = 32;
-            this.btnReadSequenceProperties.Text = "Read Sequence Properties";
-            this.btnReadSequenceProperties.UseVisualStyleBackColor = false;
-            this.btnReadSequenceProperties.Click += new System.EventHandler(this.button1_Click);
             // 
             // label8
             // 
@@ -665,38 +650,15 @@ namespace DDV
             this.txtBoxY.Text = "3000";
             this.toolTip1.SetToolTip(this.txtBoxY, "Recommended: 3000 for bacteria, 20000 for human");
             // 
-            // btnProcessBitmapDeepZoom
-            // 
-            this.btnProcessBitmapDeepZoom.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnProcessBitmapDeepZoom.Location = new System.Drawing.Point(48, 203);
-            this.btnProcessBitmapDeepZoom.Name = "btnProcessBitmapDeepZoom";
-            this.btnProcessBitmapDeepZoom.Size = new System.Drawing.Size(181, 30);
-            this.btnProcessBitmapDeepZoom.TabIndex = 30;
-            this.btnProcessBitmapDeepZoom.Text = "Process Image with Deep Zoom";
-            this.btnProcessBitmapDeepZoom.UseVisualStyleBackColor = false;
-            this.btnProcessBitmapDeepZoom.Click += new System.EventHandler(this.process_deep_zoom);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(214, 29);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 13);
+            this.label1.Size = new System.Drawing.Size(89, 13);
             this.label1.TabIndex = 31;
             this.label1.Text = "Column Height";
-            // 
-            // btnGenerateImage
-            // 
-            this.btnGenerateImage.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.btnGenerateImage.Enabled = false;
-            this.btnGenerateImage.Location = new System.Drawing.Point(175, 114);
-            this.btnGenerateImage.Name = "btnGenerateImage";
-            this.btnGenerateImage.Size = new System.Drawing.Size(184, 30);
-            this.btnGenerateImage.TabIndex = 26;
-            this.btnGenerateImage.Text = "Generate Image and Interface";
-            this.btnGenerateImage.UseVisualStyleBackColor = false;
-            this.btnGenerateImage.Click += new System.EventHandler(this.button9_Click);
             // 
             // menuStrip1
             // 
@@ -728,6 +690,7 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.button_generate_viz);
             this.groupBox4.Controls.Add(this.outputNaming);
             this.groupBox4.Controls.Add(this.label19);
             this.groupBox4.Controls.Add(this.label17);
@@ -737,10 +700,8 @@ namespace DDV
             this.groupBox4.Controls.Add(this.label14);
             this.groupBox4.Controls.Add(this.chckIncludeDensity);
             this.groupBox4.Controls.Add(this.label2);
-            this.groupBox4.Controls.Add(this.btnProcessBitmapDeepZoom);
             this.groupBox4.Controls.Add(this.textBoxTileSize);
             this.groupBox4.Controls.Add(this.label13);
-            this.groupBox4.Controls.Add(this.btnGenerateImage);
             this.groupBox4.Controls.Add(this.txtBoxY);
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Location = new System.Drawing.Point(12, 257);
@@ -825,6 +786,18 @@ namespace DDV
             this.groupBox2.TabIndex = 42;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
+            // 
+            // button_generate_viz
+            // 
+            this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.button_generate_viz.Enabled = false;
+            this.button_generate_viz.Location = new System.Drawing.Point(13, 203);
+            this.button_generate_viz.Name = "button_generate_viz";
+            this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
+            this.button_generate_viz.TabIndex = 52;
+            this.button_generate_viz.Text = "Generate Visualization";
+            this.button_generate_viz.UseVisualStyleBackColor = false;
+            this.button_generate_viz.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -998,9 +971,10 @@ namespace DDV
                     MessageBoxShow("Copied selected sequence to output folder.");
                 }
                 lblSourceSequence.Text = fDlgSourceSequence.FileName + " Selected";
+                CleanInterfaceNewSequence();
+                txtBoxSequenceNameOverride.Text = Path.GetFileNameWithoutExtension(fDlgSourceSequence.FileName);
                 fDlgSourceSequence.FileName = strDestination;
                 SetSourceSequence(fDlgSourceSequence.FileName);
-                CleanInterfaceNewSequence();
                 txtGI.Text = "";
                 BitmapClear();
                 
@@ -1017,6 +991,13 @@ namespace DDV
             { 
                 pal.Entries[i] = Color.FromArgb(255, 240, 240, 240); 
             }
+            //Skittle Colors
+            //pal.Entries[1] = Color.FromArgb(255, 0, 0, 0); //A
+            //pal.Entries[2] = Color.FromArgb(255, 0, 255, 0); //G
+            //pal.Entries[3] = Color.FromArgb(255, 0, 0, 255);//T
+            //pal.Entries[4] = Color.FromArgb(255, 255, 0, 0);//C
+
+            //Original DDV Colors
             pal.Entries[1] = Color.FromArgb(255, 255, 0, 0); //A
             pal.Entries[2] = Color.FromArgb(255, 0, 255, 0); //G
             pal.Entries[3] = Color.FromArgb(255, 250, 240, 114);//T
@@ -1462,11 +1443,14 @@ namespace DDV
                 x = xy[0];
                 y = xy[1];
             }
+            else
+            {
+                MessageBoxShow("iColumnWidth: " + columnWidthInNucleotides);
+                MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
+                MessageBoxShow("numColumns: " + numColumns);
+                MessageBoxShow("x: " + x);
+            }
 
-            MessageBoxShow("iColumnWidth: " + iColumnWidth);
-            MessageBoxShow("iNucleotidesPerColumn: " + iNucleotidesPerColumn);
-            MessageBoxShow("numColumns: " + numColumns);
-            MessageBoxShow("x: " + x);
 
 
             // Bitmap B = new Bitmap(x, y);
@@ -1512,6 +1496,7 @@ namespace DDV
                 int boundX = b.Width;
                 int boundY = b.Height;
                 int nucleotidesInThisLine = 0;
+                int nucleotidesProcessed = 0;
 
                 counter = 0;
                 bool end = false;
@@ -1589,7 +1574,7 @@ namespace DDV
                                 int[] xy = {0,0};
                                 for (int c = 0; c < read.Length; c++)
                                 {                                    
-                                    xy = tile_layout.position_on_screen(counter++);
+                                    xy = tile_layout.position_on_screen(nucleotidesProcessed++);
                                     Write1BaseToBMPUncompressed4X(c, ref b, xy[0], xy[1], ref bmd);
                                 }
                             }
@@ -1805,7 +1790,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBoxShow("Completed.");
                 MessageBoxShow("Image and interface files generated. Click on Process Image with Deep Zoom for the final step.");
                 //enable deepzoomprocessing
-                btnProcessBitmapDeepZoom.Enabled = true;
+                button_generate_viz.Enabled = true;
 
                 
             };
@@ -1813,7 +1798,7 @@ This DNA data visualization interface was generated with <a href='https://github
         }
 
         //Generates Bitmap from Data
-        private void button9_Click(object sender, EventArgs e)
+        private void generate_image_and_interface(object sender, EventArgs e)
         {
             if (File.Exists(m_strFinalDestinationFolder + "\\embed.html"))
             {
@@ -1837,8 +1822,7 @@ This DNA data visualization interface was generated with <a href='https://github
             }
             catch (System.Security.SecurityException)
             {
-                MessageBox.Show("The caller does not have the " +
-                    "required permission.");
+                MessageBox.Show("The caller does not have the required permission.");
             }
             catch (ArgumentException)
             {
@@ -1956,117 +1940,133 @@ This DNA data visualization interface was generated with <a href='https://github
         //renames "embed.html" file to index.html
         private void process_deep_zoom(object sender, EventArgs e)
         {
-            // Set cursor as hourglass
-            Cursor.Current = Cursors.WaitCursor;
-
-            progressBar1.Value = 0;
-            progressBar1.Minimum = 0;
-            progressBar1.Maximum = 40;
-            progressBar1.Value += 1;
-
-            //move source image into source folder
-            // Remove path from the file name.
-            string fName = System.IO.Path.GetFileName(m_strSourceBitmapFile);
-            string fNameNoExtension = System.IO.Path.GetFileNameWithoutExtension(m_strSourceBitmapFile);
-            string fPathName = System.IO.Path.GetDirectoryName(m_strSourceBitmapFile);
-            //string finalDestinationPath = m_strFinalDestinationFolder; 
-            string fImageDestinationPath = @Directory.GetCurrentDirectory()+"\\source\\"; ;
-            string destinationFile = fImageDestinationPath+fName;
-            if (!Directory.Exists(fImageDestinationPath)){
-             MessageBoxShow("Source folder does not exist, creating");
-                Directory.CreateDirectory(fImageDestinationPath);
-            }
-            MessageBoxShow("Moving "+fName+" from "+fPathName+" to "+destinationFile);
-            // To move source image to source folder:
-            if (!File.Exists(m_strSourceBitmapFile)) { MessageBox.Show("Error: could not locate source image file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);return; }
-            MoveWithReplace(m_strSourceBitmapFile, destinationFile);
-            
-            //default tile size is 256, but check interface for user entered value
-            int txtTileSize = 256;
-            try
+            BackgroundWorker waitForImage = new BackgroundWorker();
+            waitForImage.DoWork += (u, args) =>
             {
-                txtTileSize = Convert.ToInt32(textBoxTileSize.Text);
+                while (!ready_for_deep_zoom)
+                {
+                    System.Threading.Thread.Sleep(5000);
+                    //MessageBoxShow(".");//TODO: remove this line
+                }
 
-            }
-            catch (Exception)
+            };
+            waitForImage.RunWorkerAsync();
+            waitForImage.RunWorkerCompleted += (u, args) =>
             {
-                MessageBox.Show("Please put only numbers (1-1048) in Tile size");
-            }
 
-            //Deep Zoom processing
-            MessageBoxShow("Attempting to initialize DeepZoomTools.dll.");
-            
-            try
-            {
-                
-                //This runs Deep Zoom Tools as a separate thread in backgroundworker
-                List<object> DZparams = new List<object>();
-                DZparams.Add(destinationFile);
-                DZparams.Add(fNameNoExtension);
-                DZparams.Add(txtTileSize);
+                // Set cursor as hourglass
+                Cursor.Current = Cursors.WaitCursor;
 
-                BackgroundWorker bwDZ = new BackgroundWorker();
-                bwDZ.DoWork += new DoWorkEventHandler(DeepZoomDLL_doWork);
-                bwDZ.RunWorkerCompleted += new RunWorkerCompletedEventHandler(CopyFilesIntoOutputFolder);
-                bwDZ.RunWorkerAsync(DZparams);
-                 
+                progressBar1.Value = 0;
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = 40;
+                progressBar1.Value += 1;
 
-                /* this would run deep zoom tools.dll in the same thread.
-                ImageCreator imageCreator = new ImageCreator();
-                //CollectionCreator collectionCreator = new CollectionCreator();
-                imageCreator.TileSize = txtTileSize;
-                imageCreator.TileOverlap = 1;
-                imageCreator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Png;
-                imageCreator.Create("source\\" + fName, "output");
-                Microsoft.DeepZoomTools.Image img = new Microsoft.DeepZoomTools.Image(fName);
-                */
+                //move source image into source folder
+                // Remove path from the file name.
+                string fName = System.IO.Path.GetFileName(m_strSourceBitmapFile);
+                string fNameNoExtension = System.IO.Path.GetFileNameWithoutExtension(m_strSourceBitmapFile);
+                string fPathName = System.IO.Path.GetDirectoryName(m_strSourceBitmapFile);
+                //string finalDestinationPath = m_strFinalDestinationFolder; 
+                string fImageDestinationPath = @Directory.GetCurrentDirectory() + "\\source\\"; ;
+                string destinationFile = fImageDestinationPath + fName;
+                if (!Directory.Exists(fImageDestinationPath))
+                {
+                    MessageBoxShow("Source folder does not exist, creating");
+                    Directory.CreateDirectory(fImageDestinationPath);
+                }
+                MessageBoxShow("Moving " + fName + " from " + fPathName + " to " + destinationFile);
+                // To move source image to source folder:
+                if (!File.Exists(m_strSourceBitmapFile)) { MessageBox.Show("Error: could not locate source image file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+                MoveWithReplace(m_strSourceBitmapFile, destinationFile);
 
-                /* this runs DZConvert.exe as a process 
-                Process compiler = new Process();
-                compiler.StartInfo.CreateNoWindow = true;
-                compiler.StartInfo.FileName = "Dzconvert.exe";
-                compiler.StartInfo.Arguments = "source\\" + fName + " output /tf:png /ts:"+txtTileSize+" /ov:1";
-                compiler.StartInfo.UseShellExecute = false;
-                compiler.StartInfo.RedirectStandardOutput = true;
-                compiler.StartInfo.RedirectStandardError = true;
-                MessageBoxShow("Calling function: " + compiler.StartInfo.FileName + compiler.StartInfo.Arguments);
-                compiler.Start();
-                MessageBoxShow(compiler.StandardOutput.ReadToEnd());
-                MessageBoxShow(compiler.StandardError.ReadToEnd());
-                compiler.WaitForExit();
-                */
-                
-                progressBar1.Value += 2;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                //default tile size is 256, but check interface for user entered value
+                int txtTileSize = 256;
+                try
+                {
+                    txtTileSize = Convert.ToInt32(textBoxTileSize.Text);
 
-                MessageBoxShow("Processing with DeepZoomTools.dll, please wait...");
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Please put only numbers (1-1048) in Tile size");
+                }
 
-                // Set cursor as default arrow
-                Cursor.Current = Cursors.Default;
-                
-            }
-            catch (ArgumentNullException)
-            {
-                MessageBox.Show("Path is a null reference.");
-            }
-            catch (System.Security.SecurityException)
-            {
-                MessageBox.Show("The caller does not have the " +
-                    "required permission.");
-            }
-            catch (ArgumentException)
-            {
-                MessageBox.Show("ArgumentException Error has occurred.  ");
-            }
-            catch (System.IO.IOException)
-            {
-                MessageBox.Show("Error.  IO Exception has occurred.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Processing failed with the following error message: " + Environment.NewLine + Environment.NewLine + ex.Message, ex.GetType().Name);
-            }
+                //Deep Zoom processing
+                MessageBoxShow("Attempting to initialize DeepZoomTools.dll.");
+
+                try
+                {
+
+                    //This runs Deep Zoom Tools as a separate thread in backgroundworker
+                    List<object> DZparams = new List<object>();
+                    DZparams.Add(destinationFile);
+                    DZparams.Add(fNameNoExtension);
+                    DZparams.Add(txtTileSize);
+
+                    BackgroundWorker bwDZ = new BackgroundWorker();
+                    bwDZ.DoWork += new DoWorkEventHandler(DeepZoomDLL_doWork);
+                    bwDZ.RunWorkerCompleted += new RunWorkerCompletedEventHandler(CopyFilesIntoOutputFolder);
+                    bwDZ.RunWorkerAsync(DZparams);
+
+
+                    /* this would run deep zoom tools.dll in the same thread.
+                    ImageCreator imageCreator = new ImageCreator();
+                    //CollectionCreator collectionCreator = new CollectionCreator();
+                    imageCreator.TileSize = txtTileSize;
+                    imageCreator.TileOverlap = 1;
+                    imageCreator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Png;
+                    imageCreator.Create("source\\" + fName, "output");
+                    Microsoft.DeepZoomTools.Image img = new Microsoft.DeepZoomTools.Image(fName);
+                    */
+
+                    /* this runs DZConvert.exe as a process 
+                    Process compiler = new Process();
+                    compiler.StartInfo.CreateNoWindow = true;
+                    compiler.StartInfo.FileName = "Dzconvert.exe";
+                    compiler.StartInfo.Arguments = "source\\" + fName + " output /tf:png /ts:"+txtTileSize+" /ov:1";
+                    compiler.StartInfo.UseShellExecute = false;
+                    compiler.StartInfo.RedirectStandardOutput = true;
+                    compiler.StartInfo.RedirectStandardError = true;
+                    MessageBoxShow("Calling function: " + compiler.StartInfo.FileName + compiler.StartInfo.Arguments);
+                    compiler.Start();
+                    MessageBoxShow(compiler.StandardOutput.ReadToEnd());
+                    MessageBoxShow(compiler.StandardError.ReadToEnd());
+                    compiler.WaitForExit();
+                    */
+
+                    progressBar1.Value += 2;
+                    progressBar1.Update();
+                    progressBar1.Refresh();
+
+                    MessageBoxShow("Processing with DeepZoomTools.dll, please wait...");
+
+                    // Set cursor as default arrow
+                    Cursor.Current = Cursors.Default;
+
+                }
+                catch (ArgumentNullException)
+                {
+                    MessageBox.Show("Path is a null reference.");
+                }
+                catch (System.Security.SecurityException)
+                {
+                    MessageBox.Show("The caller does not have the " +
+                        "required permission.");
+                }
+                catch (ArgumentException)
+                {
+                    MessageBox.Show("ArgumentException Error has occurred.  ");
+                }
+                catch (System.IO.IOException)
+                {
+                    MessageBox.Show("Error.  IO Exception has occurred.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Processing failed with the following error message: " + Environment.NewLine + Environment.NewLine + ex.Message, ex.GetType().Name);
+                }
+            };
         }
 
         private void CopyFilesIntoOutputFolder(object sender, EventArgs e)
@@ -2561,8 +2561,7 @@ This DNA data visualization interface was generated with <a href='https://github
             MessageBoxShow("Attempting to download file...please wait");
             progressBar1.Minimum = 0;
             progressBar1.Maximum = 100;
-            btnGenerateImage.Enabled = true;
-            btnReadSequenceProperties.Enabled = true;
+            button_generate_viz.Enabled = true;
             try
             {
                 progressBar1.Value = 2;
@@ -2616,9 +2615,8 @@ This DNA data visualization interface was generated with <a href='https://github
 
         void DisableGenerateUI()
         {
-                btnProcessBitmapDeepZoom.Enabled = false;
-                btnGenerateImage.Enabled = false;
-                btnReadSequenceProperties.Enabled = false;
+            button_generate_viz.Enabled = false;
+            ready_for_deep_zoom = false;
         }
 
         void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -2657,11 +2655,11 @@ This DNA data visualization interface was generated with <a href='https://github
             txtBoxFASTAStats.Text = "";
             lblRefSeq.Text = "";
             progressBar1.Value = 0;
-            btnGenerateImage.Enabled = false;
-            btnProcessBitmapDeepZoom.Enabled = false;
+            //btnGenerateImage.Enabled = false;
+            //btnProcessBitmapDeepZoom.Enabled = false;
             txtBoxSequenceNameOverride.Text = "";
 
-            btnReadSequenceProperties.Enabled = true;
+            button_generate_viz.Enabled = true;
             txtBoxSequenceNameOverride.Enabled = true;
             label15.Visible = true;
             lblSourceSequence.Visible = true;
@@ -2674,7 +2672,7 @@ This DNA data visualization interface was generated with <a href='https://github
             lblSourceBitmapFilename.Visible = false;
             label8.Visible = false;
             //CLEAR functions associated with bitmap
-            btnProcessBitmapDeepZoom.Enabled = false;
+            //btnProcessBitmapDeepZoom.Enabled = false;
         }
 
         private void BitmapSet(string destinationFile)
@@ -2684,21 +2682,22 @@ This DNA data visualization interface was generated with <a href='https://github
             lblSourceBitmapFilename.Visible = true;
             label8.Visible = true;
             MessageBoxShow("Image file set to -> " + destinationFile + " for processing.");
+            ready_for_deep_zoom = true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void read_sequence(object sender, EventArgs e)
         {
             // Set cursor as wait 
             Cursor.Current = Cursors.WaitCursor;
             int length = populateInfo();
             if (length == 0)
             {
-                btnGenerateImage.Enabled = false;
+                //btnGenerateImage.Enabled = false;
                 MessageBoxShow("Cannot generate image from this FASTA file.");
             }
             else
             {
-                btnGenerateImage.Enabled = true;
+                //btnGenerateImage.Enabled = true;
                 txtBoxSequenceNameOverride.Enabled = false;
             }
             // Set cursor as default arrow
@@ -2927,7 +2926,7 @@ This DNA data visualization interface was generated with <a href='https://github
             {
                 if (dlgImageFileSet.FileName != ""){
                     BitmapSet(dlgImageFileSet.FileName);
-                    btnProcessBitmapDeepZoom.Enabled=true;
+                    //btnProcessBitmapDeepZoom.Enabled=true;
                 }
             }
         }
@@ -3003,6 +3002,13 @@ This DNA data visualization interface was generated with <a href='https://github
                 Form3 frm = new Form3(strDestination, folder);
                 frm.Show();
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            read_sequence(sender, e);
+            generate_image_and_interface(sender, e);
+            process_deep_zoom(sender, e);
         }
 	}
 }

@@ -60,6 +60,10 @@ function init() {
 
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function classic_layout_mouse_position(nucNumX, nucNumY) {
     var Nucleotide = "-";
 
@@ -156,7 +160,7 @@ function showNucleotideNumber(event) {
         }
     }
 
-    document.getElementById("Nucleotide").innerHTML = Nucleotide;
+    document.getElementById("Nucleotide").innerHTML = numberWithCommas(Nucleotide);
 
     //show sequence fragment
     if (sequence_data_viewer_initialized) {
@@ -168,7 +172,8 @@ function showNucleotideNumber(event) {
             var stop = Math.min(ipTotal, (lineNumber + 2) * columnWidthInNucleotides); //+2 = +1 start then + width of column
             theSequence = wholeSequence.substring(start, stop);
             //user visible indices start at 1, not 0
-            fragmentid = "Sequence fragment at [" + Nucleotide + "], showing: (" + (start + 1) + " - " + (stop + 1) + ")";
+            fragmentid = "Sequence fragment at [" + numberWithCommas(Nucleotide) +
+                "], showing: (" + numberWithCommas(start + 1) + " - " + numberWithCommas(stop) + ")";
             mySequence.setSequence(theSequence, fragmentid);
             mySequence.setSelection(remainder, remainder);
 
