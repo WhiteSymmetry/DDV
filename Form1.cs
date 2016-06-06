@@ -232,6 +232,7 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button_generate_viz = new System.Windows.Forms.Button();
             this.outputNaming = new System.Windows.Forms.ComboBox();
             this.label19 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
@@ -239,7 +240,6 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button_generate_viz = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -297,6 +297,7 @@ namespace DDV
             this.txtBoxSequenceNameOverride.Name = "txtBoxSequenceNameOverride";
             this.txtBoxSequenceNameOverride.Size = new System.Drawing.Size(277, 20);
             this.txtBoxSequenceNameOverride.TabIndex = 42;
+            this.txtBoxSequenceNameOverride.TextChanged += new System.EventHandler(this.txtBoxSequenceNameOverride_TextChanged);
             // 
             // label15
             // 
@@ -711,6 +712,18 @@ namespace DDV
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
             // 
+            // button_generate_viz
+            // 
+            this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.button_generate_viz.Enabled = false;
+            this.button_generate_viz.Location = new System.Drawing.Point(13, 203);
+            this.button_generate_viz.Name = "button_generate_viz";
+            this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
+            this.button_generate_viz.TabIndex = 52;
+            this.button_generate_viz.Text = "Generate Visualization";
+            this.button_generate_viz.UseVisualStyleBackColor = false;
+            this.button_generate_viz.Click += new System.EventHandler(this.button1_Click);
+            // 
             // outputNaming
             // 
             this.outputNaming.FormattingEnabled = true;
@@ -787,18 +800,6 @@ namespace DDV
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
             // 
-            // button_generate_viz
-            // 
-            this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.button_generate_viz.Enabled = false;
-            this.button_generate_viz.Location = new System.Drawing.Point(13, 203);
-            this.button_generate_viz.Name = "button_generate_viz";
-            this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
-            this.button_generate_viz.TabIndex = 52;
-            this.button_generate_viz.Text = "Generate Visualization";
-            this.button_generate_viz.UseVisualStyleBackColor = false;
-            this.button_generate_viz.Click += new System.EventHandler(this.button1_Click);
-            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -856,87 +857,6 @@ namespace DDV
 
         }
 
-		public string ConvertToDigits(string strTGACN)
-		{
-
-            /* AGCT
-             *  T="0"
-		        A="1"
-		        G="2"
-		        C="3"
-             * 
-             * ----------------------------
-             * 
-             * T (or U)..........Thymine (or Uracil) 
-             * 
-             * R.................A or G 
-             * Y.................C or T 
-             * S.................G or C 
-             * W.................A or T 
-             * K.................G or T 
-             * M.................A or C 
-             * B.................C or G or T 
-             * D.................A or G or T 
-             * H.................A or C or T 
-             * V.................A or C or G 
-             * N.................any base 
-             * . or -............gap   * 
-             */
-            
-            //now convert all to digits:
-
-			strTGACN=strTGACN.Replace("T", T);
-			strTGACN=strTGACN.Replace("A", A);
-			strTGACN=strTGACN.Replace("G", G);
-			strTGACN=strTGACN.Replace("C", C);
-
-            strTGACN = strTGACN.Replace("N", N);
-            strTGACN = strTGACN.Replace("V", V);
-            strTGACN = strTGACN.Replace("H", H);
-            strTGACN = strTGACN.Replace("D", D);
-            strTGACN = strTGACN.Replace("B", B);
-            strTGACN = strTGACN.Replace("M", M);
-            strTGACN = strTGACN.Replace("K", K);
-            strTGACN = strTGACN.Replace("W", W);
-            strTGACN = strTGACN.Replace("S", S);
-            strTGACN = strTGACN.Replace("Y", Y);
-            strTGACN = strTGACN.Replace("R", R);
-            strTGACN = strTGACN.Replace("T", T);
-            strTGACN = strTGACN.Replace("A", A);
-            strTGACN = strTGACN.Replace("G", G);
-            strTGACN = strTGACN.Replace("C", C);
-			
-			return strTGACN;
-		}
-
-		public string ConvertToTGACN(string strDigits)
-		{
-			
-			//strDigits.Replace("0", "N");
-
-			strDigits=strDigits.Replace(T, "T");
-			strDigits=strDigits.Replace(A, "A");
-			strDigits=strDigits.Replace(G, "G");
-			strDigits=strDigits.Replace(C, "C");
-			return strDigits;
-		}
-
-		public string CleanInputFile(string strFile)
-		{
-			strFile=strFile.Replace("0", "");
-			strFile=strFile.Replace("1", "");
-			strFile=strFile.Replace("2", "");
-			strFile=strFile.Replace("3", "");
-			strFile=strFile.Replace("4", "");
-			strFile=strFile.Replace("5", "");
-			strFile=strFile.Replace("6", "");
-			strFile=strFile.Replace("7", "");
-			strFile=strFile.Replace("8", "");
-			strFile=strFile.Replace("9", "");
-			strFile=strFile.Replace(" ", "");
-			return strFile.ToUpper();
-		}
-
 		
 
 		private void button2_Click_1(object sender, System.EventArgs e)
@@ -984,213 +904,12 @@ namespace DDV
 
 		}
 
-        public static void SetMyPalette(ref Bitmap b)
-        {
-            ColorPalette pal = b.Palette;
-            for (int i = 0; i < 16; i++)
-            { 
-                pal.Entries[i] = Color.FromArgb(255, 240, 240, 240); 
-            }
-            //Skittle Colors
-            //pal.Entries[1] = Color.FromArgb(255, 0, 0, 0); //A
-            //pal.Entries[2] = Color.FromArgb(255, 0, 255, 0); //G
-            //pal.Entries[3] = Color.FromArgb(255, 0, 0, 255);//T
-            //pal.Entries[4] = Color.FromArgb(255, 255, 0, 0);//C
-
-            //Original DDV Colors
-            pal.Entries[1] = Color.FromArgb(255, 255, 0, 0); //A
-            pal.Entries[2] = Color.FromArgb(255, 0, 255, 0); //G
-            pal.Entries[3] = Color.FromArgb(255, 250, 240, 114);//T
-            pal.Entries[4] = Color.FromArgb(255, 0, 0, 255);//C
-            pal.Entries[5] = Color.FromArgb(255, 30, 30, 30);//N
-            pal.Entries[6] = Color.FromArgb(255, 60, 60, 60);//R
-            pal.Entries[7] = Color.FromArgb(255, 70, 70, 70);//Y
-            pal.Entries[8] = Color.FromArgb(255, 80, 80, 80);//S
-            pal.Entries[9] = Color.FromArgb(255, 90, 90, 90);//W
-            pal.Entries[10] = Color.FromArgb(255, 100, 100, 100);//K
-            pal.Entries[11] = Color.FromArgb(255, 110, 110, 110);//M
-            pal.Entries[12] = Color.FromArgb(255, 120, 120, 120);//B
-            pal.Entries[13] = Color.FromArgb(255, 130, 130, 130);//D
-            pal.Entries[14] = Color.FromArgb(255, 140, 140, 140);//H
-            pal.Entries[15] = Color.FromArgb(255, 150, 150, 150);//V
-
-            pal.Entries[16] = Color.FromArgb(255, 0, 0, 0);//unknown - error
-              
-            b.Palette = pal;
-        }
-
-
-        public unsafe void UnsafeSetPixel(int x, int y, byte c, ref BitmapData bmd)
-        {
-           // BitmapData bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height),
-          //                ImageLockMode.ReadWrite, b.PixelFormat);
-            byte* p = (byte*)bmd.Scan0.ToPointer();
-            int offset = y * bmd.Stride + x;
-            p[offset] = c;
-        }
-
-
-		       
-
-
-       
-
-        public void Write1BaseToBMPUncompressed4X(int intStart, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
-        {
-    
-            /*
-             * R.................A or G 
-             * Y.................C or T 
-             * S.................G or C 
-             * W.................A or T 
-             * K.................G or T 
-             * M.................A or C 
-             * B.................C or G or T 
-             * D.................A or G or T 
-             * H.................A or C or T 
-             * V.................A or C or G 
-             * N.................any base 
-             * 
-             * 
-             */
-
-            string first = null;
-
-           
-            byte bytePaletteIndex = 0;
-
-            first = read.Substring(intStart, 1);
-           
-
-            if (first == A)
-            {
-                ipA++;
-                bytePaletteIndex = 1;
-            }
-            else if (first == G)
-            {
-                ipG++;
-                bytePaletteIndex = 2;
-            }
-            else if (first == T)
-            {
-                ipT++;
-                bytePaletteIndex = 3;
-            }
-            else if (first == C)
-            {
-                ipC++;
-                bytePaletteIndex = 4;
-            }
-            //logical FASTA probabilities
-            //R.................A or G 
-            else if (first == R)
-            {
-                bytePaletteIndex = 6;
-                ipR++;
-            }
-            //Y.................C or T 
-            else if (first == Y)
-            {
-                bytePaletteIndex = 7;
-                ipY++;
-            }
-            // S.................G or C 
-            else if (first == S)
-            {
-                bytePaletteIndex = 8;
-                ipS++;
-            }
-            // W.................A or T 
-            else if (first == W)
-            {
-                bytePaletteIndex = 9;
-                ipW++;
-            }
-            // K.................G or T 
-            else if (first == K)
-            {
-               
-                bytePaletteIndex = 10;
-                ipK++;
-            }
-            // M.................A or C 
-            else if (first == M)
-            {
-                
-                bytePaletteIndex = 11;
-                ipM++;
-            }
-            // B.................C or G or T 
-            else if (first == B)
-            {
-                
-                bytePaletteIndex = 12;
-                ipB++;
-            }
-            // D.................A or G or T 
-            else if (first == D)
-            {
-               
-                bytePaletteIndex = 13;
-                ipD++;
-            }
-            // H.................A or C or T 
-            else if (first == H)
-            {
-                
-                bytePaletteIndex = 14;
-                ipH++;
-            }
-            // V.................A or C or G 
-            else if (first == V)
-            {
-               
-                bytePaletteIndex = 15;
-                ipV++;
-            }
-            // N.................any base 
-            else if (first == N)
-            {
-                
-                ipN++;
-                bytePaletteIndex = 5;
-            }
-
-            else
-            {
-                
-                bytePaletteIndex = 16;
-                ipUnknown++;
-
-            }
-
-            UnsafeSetPixel(x, y, bytePaletteIndex, ref bmd);
-        }
-
-
-
 
         public int columnWidthInNucleotides = 100;
         public const int FULL_COLUMN_LAYOUT = 0;
         public const int TILED_LAYOUT = 1;
 
-		public string T="0";
-		public string A="1";
-		public string G="2";
-		public string C="3";
 
-        public string R = "R";
-        public string Y = "Y";
-        public string S = "S";
-        public string W = "W";
-        public string K = "K";
-        public string M = "M";
-        public string B = "B";
-        public string D = "D";
-        public string H = "H";
-        public string V = "V";
-        public string N = "N";
 
         public int iT = 0;
         public int iA = 0;
@@ -1227,7 +946,6 @@ namespace DDV
         public int ipV = 0;
         public int ipN = 0;
         public int ipUnknown = 0;
-       
 
         private int populateInfo()
         {
@@ -1305,7 +1023,7 @@ namespace DDV
 
                     else
                     {
-                        read = CleanInputFile(read);
+                        read = Utils.CleanInputFile(read);
 
                         //for accounting:
                         iT = iT + CountOccurencesOfChar(read, 'T');
@@ -1458,7 +1176,7 @@ namespace DDV
             MessageBoxShow(strMessage);
 
             Bitmap b = new Bitmap(x, y, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-            SetMyPalette(ref b);
+            Utils.SetMyPalette(ref b);
             BitmapData bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height),ImageLockMode.ReadWrite, b.PixelFormat);
 
 
@@ -1466,7 +1184,7 @@ namespace DDV
             {
                 for (int j = 0; j < y; j++)
                 {
-                    UnsafeSetPixel(i, j, (byte)0, ref bmd);
+                    Utils.UnsafeSetPixel(i, j, (byte)0, ref bmd);
                 }
             }
             
@@ -1496,7 +1214,6 @@ namespace DDV
                 int boundX = b.Width;
                 int boundY = b.Height;
                 int nucleotidesInThisLine = 0;
-                int nucleotidesProcessed = 0;
 
                 counter = 0;
                 bool end = false;
@@ -1507,41 +1224,45 @@ namespace DDV
                 int lineBeginning = x_pointer;
                 int progress = 0;
 
-                DDVLayoutManager tile_layout = new DDVLayoutManager();
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
 
                 progress = progress + 1;
                 worker.ReportProgress(progress);
 
-                while (((read = streamFASTAFile.ReadLine()) != null) && !end)
+                if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                 {
-                    if (read == "")
-                    { //skip 
-                    }
-                    else
+                    DDVLayoutManager tile_layout = new DDVLayoutManager();
+                    tile_layout.process_file(streamFASTAFile, worker, b, bmd);
+                }
+                if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
+                {
+                    while (((read = streamFASTAFile.ReadLine()) != null) && !end)
                     {
-                        progress += (int)read.Length;
-                        worker.ReportProgress(progress);
-
-                        firstLetter = read.Substring(0, 1);
-
-                        if (firstLetter == ">")
-                        {
-
+                        if (read == "")
+                        { //skip 
                         }
-
                         else
                         {
-                            read = CleanInputFile(read);
-                            read = ConvertToDigits(read);
+                            progress += (int)read.Length;
+                            worker.ReportProgress(progress);
 
-                            //TODO: put these layouts in their own methods
-                            if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
+                            firstLetter = read.Substring(0, 1);
+
+                            if (firstLetter == ">")
                             {
+
+                            }
+
+                            else
+                            {
+                                read = Utils.CleanInputFile(read);
+                                read = Utils.ConvertToDigits(read);
+
+                            
                                 //------------Classic Long column Layout--------------/
                                 for (int c = 0; c < read.Length; c++)
                                 {
-                                    Write1BaseToBMPUncompressed4X(c, ref b, x_pointer, y_pointer, ref bmd);
+                                    Utils.Write1BaseToBMPUncompressed4X(read[c], ref b, x_pointer, y_pointer, ref bmd);
                                     x_pointer++; //increment one pixel size to the right
                                     nucleotidesInThisLine += 1;
 
@@ -1566,16 +1287,6 @@ namespace DDV
                                             throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format.");
                                         }
                                     }
-                                }
-                            }
-                            else if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
-                            {
-                                //----------------------------New Tiled Layout style----------------------------------
-                                int[] xy = {0,0};
-                                for (int c = 0; c < read.Length; c++)
-                                {                                    
-                                    xy = tile_layout.position_on_screen(nucleotidesProcessed++);
-                                    Write1BaseToBMPUncompressed4X(c, ref b, xy[0], xy[1], ref bmd);
                                 }
                             }
                         }
@@ -2090,9 +1801,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBoxShow("Moving " + strSource + " to " + strDestination);
                 MoveDirectory(strSource, strDestination);
 
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //moving generated xml file
                 strSource = @Directory.GetCurrentDirectory() + "\\output\\" + fNameNoExtension + ".xml";
@@ -2101,9 +1810,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 //File.Move(strSource, strDestination);
                 MoveWithReplace(strSource, strDestination);
 
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 // To move generated "embed" file to output folder, rename it to index.html
                 strSource = fPathName+"\\embed.html";
@@ -2111,9 +1818,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBoxShow("Moving " + strSource + " to " + strDestination);
                 MoveWithReplace(strSource, strDestination);
 
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
 
                 //moving generated folders 
@@ -2130,9 +1835,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBoxShow("Moving Results" + strSource + " to " + strDestination);
                 MoveDirectory(strSource, strDestination);
 
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //moving [img] folder into place
                 strSource = @Directory.GetCurrentDirectory() + "\\img";
@@ -2155,69 +1858,15 @@ This DNA data visualization interface was generated with <a href='https://github
                 {
                     MessageBoxShow("Folder already exists, skipping");
                 }
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.min.js"; ;
-                strDestination = finalDestinationPath + "openseadragon.min.js";
-                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.js"; ;
-                strDestination = finalDestinationPath + "openseadragon.js";
-                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.js.map"; ;
-                strDestination = finalDestinationPath + "openseadragon.js.map";
-                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon-scalebar.js"; ;
-                strDestination = finalDestinationPath + "openseadragon-scalebar.js";
-                MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\openseadragon.min.js.map"; ;
-                strDestination = finalDestinationPath + "openseadragon.min.js.map";
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\Biojs.js"; ;
-                strDestination = finalDestinationPath + "Biojs.js";
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                //copy shared files into output folder
-                strSource = @Directory.GetCurrentDirectory() + "\\Biojs.Sequence.js"; ;
-                strDestination = finalDestinationPath + "Biojs.Sequence.js";
-                CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                string[] files = {"openseadragon.min.js","openseadragon.js","openseadragon.js.map",
+                "openseadragon-scalebar.js","openseadragon.min.js.map","Biojs.js","Biojs.Sequence.js"};
+                foreach(string file in files)
+                {
+                    copy_source_to_output_folder(finalDestinationPath, file);
+                }
 
                 // To move donwloaded sequence file to final folder
                 strSource = fPathName + "\\sequence.fasta";
@@ -2259,207 +1908,161 @@ This DNA data visualization interface was generated with <a href='https://github
                 strDestination = finalDestinationPath + "seadragon.css";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\nucleotideNumber.js";
                 strDestination = finalDestinationPath + "nucleotideNumber.js";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileWithReplaceIfNewer(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\jquery-1.7.min.js";
                 strDestination = finalDestinationPath + "jquery-1.7.min.js";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\nucleicDensity.js";
                 strDestination = finalDestinationPath + "nucleicDensity.js";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\d3.v3.js";
                 strDestination = finalDestinationPath + "d3.v3.js";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\loading.gif";
                 strDestination = finalDestinationPath + "loading.gif";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-A.png";
                 strDestination = finalDestinationPath + "LEGEND-A.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-B.png";
                 strDestination = finalDestinationPath + "LEGEND-B.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-bg.png";
                 strDestination = finalDestinationPath + "LEGEND-bg.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-C.png";
                 strDestination = finalDestinationPath + "LEGEND-C.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-D.png";
                 strDestination = finalDestinationPath + "LEGEND-D.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-G.png";
                 strDestination = finalDestinationPath + "LEGEND-G.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-H.png";
                 strDestination = finalDestinationPath + "LEGEND-H.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-K.png";
                 strDestination = finalDestinationPath + "LEGEND-K.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-M.png";
                 strDestination = finalDestinationPath + "LEGEND-M.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-N.png";
                 strDestination = finalDestinationPath + "LEGEND-N.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-R.png";
                 strDestination = finalDestinationPath + "LEGEND-R.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-S.png";
                 strDestination = finalDestinationPath + "LEGEND-S.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-T.png";
                 strDestination = finalDestinationPath + "LEGEND-T.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-V.png";
                 strDestination = finalDestinationPath + "LEGEND-V.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-W.png";
                 strDestination = finalDestinationPath + "LEGEND-W.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\LEGEND-Y.png";
                 strDestination = finalDestinationPath + "LEGEND-Y.png";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 //copy shared files into output folder
                 strSource = @Directory.GetCurrentDirectory() + "\\density.php";
                 strDestination = finalDestinationPath + "density.php";
                 MessageBoxShow("Copying " + strSource + " to " + strDestination);
                 CopyFileNoReplace(strSource, strDestination);
-                progressBar1.Value += 1;
-                progressBar1.Update();
-                progressBar1.Refresh();
+                incrementProgressbar();
 
                 MessageBoxShow("Completed. ");
 
@@ -2524,6 +2127,22 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBox.Show("Processing failed with the following error message: " + Environment.NewLine + Environment.NewLine + ex.Message, ex.GetType().Name);
             }
 
+        }
+
+        private void copy_source_to_output_folder(string finalDestinationPath, string filename)
+        {
+            string strSource = @Directory.GetCurrentDirectory() + "\\" + filename ;
+            string strDestination = finalDestinationPath + filename;
+            MessageBoxShow("Copying scripts" + strSource + " to " + strDestination);
+            CopyFileWithReplaceIfNewer(strSource, strDestination);
+            incrementProgressbar();
+        }
+
+        private void incrementProgressbar()
+        {
+            progressBar1.Value += 1;
+            progressBar1.Update();
+            progressBar1.Refresh();
         }
 
         private void button13_Click(object sender, EventArgs e)
@@ -3009,6 +2628,11 @@ This DNA data visualization interface was generated with <a href='https://github
             read_sequence(sender, e);
             generate_image_and_interface(sender, e);
             process_deep_zoom(sender, e);
+        }
+
+        private void txtBoxSequenceNameOverride_TextChanged(object sender, EventArgs e)
+        {
+
         }
 	}
 }

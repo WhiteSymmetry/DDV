@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 
@@ -168,6 +171,41 @@ index_from_screen(x, y){
             return json;
         }
 
+
+        public bool process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd)
+        {
+            int nucleotidesProcessed = 0;
+            string read = "";
+            while (((read = streamFASTAFile.ReadLine()) != null))
+            {
+                if (read != "")
+                {
+                    worker.ReportProgress(nucleotidesProcessed);
+
+                    if (read.Substring(0, 1) == ">")
+                    {
+
+                    }
+
+                    else
+                    {
+                        read = Utils.CleanInputFile(read);
+                        read = Utils.ConvertToDigits(read);
+
+
+                        //----------------------------New Tiled Layout style----------------------------------
+                        int[] xy = { 0, 0 };
+                        for (int c = 0; c < read.Length; c++)
+                        {
+                            xy = this.position_on_screen(nucleotidesProcessed++);
+                            Utils.Write1BaseToBMPUncompressed4X(read[c], ref b, xy[0], xy[1], ref bmd);
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 
 
