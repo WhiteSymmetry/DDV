@@ -12,12 +12,13 @@ namespace DDV
      * 
      * Utils mainly contains glossary alias constants, color palettes, and image writing utils.
      */ 
-    static class Utils
+    static class utils
     {
         public static char T = '0';
         public static char A = '1';
         public static char G = '2';
         public static char C = '3';
+
         public static char R = 'R';
         public static char Y = 'Y';
         public static char S = 'S';
@@ -29,51 +30,27 @@ namespace DDV
         public static char H = 'H';
         public static char V = 'V';
         public static char N = 'N';
+        
+        public static Dictionary<char, byte> colorIndex = new Dictionary<char, byte>{ //since this table has redundant lower case values, there's no need to .ToUpper() your strings
+             {'A', 1},  {'a', 1},
+             {'G', 2},  {'g', 2},
+             {'T', 3},  {'t', 3}, {'U', 3},  {'u', 3},
+             {'C', 4},  {'c', 4},
+             {'N', 5},  {'n', 5},//* N.................any base
+             {'R', 6},  {'r', 6}, //* R.................A or G
+             {'Y', 7},  {'y', 7}, //* Y.................C or T
+             {'S', 8},  {'s', 8}, //* S.................G or C
+             {'W', 9},  {'w', 9}, //* W.................A or T
+             {'K', 10}, {'k', 10},//* K.................G or T
+             {'M', 11}, {'m', 11},//* M.................A or C
+             {'B', 12}, {'b', 12},//* B.................C or G or T
+             {'D', 13}, {'d', 13},//* D.................A or G or T
+             {'H', 14}, {'h', 14},//* H.................A or C or T
+             {'V', 15}, {'v', 15} //* V.................A or C or G
+        };
 
         public static string ConvertToDigits(string strTGACN)
         {
-
-            /* AGCT
-             *  T="0"
-		        A="1"
-		        G="2"
-		        C="3"
-             * 
-             * ----------------------------
-             * 
-             * T (or U)..........Thymine (or Uracil) 
-             * 
-             * R.................A or G 
-             * Y.................C or T 
-             * S.................G or C 
-             * W.................A or T 
-             * K.................G or T 
-             * M.................A or C 
-             * B.................C or G or T 
-             * D.................A or G or T 
-             * H.................A or C or T 
-             * V.................A or C or G 
-             * N.................any base 
-             * . or -............gap   * 
-             */
-
-            //now convert all to digits:
-
-            strTGACN = strTGACN.Replace('T', T);
-            strTGACN = strTGACN.Replace('A', A);
-            strTGACN = strTGACN.Replace('G', G);
-            strTGACN = strTGACN.Replace('C', C);
-            strTGACN = strTGACN.Replace('N', N);
-            strTGACN = strTGACN.Replace('V', V);
-            strTGACN = strTGACN.Replace('H', H);
-            strTGACN = strTGACN.Replace('D', D);
-            strTGACN = strTGACN.Replace('B', B);
-            strTGACN = strTGACN.Replace('M', M);
-            strTGACN = strTGACN.Replace('K', K);
-            strTGACN = strTGACN.Replace('W', W);
-            strTGACN = strTGACN.Replace('S', S);
-            strTGACN = strTGACN.Replace('Y', Y);
-            strTGACN = strTGACN.Replace('R', R);
             strTGACN = strTGACN.Replace('T', T);
             strTGACN = strTGACN.Replace('A', A);
             strTGACN = strTGACN.Replace('G', G);
@@ -166,74 +143,10 @@ namespace DDV
         }
 
 
-        public static void Write1BaseToBMPUncompressed4X(char nucleotide, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
+        public static void Write1BaseToBMP(char nucleotide, ref Bitmap Tex, int x, int y, ref BitmapData bmd)
         {
-            /*
-             * R.................A or G 
-             * Y.................C or T 
-             * S.................G or C 
-             * W.................A or T 
-             * K.................G or T 
-             * M.................A or C 
-             * B.................C or G or T 
-             * D.................A or G or T 
-             * H.................A or C or T 
-             * V.................A or C or G 
-             * N.................any base 
-             */
-
-            byte bytePaletteIndex = 0;
-
-            if (nucleotide == A){
-                bytePaletteIndex = 1;
-            }
-            else if (nucleotide == G){
-                bytePaletteIndex = 2;
-            }
-            else if (nucleotide == T){
-                bytePaletteIndex = 3;
-            }
-            else if (nucleotide == C){
-                bytePaletteIndex = 4;
-            }
-            //logical FASTA probabilities
-            else if (nucleotide == R){
-                bytePaletteIndex = 6;
-            }
-            else if (nucleotide == Y){
-                bytePaletteIndex = 7;
-            }
-            else if (nucleotide == S){
-                bytePaletteIndex = 8;
-            }
-            else if (nucleotide == W){
-                bytePaletteIndex = 9;
-            }
-            else if (nucleotide == K){
-                bytePaletteIndex = 10;
-            }
-            else if (nucleotide == M){
-                bytePaletteIndex = 11;
-            }
-            else if (nucleotide == B){
-                bytePaletteIndex = 12;
-            }
-            else if (nucleotide == D){
-                bytePaletteIndex = 13;
-            }
-            else if (nucleotide == H){
-                bytePaletteIndex = 14;
-            }
-            else if (nucleotide == V){
-                bytePaletteIndex = 15;
-            }
-            else if (nucleotide == N){
-                bytePaletteIndex = 5;
-            }
-            else
-            {
-                bytePaletteIndex = 16;
-            }
+            byte bytePaletteIndex = 16;
+            bytePaletteIndex = colorIndex[nucleotide];
 
             UnsafeSetPixel(x, y, bytePaletteIndex, ref bmd);
         }

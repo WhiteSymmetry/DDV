@@ -155,7 +155,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utils.cs" />
+    <Compile Include="utils.cs" />
     <Compile Include="DDVLayoutManager.cs" />
     <Compile Include="Form2.cs">
       <SubType>Form</SubType>

@@ -159,7 +159,7 @@ index_from_screen(x, y){
             return xy;
         }
 
-        public string toString()
+        public string ToString()
         {
             string json = "[";
             foreach( LayoutLevel level in this.levels)
@@ -176,6 +176,13 @@ index_from_screen(x, y){
         {
             int nucleotidesProcessed = 0;
             string read = "";
+            //Pre-read generates an array of contigs with labels and sequences
+
+            //iterate through contigs in order of size
+
+            //Layout contigs one at a time
+
+
             while (((read = streamFASTAFile.ReadLine()) != null))
             {
                 if (read != "")
@@ -189,16 +196,12 @@ index_from_screen(x, y){
 
                     else
                     {
-                        read = Utils.CleanInputFile(read);
-                        read = Utils.ConvertToDigits(read);
-
-
                         //----------------------------New Tiled Layout style----------------------------------
                         int[] xy = { 0, 0 };
                         for (int c = 0; c < read.Length; c++)
                         {
                             xy = this.position_on_screen(nucleotidesProcessed++);
-                            Utils.Write1BaseToBMPUncompressed4X(read[c], ref b, xy[0], xy[1], ref bmd);
+                            utils.Write1BaseToBMP(read[c], ref b, xy[0], xy[1], ref bmd);
                         }
                     }
                 }

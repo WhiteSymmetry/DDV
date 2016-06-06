@@ -899,41 +899,24 @@ namespace DDV
                 BitmapClear();
                 
 			}
-
-			
-
 		}
 
 
         public int columnWidthInNucleotides = 100;
         public const int FULL_COLUMN_LAYOUT = 0;
         public const int TILED_LAYOUT = 1;
-
-
-
-        public int iT = 0;
-        public int iA = 0;
-        public int iG = 0;
-        public int iC = 0;
+        public int sequenceLength = 0;
+        public bool multipart_file = false;
+        public Dictionary<char, long> letter_counts = new Dictionary<char, long>() {
+             {'A', 0}, {'G', 0}, {'T', 0}, {'C', 0}, {'N', 0}, {'R', 0}, {'Y', 0}, {'S', 0}, {'W', 0},
+             {'K', 0}, {'M', 0}, {'B', 0}, {'D', 0}, {'H', 0}, {'V', 0}
+        };
 
         public int ipT = 0;
         public int ipA = 0;
         public int ipG = 0;
         public int ipC = 0;
-
-        public int iR = 0;
-        public int iY = 0;
-        public int iS = 0;
-        public int iW = 0;
-        public int iK = 0;
-        public int iM = 0;
-        public int iB = 0;
-        public int iD = 0;
-        public int iH = 0;
-        public int iV = 0;
-        public int iN = 0;
-        public int iUnknown = 0;
-
+        
         public int ipR = 0;
         public int ipY = 0;
         public int ipS = 0;
@@ -966,7 +949,7 @@ namespace DDV
             int i = 0;
             bool end = false;
             bool bOnce = false;
-            int DataLengthCounter = 0;
+            sequenceLength = 0;
             int iActualLineLength = 0;
 
 
@@ -985,7 +968,9 @@ namespace DDV
 
                     if (firstLetter == ">")
                     {
-                        if (i > 1) { end = true; }
+                        if (i > 1) { //we've now hit the second entry in this fasta file
+                            multipart_file = true;
+                        }
                         else
                         {
                             if (txtBoxSequenceNameOverride.Text == "")
@@ -1023,27 +1008,16 @@ namespace DDV
 
                     else
                     {
-                        read = Utils.CleanInputFile(read);
+                        read = read.ToUpper();
 
                         //for accounting:
-                        iT = iT + CountOccurencesOfChar(read, 'T');
-                        iA = iA + CountOccurencesOfChar(read, 'A');
-                        iG = iG + CountOccurencesOfChar(read, 'G');
-                        iC = iC + CountOccurencesOfChar(read, 'C');
-                        iR = iR + CountOccurencesOfChar(read, 'R');
-                        iY = iY + CountOccurencesOfChar(read, 'Y');
-                        iS = iS + CountOccurencesOfChar(read, 'S');
-                        iW = iW + CountOccurencesOfChar(read, 'W');
-                        iK = iK + CountOccurencesOfChar(read, 'K');
-                        iM = iM + CountOccurencesOfChar(read, 'M');
-                        iB = iB + CountOccurencesOfChar(read, 'B');
-                        iD = iD + CountOccurencesOfChar(read, 'D');
-                        iH = iH + CountOccurencesOfChar(read, 'H');
-                        iV = iV + CountOccurencesOfChar(read, 'V');
-                        iN = iN + CountOccurencesOfChar(read, 'N');
-                        if (!bOnce) { iActualLineLength = read.Length; bOnce = true; }
+                        CountOccurencesOfChar(read);
+                        if (!bOnce) { 
+                            iActualLineLength = read.Length; 
+                            bOnce = true; 
+                        }
 
-                        DataLengthCounter = DataLengthCounter + read.Trim().Length;
+                        sequenceLength +=+ read.Trim().Length;
                        
                         i++;
                     }
@@ -1051,13 +1025,13 @@ namespace DDV
             }
 
 
-            lblDataLength.Text = DataLengthCounter.ToString();
+            lblDataLength.Text = sequenceLength.ToString();
             lblDataLength.Text = lblDataLength.Text + " | Line Length: " + iActualLineLength.ToString();
             lblDataLength.Refresh();
 
             MessageBoxShow("Retrieved basic sequence properties from FASTA.");
             streamFASTAFile.Close();
-            return (DataLengthCounter);
+            return sequenceLength;
 
         }
 
@@ -1099,9 +1073,11 @@ namespace DDV
             EndOfSequence = "";
 
             string strFastaStats = "";
-
-            iT = 0; iA = 0; iG = 0; iC = 0; iR = 0; iY = 0; iS = 0; iW = 0; iK = 0; iM = 0; iB = 0;
-            iD = 0; iH = 0; iV = 0; iN = 0;
+            letter_counts = new Dictionary<char, long>()
+            {
+                 {'A', 0}, {'G', 0}, {'T', 0}, {'C', 0}, {'N', 0}, {'R', 0}, {'Y', 0}, {'S', 0}, {'W', 0},
+                 {'K', 0}, {'M', 0}, {'B', 0}, {'D', 0}, {'H', 0}, {'V', 0}
+            };
 
             ipT = 0; ipA = 0; ipG = 0; ipC = 0; ipR = 0; ipY = 0; ipS = 0; ipW = 0; ipK = 0; ipM = 0; ipB = 0;
             ipD = 0; ipH = 0; ipV = 0; ipN = 0;
@@ -1116,9 +1092,9 @@ namespace DDV
             if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file"+m_strSourceFile+". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             FileInfo TheFile = new FileInfo(m_strSourceFile);
 
-            int total = populateInfo();
+            sequenceLength = populateInfo();
 
-            if (total == 0)
+            if (sequenceLength == 0)
             {
                 MessageBoxShow("Error.  Invalid FASTA file.  ");
                 return;
@@ -1144,19 +1120,19 @@ namespace DDV
                 MessageBox.Show("Please put only numbers in Image height");
             }
             
-            //int x = (((total / y) / 60 * 2)) + (total / y) + 64 * 2;
-            //int x = 100+((((total / (y/intMagnification)) / (columnWidthInNucleotides*intMagnification)) * 4) + (total / (y/intMagnification)) + ((columnWidthInNucleotides+4)*intMagnification)) * intMagnification;
+            //int x = (((sequenceLength / y) / 60 * 2)) + (sequenceLength / y) + 64 * 2;
+            //int x = 100+((((sequenceLength / (y/intMagnification)) / (columnWidthInNucleotides*intMagnification)) * 4) + (sequenceLength / (y/intMagnification)) + ((columnWidthInNucleotides+4)*intMagnification)) * intMagnification;
 
             int iPaddingBetweenColumns = 2;
             int iColumnWidth = columnWidthInNucleotides + iPaddingBetweenColumns;
             int iNucleotidesPerColumn = columnWidthInNucleotides * y;
-            int numColumns = (int)Math.Ceiling((double)total / iNucleotidesPerColumn);
+            int numColumns = (int)Math.Ceiling((double)sequenceLength / iNucleotidesPerColumn);
             int x = (numColumns * iColumnWidth) - iPaddingBetweenColumns; //last column has no padding.
 
             if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // New layout added by Josiah Seaman
             {
                 DDVLayoutManager layout = new DDVLayoutManager();
-                int[] xy = layout.max_dimensions(total); //xy point of last pixel, gives us the largest boundaries
+                int[] xy = layout.max_dimensions(sequenceLength); //xy point of last pixel, gives us the largest boundaries
                 columnWidthInNucleotides = layout.levels[0].modulo; //override user input to ensure consistency.  Set these values in code
                 x = xy[0];
                 y = xy[1];
@@ -1176,7 +1152,7 @@ namespace DDV
             MessageBoxShow(strMessage);
 
             Bitmap b = new Bitmap(x, y, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-            Utils.SetMyPalette(ref b);
+            utils.SetMyPalette(ref b);
             BitmapData bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height),ImageLockMode.ReadWrite, b.PixelFormat);
 
 
@@ -1184,7 +1160,7 @@ namespace DDV
             {
                 for (int j = 0; j < y; j++)
                 {
-                    Utils.UnsafeSetPixel(i, j, (byte)0, ref bmd);
+                    utils.UnsafeSetPixel(i, j, (byte)0, ref bmd);
                 }
             }
             
@@ -1255,14 +1231,14 @@ namespace DDV
 
                             else
                             {
-                                read = Utils.CleanInputFile(read);
-                                read = Utils.ConvertToDigits(read);
+                                read = utils.CleanInputFile(read);
+                                read = utils.ConvertToDigits(read);
 
                             
                                 //------------Classic Long column Layout--------------/
                                 for (int c = 0; c < read.Length; c++)
                                 {
-                                    Utils.Write1BaseToBMPUncompressed4X(read[c], ref b, x_pointer, y_pointer, ref bmd);
+                                    utils.Write1BaseToBMP(read[c], ref b, x_pointer, y_pointer, ref bmd);
                                     x_pointer++; //increment one pixel size to the right
                                     nucleotidesInThisLine += 1;
 
@@ -1349,26 +1325,11 @@ namespace DDV
 
 
                 if (counter != 0) { MessageBoxShow("Error: Number of Times Max Width Reached:" + counter.ToString()); }
-                int iTotal = iA + iT + iG + iC + iR + iY + iS + iW + iK + iM + iB + iD + iH + iV + iN;
+                
                 int ipTotal = ipA + ipT + ipG + ipC + ipR + ipY + ipS + ipW + ipK + ipM + ipB + ipD + ipH + ipV + ipN;
                 strFastaStats = "FASTA Stats for " + sequenceName +
-                "\n\nA:" + iA + " processed: " + ipA +
-                "\nT:" + iT + " processed: " + ipT +
-                "\nG:" + iG + " processed: " + ipG +
-                "\nC:" + iC + " processed: " + ipC +
-                "\nR:" + iR + " processed: " + ipR +
-                " | Y:" + iY + " processed: " + ipY +
-                " | S:" + iS + " processed: " + ipS +
-                " | W:" + iW + " processed: " + ipW +
-                " | K:" + iK + " processed: " + ipK +
-                " | M:" + iM + " processed: " + ipM +
-                " | B:" + iB + " processed: " + ipB +
-                " | D:" + iD + " processed: " + ipD +
-                " | H:" + iH + " processed: " + ipH +
-                " | V:" + iV + " processed: " + ipV +
-                "\nN:" + iN + " processed: " + ipN +
-                "\nUnknown:" + iUnknown + " processed: " + ipUnknown +
-                "\niTotal:" + iTotal + " ipTotal: " + ipTotal +
+                //"\nUnknown:" + iUnknown + " processed: " + ipUnknown +
+                "\niTotal:" + sequenceLength + " ipTotal: " + ipTotal +
                 "\n---------------------------------------\n";
                 txtBoxFASTAStats.Text = strFastaStats;
                 strFastaStats += resultLogTextBox.Text;
@@ -1398,7 +1359,8 @@ namespace DDV
             var ColumnPadding = " + iPaddingBetweenColumns + @";
             var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
-            var layout_levels = " + new DDVLayoutManager().toString() + @";
+            var layout_levels = " + new DDVLayoutManager().ToString() + @";
+            var multipart_file = " + multipart_file.ToString() + @";
             var includeDensity = " + chckIncludeDensity.Checked.ToString().ToLower() + @";
 
             var usa='refseq_fetch:" + refseq + @"';          
@@ -1406,7 +1368,7 @@ namespace DDV
             var direct_data_file='sequence.fasta';
             var direct_data_file_length=" + direct_data_file_length + @";
             var sbegin='1';
-            var send=ipTotal.toString(); 
+            var send=ipTotal.ToString(); 
             </script>
 <script src='../../nucleotideNumber.js' type='text/javascript'></script>
 <script src='../../nucleicDensity.js' type='text/javascript'></script>";
@@ -1431,21 +1393,22 @@ namespace DDV
 </div>
 
 <p class='legendHeading'><strong>Legend:</strong><br /></p><div style='margin-left:50px;'>";
-                if (iA != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-A.png' />"; }
-                if (iT != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-T.png' />"; }
-                if (iG != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-G.png' />"; }
-                if (iC != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-C.png' />"; }
-                if (iR != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-R.png' />"; }
-                if (iY != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-Y.png' />"; }
-                if (iS != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-S.png' />"; }
-                if (iW != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-W.png' />"; }
-                if (iK != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-K.png' />"; }
-                if (iM != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-M.png' />"; }
-                if (iB != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-B.png' />"; }
-                if (iD != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-D.png' />"; }
-                if (iH != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-H.png' />"; }
-                if (iV != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-V.png' />"; }
-                if (iN != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-N.png' />"; }
+                if (letter_counts['A'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-A.png' />"; }
+                if (letter_counts['T'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-T.png' />"; }
+                //TODO: Add legend for U = Uracil
+                if (letter_counts['G'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-G.png' />"; }
+                if (letter_counts['C'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-C.png' />"; }
+                if (letter_counts['R'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-R.png' />"; }
+                if (letter_counts['Y'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-Y.png' />"; }
+                if (letter_counts['S'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-S.png' />"; }
+                if (letter_counts['W'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-W.png' />"; }
+                if (letter_counts['K'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-K.png' />"; }
+                if (letter_counts['M'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-M.png' />"; }
+                if (letter_counts['B'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-B.png' />"; }
+                if (letter_counts['D'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-D.png' />"; }
+                if (letter_counts['H'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-H.png' />"; }
+                if (letter_counts['V'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-V.png' />"; }
+                if (letter_counts['N'] != 0) { embedHTML = embedHTML + @"<img src='../../LEGEND-N.png' />"; }
                 embedHTML = embedHTML + @"<img src='../../LEGEND-bg.png' /></div>
 
 <script type='text/javascript'>
@@ -1499,7 +1462,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 Cursor.Current = Cursors.Default;
 
                 MessageBoxShow("Completed.");
-                MessageBoxShow("Image and interface files generated. Click on Process Image with Deep Zoom for the final step.");
+                MessageBoxShow("Image and interface files generated. Processing Deep Zoom...");
                 //enable deepzoomprocessing
                 button_generate_viz.Enabled = true;
 
@@ -1553,17 +1516,12 @@ This DNA data visualization interface was generated with <a href='https://github
 
        
 
-        public static int CountOccurencesOfChar(string instance, char c)
+        public void CountOccurencesOfChar(string instance)
         {
-            int result = 0;
             foreach (char curChar in instance)
             {
-                if (c == curChar)
-                {
-                    result++;
-                }
+                letter_counts[curChar]++;
             }
-            return result;
         }
 
         public static void CopyDirectory(string source, string destination)
