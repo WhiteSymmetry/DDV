@@ -947,26 +947,18 @@ namespace DDV
             StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
 
             int i = 0;
-            bool end = false;
             bool bOnce = false;
             sequenceLength = 0;
             int iActualLineLength = 0;
 
-
-            string firstLetter = null;
-
-
-            while (((read = streamFASTAFile.ReadLine()) != null) && !end)
+            while (((read = streamFASTAFile.ReadLine()) != null) )
             {
                 if (read == "")
                 { //skip 
                 }
                 else
                 {
-
-                    firstLetter = read.Substring(0, 1);
-
-                    if (firstLetter == ">")
+                    if (read.Substring(0, 1) == ">")
                     {
                         if (i > 1) { //we've now hit the second entry in this fasta file
                             multipart_file = true;
@@ -1178,7 +1170,11 @@ namespace DDV
             workerBMPPainter.WorkerSupportsCancellation = true;
             workerBMPPainter.ProgressChanged += (u, args) =>
             {
-                  progressBar1.Value = args.ProgressPercentage; 
+                try
+                {
+                    progressBar1.Value = args.ProgressPercentage;
+                }
+                catch (ArgumentOutOfRangeException e) { }
             };
             workerBMPPainter.DoWork += (u, args) =>
             {
