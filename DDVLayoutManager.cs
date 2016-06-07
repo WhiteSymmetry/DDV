@@ -226,19 +226,22 @@ index_from_screen(x, y){
 
         private long paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs)
         {
+            int min_gap = (20 + 6) * 100; //20px font height, + 6px vertical padding  * 100 nt per line
             if (nContigs == 0)
             {
                 return 0;
             }
             for (int i = 0; i < this.levels.Count; ++i)
             {
-                if (nextSegmentLength < levels[i].chunk_size)
+                if (nextSegmentLength + min_gap < levels[i].chunk_size)
                 {
-                    int height = 20 + 6;
-                    long mainPadding = Math.Max(height * 100, levels[i-1].chunk_size); // give a full level of blank space just in case the previous
+                    long main_padding = Math.Max(min_gap, levels[i - 1].chunk_size); // give a full level of blank space just in case the previous
+                    long space_remaining = levels[i].chunk_size - totalProgress % levels[i].chunk_size;
                     //  sequence comes right up to the edge.  There should always be >= 1 full gap
-                    long remainder = levels[i - 1].chunk_size - totalProgress % levels[i - 1].chunk_size; // fill out the remainder so we can start at the beginning
-                    return mainPadding + remainder;
+                    LayoutLevel reset_level = nextSegmentLength + main_padding > space_remaining ? levels[i] : levels[i - 1]; //bigger reset when close to filling chunk_size
+                    long remainder = reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
+                    
+                    return main_padding + remainder;
                 }
             }
             return 0;
