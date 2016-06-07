@@ -1164,8 +1164,9 @@ namespace DDV
             long size = fileSize.Length;
             progressBar1.Minimum = 0;
             progressBar1.Maximum = (int)size;
-            
+
             BackgroundWorker workerBMPPainter = new BackgroundWorker();
+            DDVLayoutManager tile_layout = new DDVLayoutManager();
             workerBMPPainter.WorkerReportsProgress = true;
             workerBMPPainter.WorkerSupportsCancellation = true;
             workerBMPPainter.ProgressChanged += (u, args) =>
@@ -1203,7 +1204,6 @@ namespace DDV
 
                 if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                 {
-                    DDVLayoutManager tile_layout = new DDVLayoutManager();
                     tile_layout.process_file(streamFASTAFile, worker, b, bmd);
                 }
                 if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
@@ -1355,7 +1355,8 @@ namespace DDV
             var ColumnPadding = " + iPaddingBetweenColumns + @";
             var columnWidthInNucleotides = " + columnWidthInNucleotides + @";
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
-            var layout_levels = " + new DDVLayoutManager().ToString() + @";
+            var layout_levels = " + tile_layout.ToString() + @";
+            var ContigSpacingJSON = " + tile_layout.ContigSpacingJSON() + @";
             var multipart_file = " + multipart_file.ToString() + @";
             var includeDensity = " + chckIncludeDensity.Checked.ToString().ToLower() + @";
 

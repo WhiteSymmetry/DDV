@@ -89,6 +89,7 @@ index_from_screen(x, y){
     class DDVLayoutManager
     {
         public List<LayoutLevel> levels;
+        public List<Contig> contigs;
         public DDVLayoutManager()
         {
             levels = new List<LayoutLevel>();
@@ -171,38 +172,54 @@ index_from_screen(x, y){
                             
             return json;
         }
-
-
-        public List<Contig> process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd)
+        
+        public string ContigSpacingJSON()
         {
-            List<Contig> contigs = new List<Contig>();
+            string json = "[";
+            foreach (Contig contig in this.contigs)
+            {
+                json += "{" + "name: '" + contig.name.Replace("'", "") + "', titlePadding: " + contig.titlePadding + ", tailPadding: " + contig.tailPadding + "},";
+            }
+            json = json.Substring(0, json.Length - 1) + "]";  // no last comma
+
+            return json;
+        }
+
+        public bool process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd)
+        {
+            contigs = new List<Contig>();
             long nucleotidesProcessed = 0;
             long seqAndPadding = 0;
             string read = "";
             string currentName = "";
-            string seq = "";
+            List<string> seq_collection = new List<string>();
+            string sequence = String.Join("", seq_collection);
             //Pre-read generates an array of contigs with labels and sequences
             while (((read = streamFASTAFile.ReadLine()) != null))
             {
                 if (read.Substring(0, 1) == ">")
                 {
-                    if (seq != "") {
-                        long padding = this.paddingInNucleotides(seqAndPadding, (long)seq.Length, contigs.Count);
-                        contigs.Add( new Contig(currentName, seq, padding) );
-                        seqAndPadding += padding + seq.Length;
+                    if (seq_collection.Count > 0) {
+                        sequence = String.Join("", seq_collection);
+                        seq_collection = new List<string>(); //clear
 
-                        seq = "";
+                        long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count);
+                        contigs.Add( new Contig(currentName, sequence, padding[0], padding[1]) );
+                        seqAndPadding += padding[0] + padding[1] + sequence.Length;
+
                         worker.ReportProgress((int)seqAndPadding);
                     }
                     currentName = read.Substring(1, read.Length-1); //between > and \n
                 }
                 else
                 {
-                    seq += read.ToUpper(); //collects the sequence to be stored in the contig
+                    seq_collection.Add(read.ToUpper()); //collects the sequence to be stored in the contig, constant time performance (don't concat strings!)
                 }
             }
             //add the last contig to the list
-            contigs.Add(new Contig(currentName, seq, this.paddingInNucleotides(seqAndPadding, seq.Length, contigs.Count)));
+            sequence = String.Join("", seq_collection);
+            long[] paddings = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count);
+            contigs.Add(new Contig(currentName, sequence, paddings[0], paddings[1]) );
             seqAndPadding = 0;
             //TODO: iterate through contigs in order of size
 
@@ -210,7 +227,7 @@ index_from_screen(x, y){
             for (int contig = 0; contig < contigs.Count; contig++)
             {
                 seqAndPadding += contigs[contig].titlePadding;
-                //worker.ReportProgress((int) (nucleotidesProcessed += contigs[contig].seq.Length)); // doesn't include padding
+                worker.ReportProgress((int) (nucleotidesProcessed += contigs[contig].seq.Length)); // doesn't include padding
 
                 //----------------------------New Tiled Layout style----------------------------------
                 int[] xy = { 0, 0 };
@@ -219,33 +236,36 @@ index_from_screen(x, y){
                     xy = this.position_on_screen(seqAndPadding++);
                     utils.Write1BaseToBMP(contigs[contig].seq[c], ref b, xy[0], xy[1], ref bmd);
                 }
+                seqAndPadding += contigs[contig].tailPadding;// add trailing white space after the contig sequence body
             }
 
-            return contigs;
+            return true;
         }
 
-        private long paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs)
+        private long[] paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs)
         {
             int min_gap = (20 + 6) * 100; //20px font height, + 6px vertical padding  * 100 nt per line
-            if (nContigs == 0)
+            if (nContigs == 0) //TODO: if (multipart_file)
             {
-                return 0;
+                return new long[]{0, 0};
             }
             for (int i = 0; i < this.levels.Count; ++i)
             {
                 if (nextSegmentLength + min_gap < levels[i].chunk_size)
                 {
-                    long main_padding = Math.Max(min_gap, levels[i - 1].chunk_size); // give a full level of blank space just in case the previous
+                    long title_padding = Math.Max(min_gap, levels[i - 1].chunk_size); // give a full level of blank space just in case the previous
                     long space_remaining = levels[i].chunk_size - totalProgress % levels[i].chunk_size;
                     //  sequence comes right up to the edge.  There should always be >= 1 full gap
-                    LayoutLevel reset_level = nextSegmentLength + main_padding > space_remaining ? levels[i] : levels[i - 1]; //bigger reset when close to filling chunk_size
-                    long remainder = reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
-                    
-                    return main_padding + remainder;
+                    LayoutLevel reset_level = nextSegmentLength + title_padding > space_remaining ? levels[i] : levels[i - 1]; //bigger reset when close to filling chunk_size
+                    long reset_padding = reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
+                    long tail = levels[i - 1].chunk_size - (totalProgress + title_padding + reset_padding + nextSegmentLength) % levels[i - 1].chunk_size - 1;
+
+                    return new long[]{ title_padding + reset_padding, tail };
                 }
             }
-            return 0;
+            return new long[]{0, 0};
         }
+
     }
 
     class Contig
@@ -253,13 +273,15 @@ index_from_screen(x, y){
         public string name; 
         public string seq;
         public long titlePadding = 0;
+        public long tailPadding = 0;
         //public long size;
-        public Contig(string name, string seq, long paddingInNucleotides)
+        public Contig(string name, string seq, long paddingInNucleotides, long tailPadding)
         {
             this.name = name;
             this.seq = seq;
             //this.size = size;
             this.titlePadding = paddingInNucleotides;
+            this.tailPadding = tailPadding;
 
         }
     }
