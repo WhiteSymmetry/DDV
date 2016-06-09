@@ -13185,7 +13185,10 @@ function configureFromObject( tileSource, configuration ){
 
             bigCanvas.width = currentWidth;
             bigCanvas.height = currentHeight;
-			bigContext.imageSmoothingEnabled = true;
+            bigContext.imageSmoothingEnabled = true;
+            bigContext.webkitImageSmoothingEnabled = true;
+            bigContext.mozImageSmoothingEnabled = true;
+            bigContext.msImageSmoothingEnabled = true;
             bigContext.drawImage(this._image, 0, 0, currentWidth, currentHeight);
             // We cache the context of the highest level because the browser
             // is a lot faster at downsampling something it already has
@@ -13208,7 +13211,10 @@ function configureFromObject( tileSource, configuration ){
                 var smallContext = smallCanvas.getContext("2d");
                 smallCanvas.width = currentWidth;
                 smallCanvas.height = currentHeight;
-				smallContext.imageSmoothingEnabled = true;
+                smallContext.imageSmoothingEnabled = true;
+                smallContext.webkitImageSmoothingEnabled = true;
+                smallContext.mozImageSmoothingEnabled = true;
+                smallContext.msImageSmoothingEnabled = true;
                 smallContext.drawImage(bigCanvas, 0, 0, currentWidth, currentHeight);
 
                 levels.splice(0, 0, {
@@ -15904,7 +15910,10 @@ $.Tile.prototype = {
         // changes as we are rendering the image
         drawingHandler({context: context, tile: this, rendered: rendered});
 
-		context.imageSmoothingEnabled = true;
+        context.imageSmoothingEnabled = true;
+        context.webkitImageSmoothingEnabled = true;
+        context.mozImageSmoothingEnabled = true;
+        context.msImageSmoothingEnabled = true;
         context.drawImage(
             rendered.canvas,
             0,
@@ -16887,7 +16896,10 @@ $.Drawer.prototype = {
             this.context.globalCompositeOperation = compositeOperation;
         }
         if (bounds) {
-			this.context.imageSmoothingEnabled = true;
+            this.context.imageSmoothingEnabled = true;
+            this.context.webkitImageSmoothingEnabled = true;
+            this.context.mozImageSmoothingEnabled = true;
+            this.context.msImageSmoothingEnabled = true;
             this.context.drawImage(
                 this.sketchCanvas,
                 bounds.x,
@@ -16913,7 +16925,10 @@ $.Drawer.prototype = {
                 widthExt = Math.round(widthDiff / 2);
                 heightExt = Math.round(heightDiff / 2);
             }
-			this.context.imageSmoothingEnabled = false;
+            this.context.imageSmoothingEnabled = false;
+            this.context.webkitImageSmoothingEnabled = false;
+            this.context.mozImageSmoothingEnabled = false;
+            this.context.msImageSmoothingEnabled = false;
             this.context.drawImage(
                 this.sketchCanvas,
                 position.x - widthExt * scale,
@@ -20231,7 +20246,10 @@ ImageRecord.prototype = {
             canvas.width = this._image.width;
             canvas.height = this._image.height;
             this._renderedContext = canvas.getContext('2d');
-			this._renderedContext.imageSmoothingEnabled = true;
+            this._renderedContext.imageSmoothingEnabled = true;
+            this._renderedContext.webkitImageSmoothingEnabled = true;
+            this._renderedContext.mozImageSmoothingEnabled = true;
+            this._renderedContext.msImageSmoothingEnabled = true;
             this._renderedContext.drawImage( this._image, 0, 0 );
             //since we are caching the prerendered image on a canvas
             //allow the image to not be held in memory
