@@ -1100,7 +1100,7 @@ namespace DDV
             FileInfo TheFile = new FileInfo(m_strSourceFile);
             sequenceLength = TheFile.Length;
 
-            sequenceLength = populateInfo(sequenceLength > 100000000);
+            sequenceLength = populateInfo(sequenceLength > 300000000);
 
             if (sequenceLength == 0)
             {
@@ -1152,8 +1152,6 @@ namespace DDV
                 MessageBoxShow("numColumns: " + numColumns);
                 MessageBoxShow("x: " + x);
             }
-
-
 
             // Bitmap B = new Bitmap(x, y);
             string strMessage = "Initializing PNG width=" + x + " height=" + y;
@@ -1216,93 +1214,22 @@ namespace DDV
             workerBMPPainter.DoWork += (u, args) =>
             {
                 BackgroundWorker worker = u as BackgroundWorker;
-
                 int selectedIndex = (int)args.Argument;
-
-                //----------------------------convert data to pixels---------------------------------
-                int boundX = b.Width;
-                int boundY = b.Height;
-                int nucleotidesInThisLine = 0;
-
-                counter = 0;
-                bool end = false;
-                string firstLetter = null;
-
-                int x_pointer = 0;
-                int y_pointer = 0;
-                int lineBeginning = x_pointer;
-                int progress = 0;
-
                 StreamReader streamFASTAFile = File.OpenText(m_strSourceFile);
-
-                progress = progress + 1;
-                worker.ReportProgress(progress);
+                worker.ReportProgress(1);
 
                 if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                 {
-                    tile_layout.process_file(streamFASTAFile, worker, b, bmd, multipart_file);
+                    //reassigns Bitmap b to a new object
+                    b = tile_layout.process_file(streamFASTAFile, worker, b, bmd, multipart_file);
                 }
                 if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
                 {
-                    while (((read = streamFASTAFile.ReadLine()) != null) && !end)
-                    {
-                        if (read == "")
-                        { //skip 
-                        }
-                        else
-                        {
-                            progress += (int)read.Length;
-                            worker.ReportProgress(progress);
-
-                            firstLetter = read.Substring(0, 1);
-
-                            if (firstLetter == ">")
-                            {
-
-                            }
-
-                            else
-                            {
-                                read = utils.CleanInputFile(read);
-                                read = utils.ConvertToDigits(read);
-
-                            
-                                //------------Classic Long column Layout--------------/
-                                for (int c = 0; c < read.Length; c++)
-                                {
-                                    utils.Write1BaseToBMP(read[c], ref b, x_pointer, y_pointer, ref bmd);
-                                    x_pointer++; //increment one pixel size to the right
-                                    nucleotidesInThisLine += 1;
-
-                                    if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
-                                    {
-                                        nucleotidesInThisLine = 0;
-                                        x_pointer = lineBeginning;
-                                        y_pointer++;
-
-                                        if (y_pointer >= boundY)
-                                        {
-                                            x_pointer += iColumnWidth;
-                                            lineBeginning = x_pointer;
-                                            y_pointer = 0;
-                                        }
-
-                                        if (x_pointer >= boundX)
-                                        {
-                                            counter++;
-                                            end = true;
-                                            //this would be an unexpected error, throw an exception
-                                            throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format.");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    counter = full_column_layout(counter, iColumnWidth, worker, streamFASTAFile, b, bmd);
                 }
 
-                //close the sequence file
-                streamFASTAFile.Close();
+
+                streamFASTAFile.Close(); //close the sequence file
 
                 //----------------------------end of convert data to pixels--------------------------
 
@@ -1312,8 +1239,6 @@ namespace DDV
             {
                 MessageBoxShow("Completed mapping DNA to pixels.  Saving result...");
 
-                b.UnlockBits(bmd);
-                bmd = null;
                 string strResultFileName = "";
                 if (outputNaming.SelectedIndex == 0)  // 0 is GI naming
                 {
@@ -1502,6 +1427,82 @@ This DNA data visualization interface was generated with <a href='https://github
                 
             };
            
+        }
+
+        private long full_column_layout(long counter, int iColumnWidth, BackgroundWorker worker, StreamReader streamFASTAFile, Bitmap b, BitmapData bmd)
+        {
+            //----------------------------convert data to pixels---------------------------------
+            int boundX = b.Width;
+            int boundY = b.Height;
+            int nucleotidesInThisLine = 0;
+
+            counter = 0;
+            bool end = false;
+            string firstLetter = null;
+
+            int x_pointer = 0;
+            int y_pointer = 0;
+            int lineBeginning = x_pointer;
+            int progress = 0;
+
+            while (((read = streamFASTAFile.ReadLine()) != null) && !end)
+            {
+                if (read == "")
+                { //skip 
+                }
+                else
+                {
+                    progress += (int)read.Length;
+                    worker.ReportProgress(progress);
+
+                    firstLetter = read.Substring(0, 1);
+
+                    if (firstLetter == ">")
+                    {
+
+                    }
+
+                    else
+                    {
+                        read = utils.CleanInputFile(read);
+                        read = utils.ConvertToDigits(read);
+
+
+                        //------------Classic Long column Layout--------------/
+                        for (int c = 0; c < read.Length; c++)
+                        {
+                            utils.Write1BaseToBMP(read[c], ref b, x_pointer, y_pointer, ref bmd);
+                            x_pointer++; //increment one pixel size to the right
+                            nucleotidesInThisLine += 1;
+
+                            if (nucleotidesInThisLine >= columnWidthInNucleotides) // carriage return
+                            {
+                                nucleotidesInThisLine = 0;
+                                x_pointer = lineBeginning;
+                                y_pointer++;
+
+                                if (y_pointer >= boundY)
+                                {
+                                    x_pointer += iColumnWidth;
+                                    lineBeginning = x_pointer;
+                                    y_pointer = 0;
+                                }
+
+                                if (x_pointer >= boundX)
+                                {
+                                    counter++;
+                                    end = true;
+                                    //this would be an unexpected error, throw an exception
+                                    throw new System.Exception("Unexpected error while converting data.  Attempt to paint a pixel outside of image bounds. Please review the parameters and ensure the data is in FASTA format.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            b.UnlockBits(bmd);
+            bmd = null;
+            return counter;
         }
 
         //Generates Bitmap from Data

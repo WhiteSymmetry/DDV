@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -181,21 +182,80 @@ index_from_screen(x, y){
             string json = "[";
             foreach (Contig contig in this.contigs)
             {
-                startingIndex += contig.titlePadding;
+                startingIndex += contig.title_padding;
                 long endIndex = startingIndex + contig.seq.Length;
                 json += "{" + "name: '" + contig.name.Replace("'", "") + "', startingIndex: " + startingIndex + ", endIndex: " + endIndex + 
-                    ", titlePadding: " + contig.titlePadding + ", tailPadding: " + contig.tailPadding + "},";
-                startingIndex = endIndex + contig.tailPadding; //used for the start calculation of the next contig
+                    ", title_padding: " + contig.title_padding + ", tail_padding: " + contig.tail_padding + "},";
+                startingIndex = endIndex + contig.tail_padding; //used for the start calculation of the next contig
             }
             json = json.Substring(0, json.Length - 1) + "]";  // no last comma
 
             return json;
         }
 
-        public bool process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd, bool multipart_file)
+        public Bitmap process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd, bool multipart_file)
         {
-            contigs = new List<Contig>();
+            contigs = read_contigs(streamFASTAFile, worker, multipart_file);
             long nucleotidesProcessed = 0;
+            long seqAndPadding = 0;
+            //TODO: iterate through contigs in order of size
+
+            //Layout contigs one at a time
+            foreach (Contig contig in contigs)
+            {
+                seqAndPadding += contig.reset_padding + contig.title_padding;
+                worker.ReportProgress((int) (nucleotidesProcessed += contig.seq.Length)); // doesn't include padding
+
+                //----------------------------New Tiled Layout style----------------------------------
+                int[] xy = { 0, 0 };
+                for (int c = 0; c < contig.seq.Length; c++)
+                {
+                    xy = this.position_on_screen(seqAndPadding++);
+                    utils.Write1BaseToBMP(contig.seq[c], ref b, xy[0], xy[1], ref bmd);
+                }
+                seqAndPadding += contig.tail_padding;// add trailing white space after the contig sequence body
+            }
+            //Make non-color indexed bitmap from the drawn image and render text onto it
+            b.UnlockBits(bmd);
+            bmd = null;
+            Bitmap composite = new Bitmap(b.Width, b.Height);
+            Graphics graphics = Graphics.FromImage(composite);
+            graphics.DrawImage(b, 0, 0);
+
+            if (multipart_file) {
+                seqAndPadding = 0;
+                foreach (Contig contig in contigs)
+                {
+                    seqAndPadding += contig.reset_padding; //this is to move the cursor to the right line for a large title
+                    draw_title(seqAndPadding, contig, composite);
+                    seqAndPadding += contig.title_padding + contig.seq.Length + contig.tail_padding;
+                }
+            }
+
+            return composite;
+        }
+
+        private void draw_title(long seqAndPadding, Contig contig, Bitmap composite)
+        {
+            int[] upper_left = position_on_screen(seqAndPadding);
+            int[] bottom_right = position_on_screen(seqAndPadding + contig.title_padding - 2);
+            
+            RectangleF rectf = new RectangleF(upper_left[0], upper_left[1], bottom_right[0], bottom_right[1]);
+            Graphics g = Graphics.FromImage(composite);
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
+            //drawFormat.Alignment = StringAlignment.Center;
+            if (contig.title_padding == this.levels[2].chunk_size) //column titles are vertically oriented
+                drawFormat.FormatFlags = StringFormatFlags.DirectionVertical;
+            g.DrawString(contig.name, new Font("Tahoma", 8), Brushes.Black, rectf, drawFormat);
+            g.Flush();
+        }
+
+        private List<Contig> read_contigs(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, bool multipart_file)
+        {
+            List<Contig> contigs = new List<Contig>();
             long seqAndPadding = 0;
             string read = "";
             string currentName = "";
@@ -206,17 +266,18 @@ index_from_screen(x, y){
             {
                 if (read.Substring(0, 1) == ">")
                 {
-                    if (seq_collection.Count > 0) {
+                    if (seq_collection.Count > 0)
+                    {
                         sequence = String.Join("", seq_collection);
                         seq_collection = new List<string>(); //clear
 
                         long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
-                        contigs.Add( new Contig(currentName, sequence, padding[0], padding[1]) );
-                        seqAndPadding += padding[0] + padding[1] + sequence.Length;
+                        contigs.Add(new Contig(currentName, sequence, padding[0], padding[1], padding[2]));
+                        seqAndPadding += padding[0] + padding[1] + padding[2] + sequence.Length;
 
                         worker.ReportProgress((int)seqAndPadding);
                     }
-                    currentName = read.Substring(1, read.Length-1); //between > and \n
+                    currentName = read.Substring(1, read.Length - 1); //between > and \n
                 }
                 else
                 {
@@ -226,27 +287,8 @@ index_from_screen(x, y){
             //add the last contig to the list
             sequence = String.Join("", seq_collection);
             long[] paddings = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
-            contigs.Add(new Contig(currentName, sequence, paddings[0], paddings[1]) );
-            seqAndPadding = 0;
-            //TODO: iterate through contigs in order of size
-
-            //Layout contigs one at a time
-            for (int contig = 0; contig < contigs.Count; contig++)
-            {
-                seqAndPadding += contigs[contig].titlePadding;
-                worker.ReportProgress((int) (nucleotidesProcessed += contigs[contig].seq.Length)); // doesn't include padding
-
-                //----------------------------New Tiled Layout style----------------------------------
-                int[] xy = { 0, 0 };
-                for (int c = 0; c < contigs[contig].seq.Length; c++)
-                {
-                    xy = this.position_on_screen(seqAndPadding++);
-                    utils.Write1BaseToBMP(contigs[contig].seq[c], ref b, xy[0], xy[1], ref bmd);
-                }
-                seqAndPadding += contigs[contig].tailPadding;// add trailing white space after the contig sequence body
-            }
-
-            return true;
+            contigs.Add(new Contig(currentName, sequence, paddings[0], paddings[1], paddings[2]));
+            return contigs;
         }
 
         private long[] paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs, bool multipart_file)
@@ -267,7 +309,7 @@ index_from_screen(x, y){
                     long reset_padding = reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
                     long tail = levels[i - 1].chunk_size - (totalProgress + title_padding + reset_padding + nextSegmentLength) % levels[i - 1].chunk_size - 1;
 
-                    return new long[]{ title_padding + reset_padding, tail };
+                    return new long[] { title_padding, tail, reset_padding };
                 }
             }
             return new long[]{0, 0};
@@ -279,17 +321,18 @@ index_from_screen(x, y){
     {
         public string name; 
         public string seq;
-        public long titlePadding = 0;
-        public long tailPadding = 0;
+        public long title_padding = 0;
+        public long tail_padding = 0;
+        public long reset_padding = 0;
         //public long size;
-        public Contig(string name, string seq, long paddingInNucleotides, long tailPadding)
+        public Contig(string name, string seq, long title_padding, long tailPadding, long reset_padding)
         {
             this.name = name;
             this.seq = seq;
             //this.size = size;
-            this.titlePadding = paddingInNucleotides;
-            this.tailPadding = tailPadding;
-
+            this.title_padding = title_padding;
+            this.tail_padding = tailPadding;
+            this.reset_padding = reset_padding;
         }
     }
 
