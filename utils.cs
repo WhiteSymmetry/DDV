@@ -138,7 +138,7 @@ namespace DDV
             // BitmapData bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height),
             //                ImageLockMode.ReadWrite, b.PixelFormat);
             byte* p = (byte*)bmd.Scan0.ToPointer();
-            int offset = y * bmd.Stride + x;
+            long offset = y * bmd.Stride + x;
             p[offset] = c;
         }
 

@@ -905,7 +905,7 @@ namespace DDV
         public int columnWidthInNucleotides = 100;
         public const int FULL_COLUMN_LAYOUT = 0;
         public const int TILED_LAYOUT = 1;
-        public int sequenceLength = 0;
+        public long sequenceLength = 0;
         public bool multipart_file = false;
         public Dictionary<char, long> letter_counts = new Dictionary<char, long>() {
              {'A', 0}, {'G', 0}, {'T', 0}, {'C', 0}, {'N', 0}, {'R', 0}, {'Y', 0}, {'S', 0}, {'W', 0},
@@ -930,7 +930,7 @@ namespace DDV
         public int ipN = 0;
         public int ipUnknown = 0;
 
-        private int populateInfo()
+        private long populateInfo(bool take_shortcuts)
         {
             if (m_strSourceFile == "") { 
                 MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); 
@@ -948,10 +948,15 @@ namespace DDV
 
             int i = 0;
             bool bOnce = false;
-            sequenceLength = 0;
+            if (!take_shortcuts)
+            {
+                sequenceLength = 0;
+            }else{
+                multipart_file = true;
+            }
             int iActualLineLength = 0;
 
-            while (((read = streamFASTAFile.ReadLine()) != null) )
+            while (((read = streamFASTAFile.ReadLine()) != null) && (!take_shortcuts || !bOnce))
             {
                 if (read == "")
                 { //skip 
@@ -1003,13 +1008,23 @@ namespace DDV
                         read = read.ToUpper();
 
                         //for accounting:
-                        CountOccurencesOfChar(read);
+                        if (take_shortcuts) { 
+                            letter_counts = new Dictionary<char, long>() //just make sure legend shows up 
+                            {
+                                    {'A', 1}, {'G', 1}, {'T', 1}, {'C', 1}, {'N', 1}, {'R', 0}, {'Y', 0}, {'S', 0}, {'W', 0},
+                                    {'K', 0}, {'M', 0}, {'B', 0}, {'D', 0}, {'H', 0}, {'V', 0}
+                            };
+                        }
+                        else
+                        {
+                            CountOccurencesOfChar(read);
+                        }
                         if (!bOnce) { 
                             iActualLineLength = read.Length; 
                             bOnce = true; 
                         }
 
-                        sequenceLength +=+ read.Trim().Length;
+                        sequenceLength += read.Trim().Length;
                        
                         i++;
                     }
@@ -1083,8 +1098,9 @@ namespace DDV
             if (m_strSourceFile == "") { MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file"+m_strSourceFile+". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             FileInfo TheFile = new FileInfo(m_strSourceFile);
+            sequenceLength = TheFile.Length;
 
-            sequenceLength = populateInfo();
+            sequenceLength = populateInfo(sequenceLength > 100000000);
 
             if (sequenceLength == 0)
             {
@@ -1124,7 +1140,7 @@ namespace DDV
             if (layoutSelector.SelectedIndex == TILED_LAYOUT)  // New layout added by Josiah Seaman
             {
                 DDVLayoutManager layout = new DDVLayoutManager();
-                int[] xy = layout.max_dimensions(sequenceLength); //xy point of last pixel, gives us the largest boundaries
+                int[] xy = layout.max_dimensions(sequenceLength, multipart_file); //xy point of last pixel, gives us the largest boundaries
                 columnWidthInNucleotides = layout.levels[0].modulo; //override user input to ensure consistency.  Set these values in code
                 x = xy[0];
                 y = xy[1];
@@ -1142,10 +1158,30 @@ namespace DDV
             // Bitmap B = new Bitmap(x, y);
             string strMessage = "Initializing PNG width=" + x + " height=" + y;
             MessageBoxShow(strMessage);
-
-            Bitmap b = new Bitmap(x, y, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+            Bitmap b;
+            try
+            {
+                b = new Bitmap(x, y, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+                MessageBoxShow("Actual PNG width=" + b.Width + " height=" + b.Height);
+            }
+            catch (ArgumentException e)
+            {
+                MessageBoxShow(e.ToString());
+                MessageBoxShow("Image is too large to allocate");
+                return;
+            }
             utils.SetMyPalette(ref b);
-            BitmapData bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height),ImageLockMode.ReadWrite, b.PixelFormat);
+            BitmapData bmd;
+            try
+            {
+                bmd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), ImageLockMode.ReadWrite, b.PixelFormat);
+            }
+            catch (Exception e)
+            {
+                MessageBoxShow(e.ToString());
+                MessageBoxShow("Could not lock image section");
+                return;
+            }
 
 
             for (int i = 0; i < x; i++)
@@ -1204,7 +1240,7 @@ namespace DDV
 
                 if (selectedIndex == TILED_LAYOUT)  // 1 is the Tiled option
                 {
-                    tile_layout.process_file(streamFASTAFile, worker, b, bmd);
+                    tile_layout.process_file(streamFASTAFile, worker, b, bmd, multipart_file);
                 }
                 if (selectedIndex == FULL_COLUMN_LAYOUT)  // 0 is the Full Height Columns (Original) option
                 {
@@ -1292,7 +1328,7 @@ namespace DDV
                 }
                 else if (outputNaming.SelectedIndex == 1 && txtBoxSequenceNameOverride.Text != "")  // 1 is Name naming
                 {
-                    sequenceName = txtBoxSequenceNameOverride.Text;
+                    sequenceName = txtBoxSequenceNameOverride.Text.Replace('.', '_');
                     strResultFileName = sequenceName + ".png";  
                 }
 
@@ -2263,7 +2299,7 @@ This DNA data visualization interface was generated with <a href='https://github
         {
             // Set cursor as wait 
             Cursor.Current = Cursors.WaitCursor;
-            int length = populateInfo();
+            long length = populateInfo(false);
             if (length == 0)
             {
                 //btnGenerateImage.Enabled = false;
@@ -2580,7 +2616,7 @@ This DNA data visualization interface was generated with <a href='https://github
 
         private void button1_Click(object sender, EventArgs e)
         {
-            read_sequence(sender, e);
+            //read_sequence(sender, e); //redundant
             generate_image_and_interface(sender, e);
             process_deep_zoom(sender, e);
         }

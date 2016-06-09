@@ -145,9 +145,11 @@ index_from_screen(x, y){
         /** Similar to position_on_screen(index) but it instead returns the largest x and y values that the layout will need from
          * any index in between 0 and last_index.
          */ 
-        public int[] max_dimensions(long last_index)
+        public int[] max_dimensions(long last_index, bool multipart_file)
         {
-            last_index *= 3; //TODO: remove margin for contig gaps
+            if (multipart_file) { 
+                last_index *= 2; //this is a guesstimation of the amount of extra pixel layout area will be needed for padding between contigs
+            }
             int[] xy = new int[] { 0, 0 };
             for (int i = 0; i < this.levels.Count; ++i)
             {
@@ -175,17 +177,22 @@ index_from_screen(x, y){
         
         public string ContigSpacingJSON()
         {
+            long startingIndex = 0; //TODO: or is this 1?
             string json = "[";
             foreach (Contig contig in this.contigs)
             {
-                json += "{" + "name: '" + contig.name.Replace("'", "") + "', titlePadding: " + contig.titlePadding + ", tailPadding: " + contig.tailPadding + "},";
+                startingIndex += contig.titlePadding;
+                long endIndex = startingIndex + contig.seq.Length;
+                json += "{" + "name: '" + contig.name.Replace("'", "") + "', startingIndex: " + startingIndex + ", endIndex: " + endIndex + 
+                    ", titlePadding: " + contig.titlePadding + ", tailPadding: " + contig.tailPadding + "},";
+                startingIndex = endIndex + contig.tailPadding; //used for the start calculation of the next contig
             }
             json = json.Substring(0, json.Length - 1) + "]";  // no last comma
 
             return json;
         }
 
-        public bool process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd)
+        public bool process_file(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, Bitmap b, BitmapData bmd, bool multipart_file)
         {
             contigs = new List<Contig>();
             long nucleotidesProcessed = 0;
@@ -203,7 +210,7 @@ index_from_screen(x, y){
                         sequence = String.Join("", seq_collection);
                         seq_collection = new List<string>(); //clear
 
-                        long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count);
+                        long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
                         contigs.Add( new Contig(currentName, sequence, padding[0], padding[1]) );
                         seqAndPadding += padding[0] + padding[1] + sequence.Length;
 
@@ -218,7 +225,7 @@ index_from_screen(x, y){
             }
             //add the last contig to the list
             sequence = String.Join("", seq_collection);
-            long[] paddings = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count);
+            long[] paddings = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
             contigs.Add(new Contig(currentName, sequence, paddings[0], paddings[1]) );
             seqAndPadding = 0;
             //TODO: iterate through contigs in order of size
@@ -242,10 +249,10 @@ index_from_screen(x, y){
             return true;
         }
 
-        private long[] paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs)
+        private long[] paddingInNucleotides(long totalProgress, long nextSegmentLength, int nContigs, bool multipart_file)
         {
             int min_gap = (20 + 6) * 100; //20px font height, + 6px vertical padding  * 100 nt per line
-            if (nContigs == 0) //TODO: if (multipart_file)
+            if (!multipart_file)
             {
                 return new long[]{0, 0};
             }
