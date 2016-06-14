@@ -1100,7 +1100,7 @@ namespace DDV
             FileInfo TheFile = new FileInfo(m_strSourceFile);
             sequenceLength = TheFile.Length;
 
-            sequenceLength = populateInfo(sequenceLength > 300000000);
+            sequenceLength = populateInfo(false); // sequenceLength > 300000000);
 
             if (sequenceLength == 0)
             {
@@ -1318,7 +1318,7 @@ namespace DDV
             var layoutSelector = " + layoutSelector.SelectedIndex + @";
             var layout_levels = " + tile_layout.ToString() + @";
             var ContigSpacingJSON = " + tile_layout.ContigSpacingJSON() + @";
-            var multipart_file = " + multipart_file.ToString() + @";
+            var multipart_file = " + multipart_file.ToString().ToLower() + @";
             var includeDensity = " + chckIncludeDensity.Checked.ToString().ToLower() + @";
 
             var usa='refseq_fetch:" + refseq + @"';          

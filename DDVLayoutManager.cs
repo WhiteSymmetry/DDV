@@ -285,24 +285,26 @@ index_from_screen(x, y){
             //Pre-read generates an array of contigs with labels and sequences
             while (((read = streamFASTAFile.ReadLine()) != null))
             {
-                if (read.Substring(0, 1) == ">")
-                {
-                    if (seq_collection.Count > 0)
+                if (read != "") { 
+                    if (read.Substring(0, 1) == ">")
                     {
-                        sequence = String.Join("", seq_collection);
-                        seq_collection = new List<string>(); //clear
+                        if (seq_collection.Count > 0)
+                        {
+                            sequence = String.Join("", seq_collection);
+                            seq_collection = new List<string>(); //clear
 
-                        long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
-                        contigs.Add(new Contig(currentName, sequence, padding[0], padding[1], padding[2]));
-                        seqAndPadding += padding[0] + padding[1] + padding[2] + sequence.Length;
+                            long[] padding = this.paddingInNucleotides(seqAndPadding, (long)sequence.Length, contigs.Count, multipart_file);
+                            contigs.Add(new Contig(currentName, sequence, padding[0], padding[1], padding[2]));
+                            seqAndPadding += padding[0] + padding[1] + padding[2] + sequence.Length;
 
-                        worker.ReportProgress((int)seqAndPadding);
+                            worker.ReportProgress((int)seqAndPadding);
+                        }
+                        currentName = read.Substring(1, read.Length - 1); //between > and \n
                     }
-                    currentName = read.Substring(1, read.Length - 1); //between > and \n
-                }
-                else
-                {
-                    seq_collection.Add(read.ToUpper()); //collects the sequence to be stored in the contig, constant time performance (don't concat strings!)
+                    else
+                    {
+                        seq_collection.Add(read.ToUpper()); //collects the sequence to be stored in the contig, constant time performance (don't concat strings!)
+                    }
                 }
             }
             //add the last contig to the list
@@ -317,7 +319,7 @@ index_from_screen(x, y){
             int min_gap = (20 + 6) * 100; //20px font height, + 6px vertical padding  * 100 nt per line
             if (!multipart_file)
             {
-                return new long[]{0, 0};
+                return new long[]{0, 0, 0};
             }
             for (int i = 0; i < this.levels.Count; ++i)
             {
@@ -333,14 +335,14 @@ index_from_screen(x, y){
                     return new long[] { title_padding, tail, reset_padding };
                 }
             }
-            return new long[]{0, 0};
+            return new long[]{0, 0, 0};
         }
 
     }
 
     class Contig
     {
-        public string name; 
+        public string name = ""; 
         public string seq;
         public long title_padding = 0;
         public long tail_padding = 0;
