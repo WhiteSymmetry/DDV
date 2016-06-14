@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace DDV
 {
@@ -239,18 +240,38 @@ index_from_screen(x, y){
         {
             int[] upper_left = position_on_screen(seqAndPadding);
             int[] bottom_right = position_on_screen(seqAndPadding + contig.title_padding - 2);
-            
-            RectangleF rectf = new RectangleF(upper_left[0], upper_left[1], bottom_right[0], bottom_right[1]);
+
+            RectangleF rectf = new RectangleF(upper_left[0], upper_left[1], bottom_right[0] - upper_left[0], bottom_right[1] - upper_left[1]);
             Graphics g = Graphics.FromImage(composite);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
             System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
-            //drawFormat.Alignment = StringAlignment.Center;
-            if (contig.title_padding == this.levels[2].chunk_size) //column titles are vertically oriented
-                drawFormat.FormatFlags = StringFormatFlags.DirectionVertical;
-            g.DrawString(contig.name, new Font("Tahoma", 8), Brushes.Black, rectf, drawFormat);
+            //drawFormat.FormatFlags |= StringFormatFlags.;
+            drawFormat.LineAlignment |= StringAlignment.Far;
+
+            int font_size = 10; 
+            if (contig.title_padding == this.levels[2].chunk_size)
+            { //column titles are vertically oriented
+                //drawFormat.FormatFlags |= StringFormatFlags.DirectionVertical;
+                g.TranslateTransform(upper_left[0], bottom_right[1]);
+                g.RotateTransform(-90);
+                rectf = new RectangleF(0, 0, bottom_right[1] - upper_left[1], bottom_right[0] - upper_left[0] );
+                font_size = 38;
+            }
+            if (contig.title_padding == this.levels[3].chunk_size)
+            {
+                font_size = 380; // full row labels for chromosomes
+            }
+            if (contig.title_padding == this.levels[4].chunk_size) //Tile dedicated to a Title (square shaped)
+            { // since this level is square, there's no point in rotating it
+                font_size = 900; //doesn't really need to be 10x larger than the rows
+            }
+
+            Font font = new Font("Tahoma", font_size, FontStyle.Regular, GraphicsUnit.Pixel); //14 pixels tall
+            g.DrawString(contig.name, font, Brushes.Black, Rectangle.Round(rectf), drawFormat);
             g.Flush();
+            g.ResetTransform();
         }
 
         private List<Contig> read_contigs(System.IO.StreamReader streamFASTAFile, BackgroundWorker worker, bool multipart_file)
@@ -306,7 +327,7 @@ index_from_screen(x, y){
                     long space_remaining = levels[i].chunk_size - totalProgress % levels[i].chunk_size;
                     //  sequence comes right up to the edge.  There should always be >= 1 full gap
                     LayoutLevel reset_level = nextSegmentLength + title_padding > space_remaining ? levels[i] : levels[i - 1]; //bigger reset when close to filling chunk_size
-                    long reset_padding = reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
+                    long reset_padding = totalProgress == 0 ? 0 : reset_level.chunk_size - totalProgress % reset_level.chunk_size; // fill out the remainder so we can start at the beginning
                     long tail = levels[i - 1].chunk_size - (totalProgress + title_padding + reset_padding + nextSegmentLength) % levels[i - 1].chunk_size - 1;
 
                     return new long[] { title_padding, tail, reset_padding };
