@@ -120,6 +120,7 @@ namespace DDV
         private Label label19;
         private Button btnUploadInterface;
         private Button button_generate_viz;
+        private ToolStripMenuItem drawImageToolStripMenuItem;
 
 
         protected const string _newline = "\r\n";
@@ -240,6 +241,7 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.drawImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -665,7 +667,8 @@ namespace DDV
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.helpToolStripMenuItem,
+            this.drawImageToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1008, 24);
@@ -799,6 +802,13 @@ namespace DDV
             this.groupBox2.TabIndex = 42;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
+            // 
+            // drawImageToolStripMenuItem
+            // 
+            this.drawImageToolStripMenuItem.Name = "drawImageToolStripMenuItem";
+            this.drawImageToolStripMenuItem.Size = new System.Drawing.Size(82, 20);
+            this.drawImageToolStripMenuItem.Text = "Draw Image";
+            this.drawImageToolStripMenuItem.Click += new System.EventHandler(this.drawImageToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -2625,6 +2635,11 @@ This DNA data visualization interface was generated with <a href='https://github
         private void txtBoxSequenceNameOverride_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void drawImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ImageDrawer.D2DToWIC();
         }
 	}
 }
