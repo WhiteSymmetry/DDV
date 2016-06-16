@@ -19,11 +19,11 @@ ul.selectChromosome li.selected {
 	border:1px solid #000000;
 	background-color: #a0a0a0;
 }
-#container .openseadragon-container .navigator {
+.chromosome-container .openseadragon-container .navigator {
 		background-color: #f0f0f0 !important;
 		opacity: 1 !important;
  }
-#container {
+.chromosome-container {
 	width: 800px;
 	height: 500px;
 	background-color: #f0f0f0;
@@ -61,7 +61,7 @@ a {
 	margin-top:5px;border:1px solid #202020;font-family:Courier New, Courier, Monospace; font-size:9pt;
 }
 
-#status { 
+#status {
 	margin-top:20px;
 	height:50px;
 	border: 1px dotted #a0a0a0;
@@ -69,19 +69,19 @@ a {
 	}
 
 #output
-            {
-                border: none;
-                margin: 1em 0em;
-            }
+{
+	border: none;
+	margin: 1em 0em;
+}
 #output td
-            {
-      
-            }
+{
+
+}
 #output .outputLabel
-            {
-                font-weight: bold;
-            }
-            
+{
+	font-weight: bold;
+}
+
 #outfile .sequenceFragment{
 	font-size:9pt;
 	width:95%;

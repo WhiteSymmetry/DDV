@@ -20,12 +20,22 @@ var fragmentid = "";
 var sequence_data_loaded = 0;
 var sequence_data_viewer_initialized = 0;
 
-function init() {
-    viewer = OpenSeadragon({
-        id: "container",
+function init_all(){
+    /** Iterates through each chromosome container and initializes and OpenSeaDragon
+     * view using the source directory specified in 'data-chr-source' */
+    $('.chromosome-container').each(function(index, element){
+        init($(element).attr('id'), $(element).attr('data-chr-source'))
+    });
+}
+
+function init(container_id, source_folder) {
+    var source = source_folder == "" ? "" : source_folder + "/"; //ensure directories end with a slash
+    source += "GeneratedImages/dzc_output.xml";
+    var viewer = OpenSeadragon({
+        id: container_id,
         prefixUrl: "img/",
         showNavigator: true,
-        tileSources: ["GeneratedImages/dzc_output.xml"],
+        tileSources: [source],
         maxZoomPixelRatio: 20
     });
     viewer.scalebar({
@@ -44,7 +54,7 @@ function init() {
         sizeAndTextRenderer: OpenSeadragon.ScalebarSizeAndTextRenderer.BASEPAIR_LENGTH
     });
 
-    OpenSeadragon.addEvent(viewer.element, "mousemove", showNucleotideNumber);
+    OpenSeadragon.addEvent(viewer.element, "mousemove", function(event){showNucleotideNumber(event, viewer)});
 
     //copy content of pointed at sequence fragment to result log
     $('body').keyup(function (event) {
@@ -56,8 +66,6 @@ function init() {
     });
 
     $('#SequenceFragmentInstruction').hide();
-
-
 }
 
 function numberWithCommas(x) {
@@ -109,30 +117,15 @@ function tiled_layout_mouse_position(nucNumX, nucNumY) {
     return index_from_xy + 1; // nucleotide position is [1] indexed, instead of [0] indexed
 }
 
-function showNucleotideNumber(event) {
-
-
-    // getMousePosition() returns position relative to page,
-    // while we want the position relative to the viewer
-    // element. so subtract the difference.
+function showNucleotideNumber(event, viewer) {
+    /** getMousePosition() returns position relative to page,
+    * while we want the position relative to the viewer
+    * element. so subtract the difference.*/
     var pixel = OpenSeadragon.getMousePosition(event).minus(OpenSeadragon.getElementPosition(viewer.element));
-
-    document.getElementById("mousePixels").innerHTML = toString(pixel, true);
-
     if (!viewer.isOpen()) {
         return;
     }
-
     var point = viewer.viewport.pointFromPixel(pixel);
-
-    document.getElementById("mousePoints").innerHTML
-        = toString(point, true);
-
-    document.getElementById("nucleotideNumberX").innerHTML
-        = point.x;
-    document.getElementById("nucleotideNumberY").innerHTML
-        = point.y;
-
 
     if ((point.x < 0) || (point.x > 1)) {
         nucNumX = "-";
@@ -190,43 +183,23 @@ function showNucleotideNumber(event) {
 
 }
 
-function toString(point, useParens) {
-    var x = point.x;
-    var y = point.y;
-
-    if (x % 1 || y % 1) {         // if not an integer,
-        x = x.toFixed(PRECISION); // then restrict number of
-        y = y.toFixed(PRECISION); // decimal places
-    }
-
-    if (useParens) {
-        return "(" + x + ", " + y + ")";
-    } else {
-        return x + " x " + y;
-    }
-}
-
 function addLoadEvent(func) {
-
-    var oldonload = window.onload;
+    var oldOnLoad = window.onload;
     if (typeof window.onload != 'function') {
         window.onload = func;
     }
     else {
         window.onload = function () {
-            if (oldonload) {
-                oldonload();
+            if (oldOnLoad) {
+                oldOnLoad();
             }
             func();
         }
-
     }
-
 }
 
-
 function getSequence() {
-    $('#getSequenceButton').hide()
+    $('#getSequenceButton').hide();
 
     $.ajax({
         xhr: function () {
@@ -237,7 +210,7 @@ function getSequence() {
                     var percentComplete = (evt.loaded / evt.total) * 100;
                     //Do something with download progress
                     if (percentComplete < 100) {
-                        $("#status").html("<img src='../../loading.gif' /> Loading sequence data: " + parseFloat(percentComplete).toFixed(2) + "% complete");
+                        $("#status").html("<img src='" + output_dir + "loading.gif' /> Loading sequence data: " + parseFloat(percentComplete).toFixed(2) + "% complete");
                     }
                     else {
                         $("#status").html("Sequence data loaded.  Display of sequence fragments activated.");
@@ -249,7 +222,7 @@ function getSequence() {
                     }
                 }
                 else {
-                    $("#status").html("<img src='../../loading.gif' />Loading sequence data  ... [ " + parseFloat(evt.loaded / 1048576).toFixed(2) + " MB loaded ]");
+                    $("#status").html("<img src='" + output_dir + "loading.gif' />Loading sequence data  ... [ " + parseFloat(evt.loaded / 1048576).toFixed(2) + " MB loaded ]");
                 }
             }, false);
             return xhr;
@@ -286,7 +259,7 @@ function processInitSequenceError() {
     //do nothing
 };
 
-addLoadEvent(init);
+addLoadEvent(init_all);
 if(includeDensity){
     addLoadEvent(getSequence);
 }
@@ -305,9 +278,9 @@ function outputTable() {
 
 function GenerateGCSkewChart() {
 
-    $("#status").html("<img src='../../loading.gif' />Generating GC Skew Plot...");
+    $("#status").html("<img src='" + output_dir + "loading.gif' />Generating GC Skew Plot...");
 
-    $.getScript("../../d3.v3.js", function () {
+    $.getScript(output_dir + "d3.v3.js", function () {
 
 
         var sbegin = $("#sbegin").val();

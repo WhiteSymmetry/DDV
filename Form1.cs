@@ -1326,7 +1326,8 @@ namespace DDV
             var direct_data_file='sequence.fasta';
             var direct_data_file_length=" + direct_data_file_length + @";
             var sbegin='1';
-            var send=ipTotal.ToString(); 
+            var send=" + ipTotal.ToString() + @";
+            var output_dir = '../../';
             </script>
 <script src='../../nucleotideNumber.js' type='text/javascript'></script>
 <script src='../../nucleicDensity.js' type='text/javascript'></script>";
@@ -1347,7 +1348,7 @@ namespace DDV
                             @"</strong> 
  </h2>
 
-<div id='container'>
+<div id='container' class='chromosome-container' data-chr-source=''>
 </div>
 
 <p class='legendHeading'><strong>Legend:</strong><br /></p><div style='margin-left:50px;'>";
@@ -1372,7 +1373,6 @@ namespace DDV
 <script type='text/javascript'>
 	        outputTable();
             if (includeDensity) { outputDensityUI();}
-            else { outputStatusResultUI();}
 </script>
 
 <div class='legend-details'>
