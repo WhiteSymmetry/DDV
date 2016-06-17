@@ -7,7 +7,7 @@ or Direct2D. We tried a lot of options.
 self.python file contains basic image handling methods.  It also contains a re-implementation of
 Josiah's "Tiled Layout" algorithm which is also in DDVLayoutManager.cs.
 """
-
+import math
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from collections import defaultdict
@@ -88,17 +88,17 @@ class DDVTileLayout:
             LayoutLevel("XInColumn", 100, 1),
             LayoutLevel("LineInColumn", 1000, 100)
         ]
-        self.levels.append(LayoutLevel("ColumnInRow", 100, self.levels))
-        self.levels.append(LayoutLevel("RowInTile", 10, self.levels))
-        self.levels.append(LayoutLevel("XInTile", 3, self.levels))
-        self.levels.append(LayoutLevel("YInTile", 4, self.levels))
-        self.levels.append(LayoutLevel("TileColumn", 9, self.levels))
-        self.levels.append(LayoutLevel("TileRow", 999, self.levels))
+        self.levels.append(LayoutLevel("ColumnInRow", 100, levels=self.levels))
+        self.levels.append(LayoutLevel("RowInTile", 10, levels=self.levels))
+        self.levels.append(LayoutLevel("XInTile", 3, levels=self.levels))
+        self.levels.append(LayoutLevel("YInTile", 4, levels=self.levels))
+        self.levels.append(LayoutLevel("TileColumn", 9, levels=self.levels))
+        self.levels.append(LayoutLevel("TileRow", 999, levels=self.levels))
 
     def process_file(self, input_file_name, output_file_name):
         start_time = datetime.now()
-        self.contigs = self.read_contigs(input_file_name)
-        self.prepare_image(output_file_name)
+        image_length = self.read_contigs(input_file_name)
+        self.prepare_image(image_length)
         total_progress = 0
 
         # Layout contigs one at a time
@@ -111,30 +111,31 @@ class DDVTileLayout:
                 self.draw_pixel(c, x, y)
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
 
-        if len(self.contigs) > 1:
-            self.draw_titles()
+        # if len(self.contigs) > 1:
+        #     self.draw_titles()
         self.output_image(output_file_name)
         print("Finished Array in:", datetime.now() - start_time)
 
 
     def read_contigs(self, input_file_name):
         multipart_file = True
-        contigs = []
+        self.contigs = []
         total_progress = 0
         current_name = ""
         seq_collection = []
 
         # Pre-read generates an array of contigs with labels and sequences
         with open(input_file_name, 'r') as streamFASTAFile:
-            for read in streamFASTAFile.readlines():
+            for read in streamFASTAFile.read().splitlines():
                 if read == "":
                     continue
                 if read[0] == ">":
                     if len(seq_collection) > 0:
+                        multipart_file = True
                         sequence = "".join(seq_collection)
                         seq_collection = []  # clear
                         reset, title, tail = self.calc_padding(total_progress, len(sequence), multipart_file)
-                        contigs.append(Contig(current_name, sequence, reset, title, tail))
+                        self.contigs.append(Contig(current_name, sequence, reset, title, tail))
                         total_progress += reset + title + tail + len(sequence)
 
                         # worker.ReportProgress((int)total_progress)
@@ -146,12 +147,13 @@ class DDVTileLayout:
         # add the last contig to the list
         sequence = "".join(seq_collection)
         reset, title, tail = self.calc_padding(total_progress, len(sequence), multipart_file)
-        contigs.append(Contig(current_name, sequence, reset, title, tail))
-        return contigs
+        self.contigs.append(Contig(current_name, sequence, reset, title, tail))
+        return total_progress + reset + title + tail + len(sequence)
 
 
-    def prepare_image(self, output_file_name):
-        self.image = Image.new('RGB', (10000, 10000), "white")
+    def prepare_image(self, image_length):
+        width, height = self.max_dimensions(image_length)
+        self.image = Image.new('RGB', (width, height), "white")
         self.draw = ImageDraw.Draw(self.image)
         self.pixels = self.image.load()
 
@@ -161,14 +163,14 @@ class DDVTileLayout:
         if not multipart_file:
             return 0, 0, 0
         
-        for i, current_level in self.levels:
+        for i, current_level in enumerate(self.levels):
             if next_segment_length + min_gap < current_level.chunk_size:
                 # give a full level of blank space just in case the previous
                 title_padding = max(min_gap, self.levels[i - 1].chunk_size)
                 space_remaining = current_level.chunk_size - total_progress % current_level.chunk_size
                 # sequence comes right up to the edge.  There should always be >= 1 full gap
                 reset_level = current_level  # bigger reset when close to filling chunk_size
-                if next_segment_length + title_padding > space_remaining:
+                if next_segment_length + title_padding < space_remaining:
                     reset_level = self.levels[i - 1] 
                 reset_padding = 0
                 if total_progress != 0:  # fill out the remainder so we can start at the beginning
@@ -183,7 +185,7 @@ class DDVTileLayout:
 
     def position_on_screen(self, index):
         xy = [0, 0]
-        for i, level in self.levels:
+        for i, level in enumerate(self.levels):
             part = i % 2
             coordinate_in_chunk = int(index / level.chunk_size) % level.modulo
             xy[part] += level.thickness * coordinate_in_chunk
@@ -215,10 +217,27 @@ class DDVTileLayout:
         del self.image
 
 
+    def max_dimensions(self, image_length):
+        """ Uses Tile Layout to find the largest chunk size in each dimension (XY) that the
+        image_length will reach
+        :param image_length: includes sequence length and padding from self.read_contigs()
+        :return: width and height needed
+        """
+        width_height = [0, 0]
+        for i, level in enumerate(self.levels):
+            part = i % 2
+            # how many of these will you need up to a full modulo worth
+            coordinate_in_chunk = min(int(math.ceil(image_length / float(level.chunk_size))), level.modulo)
+            if coordinate_in_chunk > 1:
+                # not cumulative, just take the max size for either x or y
+                width_height[part] = max(width_height[part], level.thickness * coordinate_in_chunk)
+        return width_height
+
 
 if __name__ == '__main__':
-    hello_world()
-    input_file_name, output_file_name = 'sequence.fa', 'output.png'
+    # input_file_name, output_file_name = 'sequence.fa', 'output.png'
 
     layout = DDVTileLayout()
-    layout.process_file(input_file_name, output_file_name)
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'output.png')
+    layout.process_file('Human selenoproteins.fa', 'output.png')
+
