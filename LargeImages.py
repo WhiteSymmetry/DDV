@@ -98,7 +98,9 @@ class DDVTileLayout:
     def process_file(self, input_file_name, output_file_name):
         start_time = datetime.now()
         image_length = self.read_contigs(input_file_name)
+        print("Read contigs :", datetime.now() - start_time)
         self.prepare_image(image_length)
+        print("Initialized Image:", datetime.now() - start_time)
         total_progress = 0
 
         # Layout contigs one at a time
@@ -110,11 +112,12 @@ class DDVTileLayout:
                 total_progress += 1
                 self.draw_pixel(c, x, y)
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
+        print("Drew Nucleotides:", datetime.now() - start_time)
 
         # if len(self.contigs) > 1:
         #     self.draw_titles()
         self.output_image(output_file_name)
-        print("Finished Array in:", datetime.now() - start_time)
+        print("Output Image in:", datetime.now() - start_time)
 
 
     def read_contigs(self, input_file_name):
@@ -184,12 +187,24 @@ class DDVTileLayout:
 
 
     def position_on_screen(self, index):
+        """ Readable unoptimized version:
         xy = [0, 0]
         for i, level in enumerate(self.levels):
+            if index < level.chunk_size:
+                return xy
             part = i % 2
             coordinate_in_chunk = int(index / level.chunk_size) % level.modulo
             xy[part] += level.thickness * coordinate_in_chunk
-        return xy
+        # Less readable
+        # x = self.levels[0].thickness * (int(index / self.levels[0].chunk_size) % self.levels[0].modulo)
+        # x+= self.levels[2].thickness * (int(index / self.levels[2].chunk_size) % self.levels[2].modulo)
+        # y = self.levels[1].thickness * (int(index / self.levels[1].chunk_size) % self.levels[1].modulo)
+        # y+= self.levels[3].thickness * (int(index / self.levels[3].chunk_size) % self.levels[3].modulo)
+        """
+        x = index % 100 + 106 * ((index // 100000) % 100) + 10762 * ((index // 100000000) % 3)
+        # x+= 106 * (int(index / 100000) % 100)
+        y = (index // 100) % 1000 + 1054 * ((index // 10000000) % 10)
+        return x, y
 
 
     def draw_pixel(self, character, x, y):
