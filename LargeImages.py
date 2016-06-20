@@ -72,9 +72,9 @@ class Contig:
     def __init__(self, name, seq, reset_padding, title_padding, tail_padding):
         self.name = name
         self.seq = seq
+        self.reset_padding = reset_padding
         self.title_padding = title_padding
         self.tail_padding = tail_padding
-        self.reset_padding = reset_padding
 
 
 class DDVTileLayout:
@@ -103,14 +103,23 @@ class DDVTileLayout:
         print("Initialized Image:", datetime.now() - start_time)
         total_progress = 0
 
+        if image_length > 300000000:
+            positioner = self.position_on_screen_big  # big images
+        else:
+            positioner = self.position_on_screen  # small images
+
         # Layout contigs one at a time
         for contig in self.contigs:
             total_progress += contig.reset_padding + contig.title_padding
             # worker.ReportProgress((int) (nucleotidesProcessed += contig.len(seq))) # doesn't include padding
-            for c in contig.seq:
-                x, y = self.position_on_screen(total_progress)
-                total_progress += 1
-                self.draw_pixel(c, x, y)
+            try:
+                for c in contig.seq:
+                    x, y = positioner(total_progress)
+                    total_progress += 1
+                    self.draw_pixel(c, x, y)
+            except IndexError as err:
+                print("x", x, "y", y)
+                print(err)
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
         print("Drew Nucleotides:", datetime.now() - start_time)
 
@@ -121,7 +130,7 @@ class DDVTileLayout:
 
 
     def read_contigs(self, input_file_name):
-        multipart_file = True
+        multipart_file = False
         self.contigs = []
         total_progress = 0
         current_name = ""
@@ -133,6 +142,12 @@ class DDVTileLayout:
                 if read == "":
                     continue
                 if read[0] == ">":
+                    # correct the padding on first entry before doing this one
+                    if len(seq_collection) == 1:
+                        reset, title, tail = self.calc_padding(0, len(self.contigs[0].seq), True)
+                        self.contigs[0].reset_padding, self.contigs[0].title_padding, self.contigs[0].tail_padding = reset, title, tail
+                        total_progress = reset + title + tail + len(self.contigs[0].seq)
+                        # this statement will always trigger len() > 0 as well to complete the current contig
                     if len(seq_collection) > 0:
                         multipart_file = True
                         sequence = "".join(seq_collection)
@@ -195,17 +210,24 @@ class DDVTileLayout:
             part = i % 2
             coordinate_in_chunk = int(index / level.chunk_size) % level.modulo
             xy[part] += level.thickness * coordinate_in_chunk
+        """
         # Less readable
         # x = self.levels[0].thickness * (int(index / self.levels[0].chunk_size) % self.levels[0].modulo)
         # x+= self.levels[2].thickness * (int(index / self.levels[2].chunk_size) % self.levels[2].modulo)
         # y = self.levels[1].thickness * (int(index / self.levels[1].chunk_size) % self.levels[1].modulo)
         # y+= self.levels[3].thickness * (int(index / self.levels[3].chunk_size) % self.levels[3].modulo)
-        """
-        x = index % 100 + 106 * ((index // 100000) % 100) + 10762 * ((index // 100000000) % 3)
-        # x+= 106 * (int(index / 100000) % 100)
-        y = (index // 100) % 1000 + 1054 * ((index // 10000000) % 10)
+
+        x = index % 100 + 106 * ((index // 100000) % 100) + 10654 * (index // 100000000)  # % 3)
+        y = (index // 100) % 1000 + 1018 * ((index // 10000000) % 10)  # + 10342 * ((index // 300000000) % 4)
         return x, y
 
+    def position_on_screen_big(self, index):
+        # 10654 * 3 + 486 padding = 32448
+        x = index % 100 + 106 * ((index // 100000) % 100) + 10654 * ((index // 100000000) % 3) + \
+            32448 * (index // 1200000000)  # % 9 #this will continue tile columns indefinitely (8 needed 4 human genome)
+        y = (index // 100) % 1000 + 1018 * ((index // 10000000) % 10) + 10342 * ((index // 300000000) % 4)
+        # + 42826 * (index // 10800000000)  # 10342 * 4 + 1458 padding = 42826
+        return x, y
 
     def draw_pixel(self, character, x, y):
         self.pixels[x, y] = palette[character]
@@ -214,7 +236,7 @@ class DDVTileLayout:
     def draw_titles(self):
         total_progress = 0
         for contig in self.contigs:
-            total_progress += contig.reset_padding  # self.is to move the cursor to the right line for a large title
+            total_progress += contig.reset_padding  # is to move the cursor to the right line for a large title
             self.draw_title(total_progress, contig)
             total_progress += contig.title_padding + len(contig.seq) + contig.tail_padding
 
@@ -253,6 +275,7 @@ if __name__ == '__main__':
     # input_file_name, output_file_name = 'sequence.fa', 'output.png'
 
     layout = DDVTileLayout()
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'output.png')
-    layout.process_file('Human selenoproteins.fa', 'output.png')
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'ch20-2.png')
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', 'chr1 Human.png')
+    layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
 
