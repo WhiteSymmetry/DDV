@@ -297,7 +297,6 @@ namespace DDV
             this.txtBoxSequenceNameOverride.Name = "txtBoxSequenceNameOverride";
             this.txtBoxSequenceNameOverride.Size = new System.Drawing.Size(277, 20);
             this.txtBoxSequenceNameOverride.TabIndex = 42;
-            this.txtBoxSequenceNameOverride.TextChanged += new System.EventHandler(this.txtBoxSequenceNameOverride_TextChanged);
             // 
             // label15
             // 
@@ -716,13 +715,13 @@ namespace DDV
             // 
             this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
             this.button_generate_viz.Enabled = false;
-            this.button_generate_viz.Location = new System.Drawing.Point(13, 203);
+            this.button_generate_viz.Location = new System.Drawing.Point(355, 203);
             this.button_generate_viz.Name = "button_generate_viz";
             this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
             this.button_generate_viz.TabIndex = 52;
             this.button_generate_viz.Text = "Generate Visualization";
             this.button_generate_viz.UseVisualStyleBackColor = false;
-            this.button_generate_viz.Click += new System.EventHandler(this.button1_Click);
+            this.button_generate_viz.Click += new System.EventHandler(this.button_generate_viz_Click);
             // 
             // outputNaming
             // 
@@ -2615,16 +2614,11 @@ This DNA data visualization interface was generated with <a href='https://github
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button_generate_viz_Click(object sender, EventArgs e)
         {
             //read_sequence(sender, e); //redundant
             generate_image_and_interface(sender, e);
             process_deep_zoom(sender, e);
-        }
-
-        private void txtBoxSequenceNameOverride_TextChanged(object sender, EventArgs e)
-        {
-
         }
 	}
 }
