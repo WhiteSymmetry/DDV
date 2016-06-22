@@ -240,36 +240,42 @@ class DDVTileLayout:
         upper_left = self.position_on_screen_big(total_progress)
         bottom_right = self.position_on_screen_big(total_progress + contig.title_padding - 2)
         width, height = bottom_right[0] - upper_left[0], bottom_right[1] - upper_left[1]
-        font_size = 10
 
-        # cram every last bit into the line labels, there's not much room
-        as_much = textwrap.wrap(contig.name, 18) + ['', '', '']  # just in case it's blank
-        lines = as_much[0] + '\n' + ((as_much[1] + ' ' + as_much[2])[:18])
+        font_size = 9
+        title_width = 18
+        title_lines = 2
 
         # Title orientation and size
         if contig.title_padding == self.levels[2].chunk_size:
             # column titles are vertically oriented
             width, height = height, width  # swap
             font_size = 38
-            lines = '\n'.join(textwrap.wrap(contig.name, 50)[:2])  # approximate width
+            title_width = 50  # TODO: find width programatically
         if contig.title_padding >= self.levels[3].chunk_size:
             font_size = 380  # full row labels for chromosomes
-            lines = '\n'.join(textwrap.wrap(contig.name, 250)[:2])  # approximate width
-        # if contig.title_padding == self.levels[4].chunk_size:  # Tile dedicated to a Title (square shaped)
-        #     # since this level is square, there's no point in rotating it
-        #     font_size = 900  # doesn't really need to be 10x larger than the rows
+            title_width = 50  # approximate width
+        if contig.title_padding == self.levels[4].chunk_size:  # Tile dedicated to a Title (square shaped)
+            # since this level is square, there's no point in rotating it
+            font_size = 380 * 2  # doesn't really need to be 10x larger than the rows
+            title_width = 125
+            title_lines = 10
 
         font = ImageFont.truetype("tahoma.ttf", font_size)
         txt = Image.new('RGBA', (width, height))
-        ImageDraw.Draw(txt).multiline_text((0, 0), lines, font=font, fill=(0, 0, 0, 255))
+        multi_line_title = '\n'.join(textwrap.wrap(contig.name, title_width)[:title_lines])  # approximate width
+        if contig.title_padding < self.levels[2].chunk_size:  # very small space for title
+            # cram every last bit into the line labels, there's not much room
+            multi_line_title = contig.name[:title_width] + '\n' + contig.name[title_width:title_width * 2]
+
+        bottom_justified = height - multi_line_height(font, multi_line_title, txt)
+        ImageDraw.Draw(txt).multiline_text((0, min(0, max(4, bottom_justified))), multi_line_title, font=font, fill=(0, 0, 0, 255))
         if contig.title_padding == self.levels[2].chunk_size:
             txt = txt.rotate(90, expand=True)
-            upper_left[0] += 15  # adjusts baseline for more polish
+            upper_left[0] += 8  # adjusts baseline for more polish
 
         self.image.paste(txt, (upper_left[0], upper_left[1]), txt)
 
         # self.draw.text(upper_left, contig.name, (0, 0, 0), font=font)
-
 
     def output_image(self, output_file_name):
         del self.pixels
@@ -295,12 +301,19 @@ class DDVTileLayout:
         return width_height
 
 
+def multi_line_height(font, multi_line_title, txt):
+    sum_line_spacing = ImageDraw.Draw(txt).multiline_textsize(multi_line_title, font)[1]
+    descender = font.getsize('y')[1] - font.getsize('A')[1]
+    return sum_line_spacing + descender
+
+
 if __name__ == '__main__':
     # input_file_name, output_file_name = 'sequence.fa', 'output.png'
 
     layout = DDVTileLayout()
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'ch20-2.png')
+    layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', 'non-chromosomal.png')
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', 'chr1 Human.png')
     # layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
-    layout.process_file('multi_part_layout.fa', 'multi_part_layout.png')
+    # layout.process_file('multi_part_layout.fa', 'multi_part_layout.png')
 
