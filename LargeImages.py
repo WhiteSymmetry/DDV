@@ -8,6 +8,8 @@ self.python file contains basic image handling methods.  It also contains a re-i
 Josiah's "Tiled Layout" algorithm which is also in DDVLayoutManager.cs.
 """
 import math
+import textwrap
+
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from collections import defaultdict
@@ -123,8 +125,8 @@ class DDVTileLayout:
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
         print("Drew Nucleotides:", datetime.now() - start_time)
 
-        # if len(self.contigs) > 1:
-        #     self.draw_titles()
+        if len(self.contigs) > 1:
+            self.draw_titles()
         self.output_image(output_file_name)
         print("Output Image in:", datetime.now() - start_time)
 
@@ -142,17 +144,11 @@ class DDVTileLayout:
                 if read == "":
                     continue
                 if read[0] == ">":
-                    # correct the padding on first entry before doing this one
-                    if len(seq_collection) == 1:
-                        reset, title, tail = self.calc_padding(0, len(self.contigs[0].seq), True)
-                        self.contigs[0].reset_padding, self.contigs[0].title_padding, self.contigs[0].tail_padding = reset, title, tail
-                        total_progress = reset + title + tail + len(self.contigs[0].seq)
-                        # this statement will always trigger len() > 0 as well to complete the current contig
+                    # If we have sequence gathered and we run into a second (or more) block
                     if len(seq_collection) > 0:
-                        multipart_file = True
                         sequence = "".join(seq_collection)
                         seq_collection = []  # clear
-                        reset, title, tail = self.calc_padding(total_progress, len(sequence), multipart_file)
+                        reset, title, tail = self.calc_padding(total_progress, len(sequence), True)
                         self.contigs.append(Contig(current_name, sequence, reset, title, tail))
                         total_progress += reset + title + tail + len(sequence)
 
@@ -164,7 +160,7 @@ class DDVTileLayout:
 
         # add the last contig to the list
         sequence = "".join(seq_collection)
-        reset, title, tail = self.calc_padding(total_progress, len(sequence), multipart_file)
+        reset, title, tail = self.calc_padding(total_progress, len(sequence), len(self.contigs) > 0)
         self.contigs.append(Contig(current_name, sequence, reset, title, tail))
         return total_progress + reset + title + tail + len(sequence)
 
@@ -227,7 +223,7 @@ class DDVTileLayout:
             32448 * (index // 1200000000)  # % 9 #this will continue tile columns indefinitely (8 needed 4 human genome)
         y = (index // 100) % 1000 + 1018 * ((index // 10000000) % 10) + 10342 * ((index // 300000000) % 4)
         # + 42826 * (index // 10800000000)  # 10342 * 4 + 1458 padding = 42826
-        return x, y
+        return [x, y]
 
     def draw_pixel(self, character, x, y):
         self.pixels[x, y] = palette[character]
@@ -240,11 +236,39 @@ class DDVTileLayout:
             self.draw_title(total_progress, contig)
             total_progress += contig.title_padding + len(contig.seq) + contig.tail_padding
 
-    def draw_title(self, seqAndPadding, contig):
-        font = ImageFont.truetype("calibri.ttf", 16)
-        # TODO: from C sharp
-        self.draw.text((1000, 1000), "Hello Beginning!", (255, 255, 255), font=font)
-        self.draw.text((9000, 9000), "Goodbye Ending!", (255, 255, 255), font=font)
+    def draw_title(self, total_progress, contig):
+        upper_left = self.position_on_screen_big(total_progress)
+        bottom_right = self.position_on_screen_big(total_progress + contig.title_padding - 2)
+        width, height = bottom_right[0] - upper_left[0], bottom_right[1] - upper_left[1]
+        font_size = 10
+
+        # cram every last bit into the line labels, there's not much room
+        as_much = textwrap.wrap(contig.name, 18) + ['', '', '']  # just in case it's blank
+        lines = as_much[0] + '\n' + ((as_much[1] + ' ' + as_much[2])[:18])
+
+        # Title orientation and size
+        if contig.title_padding == self.levels[2].chunk_size:
+            # column titles are vertically oriented
+            width, height = height, width  # swap
+            font_size = 38
+            lines = '\n'.join(textwrap.wrap(contig.name, 50)[:2])  # approximate width
+        if contig.title_padding >= self.levels[3].chunk_size:
+            font_size = 380  # full row labels for chromosomes
+            lines = '\n'.join(textwrap.wrap(contig.name, 250)[:2])  # approximate width
+        # if contig.title_padding == self.levels[4].chunk_size:  # Tile dedicated to a Title (square shaped)
+        #     # since this level is square, there's no point in rotating it
+        #     font_size = 900  # doesn't really need to be 10x larger than the rows
+
+        font = ImageFont.truetype("tahoma.ttf", font_size)
+        txt = Image.new('RGBA', (width, height))
+        ImageDraw.Draw(txt).multiline_text((0, 0), lines, font=font, fill=(0, 0, 0, 255))
+        if contig.title_padding == self.levels[2].chunk_size:
+            txt = txt.rotate(90, expand=True)
+            upper_left[0] += 15  # adjusts baseline for more polish
+
+        self.image.paste(txt, (upper_left[0], upper_left[1]), txt)
+
+        # self.draw.text(upper_left, contig.name, (0, 0, 0), font=font)
 
 
     def output_image(self, output_file_name):
@@ -277,5 +301,6 @@ if __name__ == '__main__':
     layout = DDVTileLayout()
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'ch20-2.png')
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', 'chr1 Human.png')
-    layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
+    # layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
+    layout.process_file('multi_part_layout.fa', 'multi_part_layout.png')
 
