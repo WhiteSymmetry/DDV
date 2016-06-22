@@ -120,6 +120,8 @@ namespace DDV
         private Label label19;
         private Button btnUploadInterface;
         private Button button_generate_viz;
+        private Button button_generate_python_viz;
+        private Label label18;
 
 
         protected const string _newline = "\r\n";
@@ -141,6 +143,7 @@ namespace DDV
             this.outputNaming.SelectedIndex = 1;
 
             button_generate_viz.Enabled = false;
+            button_generate_python_viz.Enabled = false;
             checkEnvironment();
             launchCivetweb();
             SetFinalDestinationFolder(@Directory.GetCurrentDirectory() + "\\output\\");
@@ -240,6 +243,8 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_generate_python_viz = new System.Windows.Forms.Button();
+            this.label18 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -690,6 +695,8 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.label18);
+            this.groupBox4.Controls.Add(this.button_generate_python_viz);
             this.groupBox4.Controls.Add(this.button_generate_viz);
             this.groupBox4.Controls.Add(this.outputNaming);
             this.groupBox4.Controls.Add(this.label19);
@@ -715,7 +722,7 @@ namespace DDV
             // 
             this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
             this.button_generate_viz.Enabled = false;
-            this.button_generate_viz.Location = new System.Drawing.Point(355, 203);
+            this.button_generate_viz.Location = new System.Drawing.Point(123, 203);
             this.button_generate_viz.Name = "button_generate_viz";
             this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
             this.button_generate_viz.TabIndex = 52;
@@ -799,6 +806,27 @@ namespace DDV
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
             // 
+            // button_generate_python_viz
+            //
+            this.button_generate_python_viz.BackColor = System.Drawing.Color.SkyBlue;
+            this.button_generate_python_viz.Enabled = false;
+            this.button_generate_python_viz.Location = new System.Drawing.Point(309, 203);
+            this.button_generate_python_viz.Name = "button_generate_python_viz";
+            this.button_generate_python_viz.Size = new System.Drawing.Size(197, 30);
+            this.button_generate_python_viz.TabIndex = 53;
+            this.button_generate_python_viz.Text = "Generate Visualization in Python";
+            this.button_generate_python_viz.UseVisualStyleBackColor = false;
+            this.button_generate_python_viz.Click += new System.EventHandler(this.button_generate_python_viz_Click);
+            //
+            // label18
+            //
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(280, 212);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(23, 13);
+            this.label18.TabIndex = 54;
+            this.label18.Text = "OR";
+            //
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1422,6 +1450,10 @@ This DNA data visualization interface was generated with <a href='https://github
                 MessageBoxShow("Image and interface files generated. Processing Deep Zoom...");
                 //enable deepzoomprocessing
                 button_generate_viz.Enabled = true;
+                if (layoutSelector.SelectedIndex == 1)
+                {
+                    button_generate_python_viz.Enabled = true;
+                }
 
                 
             };
@@ -2172,6 +2204,9 @@ This DNA data visualization interface was generated with <a href='https://github
             progressBar1.Minimum = 0;
             progressBar1.Maximum = 100;
             button_generate_viz.Enabled = true;
+            if (layoutSelector.SelectedIndex == 1) {
+                button_generate_python_viz.Enabled = true;
+            }
             try
             {
                 progressBar1.Value = 2;
@@ -2226,6 +2261,7 @@ This DNA data visualization interface was generated with <a href='https://github
         void DisableGenerateUI()
         {
             button_generate_viz.Enabled = false;
+            button_generate_python_viz.Enabled = false;
             ready_for_deep_zoom = false;
         }
 
@@ -2270,6 +2306,10 @@ This DNA data visualization interface was generated with <a href='https://github
             txtBoxSequenceNameOverride.Text = "";
 
             button_generate_viz.Enabled = true;
+            if (layoutSelector.SelectedIndex == 1)
+            {
+                button_generate_python_viz.Enabled = true;
+            }
             txtBoxSequenceNameOverride.Enabled = true;
             label15.Visible = true;
             lblSourceSequence.Visible = true;
@@ -2575,11 +2615,16 @@ This DNA data visualization interface was generated with <a href='https://github
             {
                 txtBoxColumnWidth.Enabled = true;
                 txtBoxY.Enabled = true;
+                button_generate_python_viz.Enabled = false;
             }
             else if (layoutSelector.SelectedIndex == 1)  // 1 is Tiled
             {
                 txtBoxColumnWidth.Enabled = false; //edit these numbers directly in DDVLayoutManager.cs
                 txtBoxY.Enabled = false;
+                if (button_generate_viz.Enabled)
+                {
+                    button_generate_python_viz.Enabled = true;
+                }
             }
         }
 
@@ -2618,6 +2663,12 @@ This DNA data visualization interface was generated with <a href='https://github
         {
             //read_sequence(sender, e); //redundant
             generate_image_and_interface(sender, e);
+            process_deep_zoom(sender, e);
+        }
+
+        private void button_generate_python_viz_Click(object sender, EventArgs e)
+        {
+            //generate_image_and_interface(sender, e);  // TODO: Make this a Python call sending in all the UI arguments.
             process_deep_zoom(sender, e);
         }
 	}
