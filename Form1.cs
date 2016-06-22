@@ -122,6 +122,7 @@ namespace DDV
         private Button button_generate_viz;
         private Button button_generate_python_viz;
         private Label label18;
+        private OpenFileDialog fDlgPythonInterpreter;
 
 
         protected const string _newline = "\r\n";
@@ -235,6 +236,8 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.button_generate_python_viz = new System.Windows.Forms.Button();
             this.button_generate_viz = new System.Windows.Forms.Button();
             this.outputNaming = new System.Windows.Forms.ComboBox();
             this.label19 = new System.Windows.Forms.Label();
@@ -243,8 +246,7 @@ namespace DDV
             this.txtBoxColumnWidth = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button_generate_python_viz = new System.Windows.Forms.Button();
-            this.label18 = new System.Windows.Forms.Label();
+            this.fDlgPythonInterpreter = new System.Windows.Forms.OpenFileDialog();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -718,6 +720,27 @@ namespace DDV
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
             // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(280, 212);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(23, 13);
+            this.label18.TabIndex = 54;
+            this.label18.Text = "OR";
+            // 
+            // button_generate_python_viz
+            // 
+            this.button_generate_python_viz.BackColor = System.Drawing.Color.SkyBlue;
+            this.button_generate_python_viz.Enabled = false;
+            this.button_generate_python_viz.Location = new System.Drawing.Point(309, 203);
+            this.button_generate_python_viz.Name = "button_generate_python_viz";
+            this.button_generate_python_viz.Size = new System.Drawing.Size(197, 30);
+            this.button_generate_python_viz.TabIndex = 53;
+            this.button_generate_python_viz.Text = "Generate Visualization in Python";
+            this.button_generate_python_viz.UseVisualStyleBackColor = false;
+            this.button_generate_python_viz.Click += new System.EventHandler(this.button_generate_python_viz_Click);
+            // 
             // button_generate_viz
             // 
             this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
@@ -806,27 +829,10 @@ namespace DDV
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Sequence Properties";
             // 
-            // button_generate_python_viz
-            //
-            this.button_generate_python_viz.BackColor = System.Drawing.Color.SkyBlue;
-            this.button_generate_python_viz.Enabled = false;
-            this.button_generate_python_viz.Location = new System.Drawing.Point(309, 203);
-            this.button_generate_python_viz.Name = "button_generate_python_viz";
-            this.button_generate_python_viz.Size = new System.Drawing.Size(197, 30);
-            this.button_generate_python_viz.TabIndex = 53;
-            this.button_generate_python_viz.Text = "Generate Visualization in Python";
-            this.button_generate_python_viz.UseVisualStyleBackColor = false;
-            this.button_generate_python_viz.Click += new System.EventHandler(this.button_generate_python_viz_Click);
-            //
-            // label18
-            //
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(280, 212);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(23, 13);
-            this.label18.TabIndex = 54;
-            this.label18.Text = "OR";
-            //
+            // fDlgPythonInterpreter
+            // 
+            this.fDlgPythonInterpreter.Filter = "Python Interpreter|python.exe";
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2668,8 +2674,25 @@ This DNA data visualization interface was generated with <a href='https://github
 
         private void button_generate_python_viz_Click(object sender, EventArgs e)
         {
-            //generate_image_and_interface(sender, e);  // TODO: Make this a Python call sending in all the UI arguments.
-            process_deep_zoom(sender, e);
+            MessageBox.Show("Please select the 'Python.exe' associated with your VirtualEnvironment setup for this project.", "Select Virtual Environment", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            DialogResult dr = fDlgPythonInterpreter.ShowDialog();
+
+            if (dr == DialogResult.OK)
+            {
+                if (fDlgPythonInterpreter.FileName == "")
+                {
+                    MessageBox.Show("A proper Python Interpreter was not selected!", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                string interpreter_path = fDlgPythonInterpreter.FileName;
+
+                process_deep_zoom(sender, e);
+            }
+            else
+            {
+                //TODO: FAILED to pick python interpreter
+            }
         }
 	}
 }
