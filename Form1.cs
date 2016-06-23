@@ -123,6 +123,7 @@ namespace DDV
         private Button button_generate_python_viz;
         private Label label18;
         private OpenFileDialog fDlgPythonInterpreter;
+        private Button button_run_deepzoom;
 
 
         protected const string _newline = "\r\n";
@@ -145,6 +146,7 @@ namespace DDV
 
             button_generate_viz.Enabled = false;
             button_generate_python_viz.Enabled = false;
+            button_run_deepzoom.Enabled = false;
             checkEnvironment();
             launchCivetweb();
             SetFinalDestinationFolder(@Directory.GetCurrentDirectory() + "\\output\\");
@@ -236,6 +238,7 @@ namespace DDV
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dlgImageFileSet = new System.Windows.Forms.OpenFileDialog();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button_run_deepzoom = new System.Windows.Forms.Button();
             this.label18 = new System.Windows.Forms.Label();
             this.button_generate_python_viz = new System.Windows.Forms.Button();
             this.button_generate_viz = new System.Windows.Forms.Button();
@@ -697,6 +700,7 @@ namespace DDV
             // 
             this.groupBox4.AutoSize = true;
             this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.groupBox4.Controls.Add(this.button_run_deepzoom);
             this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.button_generate_python_viz);
             this.groupBox4.Controls.Add(this.button_generate_viz);
@@ -720,10 +724,22 @@ namespace DDV
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Generate DNA Visualization";
             // 
+            // button_run_deepzoom
+            // 
+            this.button_run_deepzoom.BackColor = System.Drawing.Color.SkyBlue;
+            this.button_run_deepzoom.Enabled = false;
+            this.button_run_deepzoom.Location = new System.Drawing.Point(430, 203);
+            this.button_run_deepzoom.Name = "button_run_deepzoom";
+            this.button_run_deepzoom.Size = new System.Drawing.Size(76, 30);
+            this.button_run_deepzoom.TabIndex = 55;
+            this.button_run_deepzoom.Text = "DeepZoom";
+            this.button_run_deepzoom.UseVisualStyleBackColor = false;
+            this.button_run_deepzoom.Click += new System.EventHandler(this.button_generate_python_viz_Click);
+            // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(280, 212);
+            this.label18.Location = new System.Drawing.Point(204, 212);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(23, 13);
             this.label18.TabIndex = 54;
@@ -733,7 +749,7 @@ namespace DDV
             // 
             this.button_generate_python_viz.BackColor = System.Drawing.Color.SkyBlue;
             this.button_generate_python_viz.Enabled = false;
-            this.button_generate_python_viz.Location = new System.Drawing.Point(309, 203);
+            this.button_generate_python_viz.Location = new System.Drawing.Point(233, 203);
             this.button_generate_python_viz.Name = "button_generate_python_viz";
             this.button_generate_python_viz.Size = new System.Drawing.Size(197, 30);
             this.button_generate_python_viz.TabIndex = 53;
@@ -745,7 +761,7 @@ namespace DDV
             // 
             this.button_generate_viz.BackColor = System.Drawing.Color.LightSkyBlue;
             this.button_generate_viz.Enabled = false;
-            this.button_generate_viz.Location = new System.Drawing.Point(123, 203);
+            this.button_generate_viz.Location = new System.Drawing.Point(47, 203);
             this.button_generate_viz.Name = "button_generate_viz";
             this.button_generate_viz.Size = new System.Drawing.Size(151, 30);
             this.button_generate_viz.TabIndex = 52;
@@ -1464,6 +1480,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 if (layoutSelector.SelectedIndex == 1)
                 {
                     button_generate_python_viz.Enabled = true;
+                    button_run_deepzoom.Enabled = true;
                 }
 
                 
@@ -2217,6 +2234,7 @@ This DNA data visualization interface was generated with <a href='https://github
             button_generate_viz.Enabled = true;
             if (layoutSelector.SelectedIndex == 1) {
                 button_generate_python_viz.Enabled = true;
+                button_run_deepzoom.Enabled = true;
             }
             try
             {
@@ -2273,6 +2291,7 @@ This DNA data visualization interface was generated with <a href='https://github
         {
             button_generate_viz.Enabled = false;
             button_generate_python_viz.Enabled = false;
+            button_run_deepzoom.Enabled = false;
             ready_for_deep_zoom = false;
         }
 
@@ -2320,6 +2339,7 @@ This DNA data visualization interface was generated with <a href='https://github
             if (layoutSelector.SelectedIndex == 1)
             {
                 button_generate_python_viz.Enabled = true;
+                button_run_deepzoom.Enabled = true;
             }
             txtBoxSequenceNameOverride.Enabled = true;
             label15.Visible = true;
@@ -2627,6 +2647,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 txtBoxColumnWidth.Enabled = true;
                 txtBoxY.Enabled = true;
                 button_generate_python_viz.Enabled = false;
+                button_run_deepzoom.Enabled = false;
             }
             else if (layoutSelector.SelectedIndex == 1)  // 1 is Tiled
             {
@@ -2635,6 +2656,7 @@ This DNA data visualization interface was generated with <a href='https://github
                 if (button_generate_viz.Enabled)
                 {
                     button_generate_python_viz.Enabled = true;
+                    button_run_deepzoom.Enabled = true;
                 }
             }
         }
@@ -2677,52 +2699,39 @@ This DNA data visualization interface was generated with <a href='https://github
             process_deep_zoom(sender, e);
         }
 
-        private void button_generate_python_viz_Click(object sender, EventArgs e)
+        private void run_external_processing(object sender, EventArgs e, bool image_done)
         {
-            if (m_strSourceFile == "") { MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
-            if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file: " + m_strSourceFile + ". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            lblProgressText.Text = "";
+            lblProgressText.Refresh();
+            progressBar1.Value = 0;
+            progressBar1.Update();
+            progressBar1.Refresh();
 
-            MessageBox.Show("Please select the 'Python.exe' associated with your VirtualEnvironment setup for this project.", "Select Virtual Environment", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            FileInfo TheFile = new FileInfo(m_strSourceFile);
+            sequenceLength = TheFile.Length;
+            sequenceLength = populateInfo(false); // sequenceLength > 300000000);
 
-            DialogResult dr = fDlgPythonInterpreter.ShowDialog();
+            string large_images_py = @Directory.GetCurrentDirectory() + "\\LargeImages.py";
 
-            if (dr == DialogResult.OK)
+            string sequenceName = "";
+            if (outputNaming.SelectedIndex == 0)
             {
-                if (fDlgPythonInterpreter.FileName == "")
+                if (gi != "")
                 {
-                    MessageBox.Show("A proper Python Interpreter was not selected!", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
+                    sequenceName = gi;
                 }
-
-                lblProgressText.Text = "";
-                lblProgressText.Refresh();
-                progressBar1.Value = 0;
-                progressBar1.Update();
-                progressBar1.Refresh();
-
-                FileInfo TheFile = new FileInfo(m_strSourceFile);
-                sequenceLength = TheFile.Length;
-                sequenceLength = populateInfo(false); // sequenceLength > 300000000);
-
-                string large_images_py = @Directory.GetCurrentDirectory() + "\\LargeImages.py";
-                
-                string sequenceName = "";
-                if (outputNaming.SelectedIndex == 0)
+                else
                 {
-                    if (gi != "")
-                    {
-                        sequenceName = gi;
-                    }
-                    else
-                    {
-                        sequenceName = DDVseqID;
-                    }
+                    sequenceName = DDVseqID;
                 }
-                else if (outputNaming.SelectedIndex == 1 && txtBoxSequenceNameOverride.Text != "")
-                {
-                    sequenceName = txtBoxSequenceNameOverride.Text.Replace('.', '_');
-                }
-                string strResultFileName = sequenceName + ".png";
+            }
+            else if (outputNaming.SelectedIndex == 1 && txtBoxSequenceNameOverride.Text != "")
+            {
+                sequenceName = txtBoxSequenceNameOverride.Text.Replace('.', '_');
+            }
+            string strResultFileName = sequenceName + ".png";
+            if (!image_done)
+            {
                 if (File.Exists(strResultFileName))
                 {
                     MessageBoxShow("Removing temp version of PNG file.");
@@ -2733,10 +2742,13 @@ This DNA data visualization interface was generated with <a href='https://github
                     MessageBoxShow("Removing temp version of embed html file.");
                     File.Delete("embed.html");
                 }
+            }
 
-                progressBar1.Value = 10;
-                progressBar1.Update();
-                progressBar1.Refresh();
+            progressBar1.Value = 10;
+            progressBar1.Update();
+            progressBar1.Refresh();
+            if (!image_done)
+            {
                 MessageBoxShow("Sending job to Python...");
                 ProcessStartInfo python = new ProcessStartInfo();
                 python.FileName = fDlgPythonInterpreter.FileName;
@@ -2753,31 +2765,59 @@ This DNA data visualization interface was generated with <a href='https://github
                     }
                 }
                 MessageBoxShow("Done creating PNG and embed HTML files.");
-                progressBar1.Value = 40;
-                progressBar1.Update();
-                progressBar1.Refresh();
+            }
+            progressBar1.Value = 40;
+            progressBar1.Update();
+            progressBar1.Refresh();
 
-                string pngDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + strResultFileName;
-                string htmlDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + "embed.html";
-                MoveWithReplace(strResultFileName, pngDestination);
-                MoveWithReplace("embed.html", htmlDestination);
-                CopyFileWithReplaceIfNewer(m_strSourceFile, m_strFinalDestinationFolder + "//sequence.fasta");
-                BitmapSet(pngDestination);
+            string pngDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + strResultFileName;
+            string htmlDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + "embed.html";
+            MoveWithReplace(strResultFileName, pngDestination);
+            MoveWithReplace("embed.html", htmlDestination);
+            CopyFileWithReplaceIfNewer(m_strSourceFile, m_strFinalDestinationFolder + "//sequence.fasta");
+            BitmapSet(pngDestination);
 
-                progressBar1.Value = 70;
-                progressBar1.Update();
-                progressBar1.Refresh();
+            progressBar1.Value = 70;
+            progressBar1.Update();
+            progressBar1.Refresh();
 
-                MessageBoxShow("Starting Deep Zoom Processing...");
-                process_deep_zoom(sender, e);
+            MessageBoxShow("Starting Deep Zoom Processing...");
+            process_deep_zoom(sender, e);
 
-                progressBar1.Value = 100;
-                progressBar1.Update();
-                progressBar1.Refresh();
+            progressBar1.Value = 100;
+            progressBar1.Update();
+            progressBar1.Refresh();
+        }
+
+        private void button_generate_python_viz_Click(object sender, EventArgs e)
+        {
+            if (m_strSourceFile == "") { MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file: " + m_strSourceFile + ". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+
+            Button button_sender = (Button)sender;
+            if (button_sender.Name == "button_generate_python_viz")
+            {
+                MessageBox.Show("Please select the 'Python.exe' associated with your VirtualEnvironment setup for this project.", "Select Virtual Environment", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                DialogResult dr = fDlgPythonInterpreter.ShowDialog();
+
+                if (dr == DialogResult.OK)
+                {
+                    if (fDlgPythonInterpreter.FileName == "")
+                    {
+                        MessageBox.Show("A proper Python Interpreter was not selected!", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                    run_external_processing(sender, e, false);
+                }
+                else
+                {
+                    MessageBox.Show("Not processing as a Python Interpreter was not selected!", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             else
             {
-                //TODO: FAILED to pick python interpreter
+                run_external_processing(sender, e, true);
             }
         }
 	}
