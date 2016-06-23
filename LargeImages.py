@@ -7,6 +7,7 @@ or Direct2D. We tried a lot of options.
 self.python file contains basic image handling methods.  It also contains a re-implementation of
 Josiah's "Tiled Layout" algorithm which is also in DDVLayoutManager.cs.
 """
+import sys
 import math
 import textwrap
 
@@ -102,7 +103,7 @@ class DDVTileLayout:
         image_length = self.read_contigs(input_file_name)
         print("Read contigs :", datetime.now() - start_time)
         self.prepare_image(image_length)
-        print("Initialized Image:", datetime.now() - start_time)
+        print("Initialized Image:", datetime.now() - start_time, "\n")
         total_progress = 0
 
         if image_length > 300000000:
@@ -114,19 +115,18 @@ class DDVTileLayout:
         for contig in self.contigs:
             total_progress += contig.reset_padding + contig.title_padding
             # worker.ReportProgress((int) (nucleotidesProcessed += contig.len(seq))) # doesn't include padding
-            try:
-                for c in contig.seq:
-                    x, y = positioner(total_progress)
-                    total_progress += 1
-                    self.draw_pixel(c, x, y)
-            except IndexError as err:
-                print("x", x, "y", y)
-                print(err)
+            for c in contig.seq:
+                x, y = positioner(total_progress)
+                total_progress += 1
+                self.draw_pixel(c, x, y)
+            if image_length > 10000000:
+                print('\r', str(total_progress / image_length * 100)[:6], '% done:', contig.name, end="")  # pseudo progress bar
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
-        print("Drew Nucleotides:", datetime.now() - start_time)
+        print("\nDrew Nucleotides:", datetime.now() - start_time)
 
         if len(self.contigs) > 1:
             self.draw_titles()
+        print("Drew Titles:", datetime.now() - start_time)
         self.output_image(output_file_name)
         print("Output Image in:", datetime.now() - start_time)
 
@@ -312,8 +312,9 @@ if __name__ == '__main__':
 
     layout = DDVTileLayout()
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'ch20-2.png')
-    layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', 'non-chromosomal.png')
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', 'non-chromosomal.png')
     # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', 'chr1 Human.png')
     # layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
     # layout.process_file('multi_part_layout.fa', 'multi_part_layout.png')
-
+    # layout.process_file('CYUI01000001-CYUI01015997.fasta', 'susie3.png')
+    layout.process_file(sys.argv[1], sys.argv[2])
