@@ -1296,6 +1296,11 @@ namespace DDV
                     MessageBoxShow("Removing temp version of PNG file.");
                     File.Delete(strResultFileName);
                 }
+                if (File.Exists("embed.html"))
+                {
+                    MessageBoxShow("Removing temp version of PNG file.");
+                    File.Delete("embed.html");
+                }
                 try
                 {
                     b.Save(strResultFileName, System.Drawing.Imaging.ImageFormat.Png);
@@ -2674,6 +2679,9 @@ This DNA data visualization interface was generated with <a href='https://github
 
         private void button_generate_python_viz_Click(object sender, EventArgs e)
         {
+            if (m_strSourceFile == "") { MessageBox.Show("Please select source file.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            if (!File.Exists(m_strSourceFile)) { MessageBox.Show("Could not find source FASTA file: " + m_strSourceFile + ". Please select source file", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+
             MessageBox.Show("Please select the 'Python.exe' associated with your VirtualEnvironment setup for this project.", "Select Virtual Environment", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             DialogResult dr = fDlgPythonInterpreter.ShowDialog();
@@ -2685,9 +2693,87 @@ This DNA data visualization interface was generated with <a href='https://github
                     MessageBox.Show("A proper Python Interpreter was not selected!", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                string interpreter_path = fDlgPythonInterpreter.FileName;
 
+                lblProgressText.Text = "";
+                lblProgressText.Refresh();
+                progressBar1.Value = 0;
+                progressBar1.Update();
+                progressBar1.Refresh();
+
+                FileInfo TheFile = new FileInfo(m_strSourceFile);
+                sequenceLength = TheFile.Length;
+                sequenceLength = populateInfo(false); // sequenceLength > 300000000);
+
+                string large_images_py = @Directory.GetCurrentDirectory() + "\\LargeImages.py";
+                
+                string sequenceName = "";
+                if (outputNaming.SelectedIndex == 0)
+                {
+                    if (gi != "")
+                    {
+                        sequenceName = gi;
+                    }
+                    else
+                    {
+                        sequenceName = DDVseqID;
+                    }
+                }
+                else if (outputNaming.SelectedIndex == 1 && txtBoxSequenceNameOverride.Text != "")
+                {
+                    sequenceName = txtBoxSequenceNameOverride.Text.Replace('.', '_');
+                }
+                string strResultFileName = sequenceName + ".png";
+                if (File.Exists(strResultFileName))
+                {
+                    MessageBoxShow("Removing temp version of PNG file.");
+                    File.Delete(strResultFileName);
+                }
+                if (File.Exists("embed.html"))
+                {
+                    MessageBoxShow("Removing temp version of embed html file.");
+                    File.Delete("embed.html");
+                }
+
+                progressBar1.Value = 10;
+                progressBar1.Update();
+                progressBar1.Refresh();
+                MessageBoxShow("Sending job to Python...");
+                ProcessStartInfo python = new ProcessStartInfo();
+                python.FileName = fDlgPythonInterpreter.FileName;
+                python.Arguments = string.Format("{0} {1} {2} {3}", large_images_py, m_strSourceFile, @Directory.GetCurrentDirectory(), strResultFileName);
+                python.UseShellExecute = false;
+                python.RedirectStandardOutput = true;
+
+                using (Process python_process = Process.Start(python))
+                {
+                    using (StreamReader reader = python_process.StandardOutput)
+                    {
+                        string result = reader.ReadToEnd();
+                        MessageBoxShow(result);
+                    }
+                }
+                MessageBoxShow("Done creating PNG and embed HTML files.");
+                progressBar1.Value = 40;
+                progressBar1.Update();
+                progressBar1.Refresh();
+
+                string pngDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + strResultFileName;
+                string htmlDestination = TheFile.DirectoryName + Path.DirectorySeparatorChar + "embed.html";
+                MoveWithReplace(strResultFileName, pngDestination);
+                MoveWithReplace("embed.html", htmlDestination);
+                CopyFileWithReplaceIfNewer(m_strSourceFile, m_strFinalDestinationFolder + "//sequence.fasta");
+                BitmapSet(pngDestination);
+
+                progressBar1.Value = 70;
+                progressBar1.Update();
+                progressBar1.Refresh();
+
+                MessageBoxShow("Starting Deep Zoom Processing...");
                 process_deep_zoom(sender, e);
+
+                progressBar1.Value = 100;
+                progressBar1.Update();
+                progressBar1.Refresh();
             }
             else
             {
