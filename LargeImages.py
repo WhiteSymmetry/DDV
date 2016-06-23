@@ -7,6 +7,7 @@ or Direct2D. We tried a lot of options.
 self.python file contains basic image handling methods.  It also contains a re-implementation of
 Josiah's "Tiled Layout" algorithm which is also in DDVLayoutManager.cs.
 """
+import os
 import sys
 import math
 import textwrap
@@ -86,6 +87,7 @@ class DDVTileLayout:
         self.draw = None
         self.pixels = None
         self.contigs = []
+        self.image_length = 0
         # noinspection PyListCreation
         self.levels = [
             LayoutLevel("XInColumn", 100, 1),
@@ -97,16 +99,18 @@ class DDVTileLayout:
         self.levels.append(LayoutLevel("YInTile", 4, levels=self.levels))
         self.levels.append(LayoutLevel("TileColumn", 9, levels=self.levels))
         self.levels.append(LayoutLevel("TileRow", 999, levels=self.levels))
+        self.tile_label_size = self.levels[3].chunk_size * 2
 
-    def process_file(self, input_file_name, output_file_name):
+
+    def process_file(self, input_file_name, output_folder, output_file_name):
         start_time = datetime.now()
-        image_length = self.read_contigs(input_file_name)
+        self.image_length = self.read_contigs(input_file_name)
         print("Read contigs :", datetime.now() - start_time)
-        self.prepare_image(image_length)
+        self.prepare_image(self.image_length)
         print("Initialized Image:", datetime.now() - start_time, "\n")
         total_progress = 0
 
-        if image_length > 300000000:
+        if self.image_length > 300000000:
             positioner = self.position_on_screen_big  # big images
         else:
             positioner = self.position_on_screen  # small images
@@ -119,15 +123,16 @@ class DDVTileLayout:
                 x, y = positioner(total_progress)
                 total_progress += 1
                 self.draw_pixel(c, x, y)
-            if image_length > 10000000:
-                print('\r', str(total_progress / image_length * 100)[:6], '% done:', contig.name, end="")  # pseudo progress bar
+            if self.image_length > 10000000:
+                print('\r', str(total_progress / self.image_length * 100)[:6], '% done:', contig.name, end="")  # pseudo progress bar
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
         print("\nDrew Nucleotides:", datetime.now() - start_time)
 
         if len(self.contigs) > 1:
             self.draw_titles()
         print("Drew Titles:", datetime.now() - start_time)
-        self.output_image(output_file_name)
+        self.generate_html(input_file_name, output_folder, output_file_name)
+        self.output_image(output_folder, output_file_name)
         print("Output Image in:", datetime.now() - start_time)
 
 
@@ -185,7 +190,10 @@ class DDVTileLayout:
                 # sequence comes right up to the edge.  There should always be >= 1 full gap
                 reset_level = current_level  # bigger reset when close to filling chunk_size
                 if next_segment_length + title_padding < space_remaining:
-                    reset_level = self.levels[i - 1] 
+                    reset_level = self.levels[i - 1]
+                if title_padding >= self.tile_label_size:  # Special case for full tile, don't need to go that big
+                    title_padding = self.tile_label_size
+                    # reset_level = self.levels[i - 1]
                 reset_padding = 0
                 if total_progress != 0:  # fill out the remainder so we can start at the beginning
                     reset_padding = reset_level.chunk_size - total_progress % reset_level.chunk_size
@@ -254,11 +262,10 @@ class DDVTileLayout:
         if contig.title_padding >= self.levels[3].chunk_size:
             font_size = 380  # full row labels for chromosomes
             title_width = 50  # approximate width
-        if contig.title_padding == self.levels[4].chunk_size:  # Tile dedicated to a Title (square shaped)
+        if contig.title_padding == self.tile_label_size:  # Tile dedicated to a Title (square shaped)
             # since this level is square, there's no point in rotating it
             font_size = 380 * 2  # doesn't really need to be 10x larger than the rows
-            title_width = 125
-            title_lines = 10
+            title_width = 50 // 2
 
         font = ImageFont.truetype("tahoma.ttf", font_size)
         txt = Image.new('RGBA', (width, height))
@@ -268,7 +275,7 @@ class DDVTileLayout:
             multi_line_title = contig.name[:title_width] + '\n' + contig.name[title_width:title_width * 2]
 
         bottom_justified = height - multi_line_height(font, multi_line_title, txt)
-        ImageDraw.Draw(txt).multiline_text((0, min(0, max(4, bottom_justified))), multi_line_title, font=font, fill=(0, 0, 0, 255))
+        ImageDraw.Draw(txt).multiline_text((0, max(0, bottom_justified)), multi_line_title, font=font, fill=(0, 0, 0, 255))
         if contig.title_padding == self.levels[2].chunk_size:
             txt = txt.rotate(90, expand=True)
             upper_left[0] += 8  # adjusts baseline for more polish
@@ -277,10 +284,10 @@ class DDVTileLayout:
 
         # self.draw.text(upper_left, contig.name, (0, 0, 0), font=font)
 
-    def output_image(self, output_file_name):
+    def output_image(self, output_folder, output_file_name):
         del self.pixels
         del self.draw
-        self.image.save(output_file_name, 'PNG')
+        self.image.save(os.path.join(output_folder, output_file_name), 'PNG')
         del self.image
 
 
@@ -300,6 +307,94 @@ class DDVTileLayout:
                 width_height[part] = max(width_height[part], level.thickness * coordinate_in_chunk)
         return width_height
 
+    def generate_html(self, input_file_name, output_folder, output_file_name):
+        os.makedirs(output_folder, exist_ok=True)
+        html_path = os.path.join(output_folder, 'embed.html')
+        html_content = """
+        <!DOCTYPE html>
+        <html lang='en'>
+        <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <title>DNA Data Visualization : """ + input_file_name[:input_file_name.rfind('.')] + """</title>
+        <script src='../../openseadragon.js' type='text/javascript'></script>
+        <script type='text/javascript' src='../../jquery-1.7.min.js'></script>
+        <script src='../../openseadragon-scalebar.js' type='text/javascript'></script>
+
+        <script type='text/javascript'>
+	        var originalImageWidth= """ + self.image.width + """;
+            var originalImageHeight= """ + self.image.height + """;
+            var ColumnPadding = """ + str(self.levels[2].padding) + """;
+            var columnWidthInNucleotides = """ + self.levels[1].chunk_size + """;
+            var layoutSelector = 1;
+            var layout_levels = """ + str(self.levels)[1:-1] + """;
+            var ContigSpacingJSON = [];
+            var multipart_file = """ + str(len(self.contigs) > 1).lower() + """;
+            var includeDensity = false;
+
+            var usa='refseq_fetch:""" + input_file_name + """';
+            var ipTotal = """ + str(self.image_length) + """;
+            var direct_data_file='sequence.fasta';
+            var direct_data_file_length=1;
+            var sbegin='1';
+            var send=""" + str(self.image_length) + """;
+            var output_dir = '../../';
+            </script>
+        <script src='../../nucleotideNumber.js' type='text/javascript'></script>
+        <script src='../../nucleicDensity.js' type='text/javascript'></script>
+        <link rel='stylesheet' type='text/css' href='../../seadragon.css' />
+            <!-- BIOJS css -->
+            <script language='JavaScript' type='text/javascript' src='../../Biojs.js'></script>
+            <!-- component code -->
+            <script language='JavaScript' type='text/javascript' src='../../Biojs.Sequence.js'></script>
+        </head>
+
+        <body>
+        <h2 class='mainTitle'>Data Visualization - DNA</h2>
+        <span style='float:left;'>Menu:&nbsp;</span>
+            <ul class='selectChromosome'>
+            <li><a href='../'>Select Visualization</a></li>
+             </ul>
+        <h2 class='mainTitle'><strong>""" + input_file_name + """</strong>
+         </h2>
+
+        <div id='container' class='chromosome-container' data-chr-source=''>
+        </div>
+
+        <p class='legendHeading'><strong>Legend:</strong><br /></p>
+        <div style='margin-left:50px;'>
+            <img src='../../LEGEND-A.png' />
+            <img src='../../LEGEND-T.png' />
+            <img src='../../LEGEND-G.png' />
+            <img src='../../LEGEND-C.png' />
+            <img src='../../LEGEND-N.png' />
+            <img src='../../LEGEND-bg.png' />
+        </div>
+
+        <script type='text/javascript'>
+            outputTable();
+            if (includeDensity) { outputDensityUI();}
+        </script>
+
+        <div class='legend-details'>
+        <h3>Data Source:</h3>
+        <a href='sequence.fasta'>Download FASTA file</a>
+        <br />
+        Custom/local sequence (DDV seq ID): """ + input_file_name + """<br />
+
+        <h3>Notes</h3>
+        This DNA data visualization interface was generated with <a href='https://github.com/photomedia/DDV'>DDV</a>
+        <br />Date Visualization Created:""" + datetime.now().strftime("%Y-%m-%d") + """
+        <script type='text/javascript'>
+                    otherCredits();
+        </script>
+        </div>
+        </body>
+
+        </html>
+        """
+        with open(html_path, 'w') as out:
+            out.write(html_content)
+
 
 def multi_line_height(font, multi_line_title, txt):
     sum_line_spacing = ImageDraw.Draw(txt).multiline_textsize(multi_line_title, font)[1]
@@ -311,10 +406,16 @@ if __name__ == '__main__':
     # input_file_name, output_file_name = 'sequence.fa', 'output.png'
 
     layout = DDVTileLayout()
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', 'ch20-2.png')
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', 'non-chromosomal.png')
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', 'chr1 Human.png')
-    # layout.process_file('Human selenoproteins.fa', 'selenoproteins.png')
-    # layout.process_file('multi_part_layout.fa', 'multi_part_layout.png')
-    # layout.process_file('CYUI01000001-CYUI01015997.fasta', 'susie3.png')
-    layout.process_file(sys.argv[1], sys.argv[2])
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', '', 'ch20-2.png')
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', '', 'non-chromosomal.png')
+    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', '', 'chr1 Human.png')
+    # layout.process_file('Human selenoproteins.fa', '', 'selenoproteins.png')
+    # layout.process_file('multi_part_layout.fa', '', 'multi_part_layout.png')
+    # layout.process_file('CYUI01000001-CYUI01015997.fasta', '', 'susie3.png')
+    folder = '.'
+    image = sys.argv[1][:sys.argv[1].rfind('.')] + '.png'
+    if len(sys.argv) >= 4:
+        folder, image = sys.argv[2], sys.argv[3]
+    if len(sys.argv) == 3:
+        image = sys.argv[2]
+    layout.process_file(sys.argv[1], folder, image)
