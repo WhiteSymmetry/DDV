@@ -8,6 +8,7 @@ self.python file contains basic image handling methods.  It also contains a re-i
 Josiah's "Tiled Layout" algorithm which is also in DDVLayoutManager.cs.
 """
 import os
+import re as regex
 import sys
 import math
 import textwrap
@@ -79,6 +80,20 @@ class Contig:
         self.reset_padding = reset_padding
         self.title_padding = title_padding
         self.tail_padding = tail_padding
+
+
+def pretty_contig_name(contig, title_width, title_lines):
+    """Since textwrap.wrap break on whitespace, it's important to make sure there's whitespace
+    where there should be.  Contig names don't tend to be pretty."""
+    pretty_name = contig.name.replace('_', ' ').replace('|', ' ')
+    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)
+    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)  # don't ask
+    if title_width < 20:
+        # For small spaces, cram every last bit into the line labels, there's not much room
+        pretty_name = pretty_name[:title_width] + '\n' + pretty_name[title_width:title_width * 2]
+    else:
+        pretty_name = '\n'.join(textwrap.wrap(pretty_name, title_width)[:title_lines])  # approximate width
+    return pretty_name
 
 
 class DDVTileLayout:
@@ -158,7 +173,7 @@ class DDVTileLayout:
                         total_progress += reset + title + tail + len(sequence)
 
                         # worker.ReportProgress((int)total_progress)
-                    current_name = read[1: -1]  # between > and \n
+                    current_name = read[1:]  # between >
                 else:
                     # collects the sequence to be stored in the contig, constant time performance don't concat strings!
                     seq_collection.append(read)
@@ -269,10 +284,7 @@ class DDVTileLayout:
 
         font = ImageFont.truetype("tahoma.ttf", font_size)
         txt = Image.new('RGBA', (width, height))
-        multi_line_title = '\n'.join(textwrap.wrap(contig.name, title_width)[:title_lines])  # approximate width
-        if contig.title_padding < self.levels[2].chunk_size:  # very small space for title
-            # cram every last bit into the line labels, there's not much room
-            multi_line_title = contig.name[:title_width] + '\n' + contig.name[title_width:title_width * 2]
+        multi_line_title = pretty_contig_name(contig, title_width, title_lines)
 
         bottom_justified = height - multi_line_height(font, multi_line_title, txt)
         ImageDraw.Draw(txt).multiline_text((0, max(0, bottom_justified)), multi_line_title, font=font, fill=(0, 0, 0, 255))
@@ -281,8 +293,6 @@ class DDVTileLayout:
             upper_left[0] += 8  # adjusts baseline for more polish
 
         self.image.paste(txt, (upper_left[0], upper_left[1]), txt)
-
-        # self.draw.text(upper_left, contig.name, (0, 0, 0), font=font)
 
     def output_image(self, output_folder, output_file_name):
         del self.pixels
