@@ -321,12 +321,12 @@ class DDVTileLayout:
         <script src='../../openseadragon-scalebar.js' type='text/javascript'></script>
 
         <script type='text/javascript'>
-	        var originalImageWidth= """ + self.image.width + """;
-            var originalImageHeight= """ + self.image.height + """;
+	        var originalImageWidth= """ + str(self.image.width) + """;
+            var originalImageHeight= """ + str(self.image.height) + """;
             var ColumnPadding = """ + str(self.levels[2].padding) + """;
-            var columnWidthInNucleotides = """ + self.levels[1].chunk_size + """;
+            var columnWidthInNucleotides = """ + str(self.levels[1].chunk_size) + """;
             var layoutSelector = 1;
-            var layout_levels = """ + str(self.levels)[1:-1] + """;
+            var layout_levels = """ + self.levels_json() + """;
             var ContigSpacingJSON = """ + self.contig_json() + """;
             var multipart_file = """ + str(len(self.contigs) > 1).lower() + """;
             var includeDensity = false;
@@ -403,6 +403,13 @@ class DDVTileLayout:
             endIndex = startingIndex + len(contig.seq)
             json.append({"name": contig.name.replace("'", ""), "startingIndex": startingIndex, "endIndex": endIndex,
                          "title_padding": contig.title_padding, "tail_padding": contig.tail_padding})
+        return str(json)
+
+    def levels_json(self):
+        json = []
+        for level in self.levels:
+            json.append({"modulo": level.modulo, "chunk_size": level.chunk_size,
+                         "padding": level.padding, "thickness": level.thickness})
         return str(json)
 
 
