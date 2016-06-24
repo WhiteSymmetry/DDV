@@ -327,7 +327,7 @@ class DDVTileLayout:
             var columnWidthInNucleotides = """ + self.levels[1].chunk_size + """;
             var layoutSelector = 1;
             var layout_levels = """ + str(self.levels)[1:-1] + """;
-            var ContigSpacingJSON = [];
+            var ContigSpacingJSON = """ + self.contig_json() + """;
             var multipart_file = """ + str(len(self.contigs) > 1).lower() + """;
             var includeDensity = false;
 
@@ -394,6 +394,16 @@ class DDVTileLayout:
         """
         with open(html_path, 'w') as out:
             out.write(html_content)
+
+    def contig_json(self):
+        json = []
+        startingIndex = 0  # camel case is left over from C# for javascript compatibility
+        for contig in self.contigs:
+            startingIndex += contig.title_padding
+            endIndex = startingIndex + len(contig.seq)
+            json.append({"name": contig.name.replace("'", ""), "startingIndex": startingIndex, "endIndex": endIndex,
+                         "title_padding": contig.title_padding, "tail_padding": contig.tail_padding})
+        return str(json)
 
 
 def multi_line_height(font, multi_line_title, txt):
