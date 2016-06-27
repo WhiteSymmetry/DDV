@@ -31,33 +31,6 @@ palette['N'] = (30, 30, 30)
 palette['n'] = (30, 30, 30)  # N
 
 
-def hello_world():
-    starttime = datetime.now()
-
-    image = Image.new('RGB', (10000, 10000), "white")
-    draw = ImageDraw.Draw(image)
-    pixels = image.load()
-    font = ImageFont.truetype("calibri.ttf", 16)
-
-    for i in range(image.size[0]):
-        j = 0
-        while j < image.size[1]:
-            pixels[i, j] = (255, 0, 0)
-            j += 1
-            pixels[i, j] = (0, 0, 255)
-            j += 1
-    draw.text((1000, 1000), "Hello Beginning!", (255, 255, 255), font=font)
-    draw.text((9000, 9000), "Goodbye Ending!", (255, 255, 255), font=font)
-
-    del pixels
-    del draw
-    image.save('output.png', 'PNG')
-    del image
-
-    print("Finished Array in:", datetime.now() - starttime)
-
-
-
 class LayoutLevel:
     def __init__(self, name, modulo, chunk_size=None, padding=0, thickness=1, levels=None):
         self.modulo = modulo
@@ -82,22 +55,10 @@ class Contig:
         self.tail_padding = tail_padding
 
 
-def pretty_contig_name(contig, title_width, title_lines):
-    """Since textwrap.wrap break on whitespace, it's important to make sure there's whitespace
-    where there should be.  Contig names don't tend to be pretty."""
-    pretty_name = contig.name.replace('_', ' ').replace('|', ' ')
-    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)
-    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)  # don't ask
-    if title_width < 20:
-        # For small spaces, cram every last bit into the line labels, there's not much room
-        pretty_name = pretty_name[:title_width] + '\n' + pretty_name[title_width:title_width * 2]
-    else:
-        pretty_name = '\n'.join(textwrap.wrap(pretty_name, title_width)[:title_lines])  # approximate width
-    return pretty_name
-
-
 class DDVTileLayout:
     def __init__(self):
+        self.use_fat_headers = True  # For large chromosomes, do you change the layout to allow for
+        # ...titles that are outside of the nucleotide coordinate grid?
         self.image = None
         self.draw = None
         self.pixels = None
@@ -105,16 +66,22 @@ class DDVTileLayout:
         self.image_length = 0
         # noinspection PyListCreation
         self.levels = [
-            LayoutLevel("XInColumn", 100, 1),
-            LayoutLevel("LineInColumn", 1000, 100)
+            LayoutLevel("XInColumn", 100, 1),  # [0]
+            LayoutLevel("LineInColumn", 1000, 100)  # [1]
         ]
-        self.levels.append(LayoutLevel("ColumnInRow", 100, levels=self.levels))
-        self.levels.append(LayoutLevel("RowInTile", 10, levels=self.levels))
-        self.levels.append(LayoutLevel("XInTile", 3, levels=self.levels))
-        self.levels.append(LayoutLevel("YInTile", 4, levels=self.levels))
-        self.levels.append(LayoutLevel("TileColumn", 9, levels=self.levels))
-        self.levels.append(LayoutLevel("TileRow", 999, levels=self.levels))
+        self.levels.append(LayoutLevel("ColumnInRow", 100, levels=self.levels))  # [2]
+        self.levels.append(LayoutLevel("RowInTile", 10, levels=self.levels))  # [3]
+        self.levels.append(LayoutLevel("XInTile", 3, levels=self.levels))  # [4]
+        self.levels.append(LayoutLevel("YInTile", 4, levels=self.levels))  # [5]
+        if self.use_fat_headers:
+            self.levels[5].padding += self.levels[3].thickness  # one full row for a chromosome title
+            self.levels[5].thickness += self.levels[3].thickness
+        self.levels.append(LayoutLevel("TileColumn", 9, levels=self.levels))  # [6]
+        self.levels.append(LayoutLevel("TileRow", 999, levels=self.levels))  # [7]
+
         self.tile_label_size = self.levels[3].chunk_size * 2
+        if self.use_fat_headers:
+            self.tile_label_size = 0  # Fat_headers are not part of the coordinate space
 
 
     def process_file(self, input_file_name, output_folder, output_file_name):
@@ -123,33 +90,43 @@ class DDVTileLayout:
         print("Read contigs :", datetime.now() - start_time)
         self.prepare_image(self.image_length)
         print("Initialized Image:", datetime.now() - start_time, "\n")
+        try:
+            self.draw_nucleotides()
+            print("\nDrew Nucleotides:", datetime.now() - start_time)
+        except Exception as e:
+            print('Encountered exception while drawing nucleotides:', '\n', str(e))
+        try:
+            if len(self.contigs) > 1:
+                self.draw_titles()
+                print("Drew Titles:", datetime.now() - start_time)
+        except Exception as e:
+            print('Encountered exception while drawing titles:', '\n', str(e))
+        try:
+            self.generate_html(input_file_name, output_folder, output_file_name)
+        except: pass
+        self.output_image(output_folder, output_file_name)
+        print("Output Image in:", datetime.now() - start_time)
+
+    def draw_nucleotides(self):
         total_progress = 0
-
-        if self.image_length > 300000000:
-            positioner = self.position_on_screen_big  # big images
-        else:
-            positioner = self.position_on_screen  # small images
-
+        # if self.image_length > 300000000:
+        #     positioner = self.position_on_screen_big  # big images
+        # else:
+        #     positioner = self.position_on_screen  # small images
         # Layout contigs one at a time
         for contig in self.contigs:
             total_progress += contig.reset_padding + contig.title_padding
             # worker.ReportProgress((int) (nucleotidesProcessed += contig.len(seq))) # doesn't include padding
-            for c in contig.seq:
-                x, y = positioner(total_progress)
-                total_progress += 1
-                self.draw_pixel(c, x, y)
+            for cx in range(0, len(contig.seq), 100):
+                x, y = self.position_on_screen(total_progress)
+                remaining = min(100, len(contig.seq) - cx)
+                total_progress += remaining
+                for i in range(remaining):
+                    self.draw_pixel(contig.seq[cx + i], x + i, y)
             if self.image_length > 10000000:
-                print('\r', str(total_progress / self.image_length * 100)[:6], '% done:', contig.name, end="")  # pseudo progress bar
+                print('\r', str(total_progress / self.image_length * 100)[:6], '% done:', contig.name,
+                      end="")  # pseudo progress bar
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
-        print("\nDrew Nucleotides:", datetime.now() - start_time)
-
-        if len(self.contigs) > 1:
-            self.draw_titles()
-        print("Drew Titles:", datetime.now() - start_time)
-        self.generate_html(input_file_name, output_folder, output_file_name)
-        self.output_image(output_folder, output_file_name)
-        print("Output Image in:", datetime.now() - start_time)
-
 
     def read_contigs(self, input_file_name):
         multipart_file = False
@@ -171,9 +148,7 @@ class DDVTileLayout:
                         reset, title, tail = self.calc_padding(total_progress, len(sequence), True)
                         self.contigs.append(Contig(current_name, sequence, reset, title, tail))
                         total_progress += reset + title + tail + len(sequence)
-
-                        # worker.ReportProgress((int)total_progress)
-                    current_name = read[1:]  # between >
+                    current_name = read[1:]  # remove >
                 else:
                     # collects the sequence to be stored in the contig, constant time performance don't concat strings!
                     seq_collection.append(read)
@@ -206,7 +181,7 @@ class DDVTileLayout:
                 reset_level = current_level  # bigger reset when close to filling chunk_size
                 if next_segment_length + title_padding < space_remaining:
                     reset_level = self.levels[i - 1]
-                if title_padding >= self.tile_label_size:  # Special case for full tile, don't need to go that big
+                if title_padding > self.levels[3].chunk_size:  # Special case for full tile, don't need to go that big
                     title_padding = self.tile_label_size
                     # reset_level = self.levels[i - 1]
                 reset_padding = 0
@@ -221,15 +196,20 @@ class DDVTileLayout:
 
 
     def position_on_screen(self, index):
-        """ Readable unoptimized version:
+        """ Readable unoptimized version:"""
         xy = [0, 0]
+        if self.use_fat_headers:
+            xy[1] = self.levels[5].padding  # padding comes before, not after
         for i, level in enumerate(self.levels):
             if index < level.chunk_size:
                 return xy
             part = i % 2
             coordinate_in_chunk = int(index / level.chunk_size) % level.modulo
             xy[part] += level.thickness * coordinate_in_chunk
-        """
+        return xy
+
+    @staticmethod
+    def position_on_screen_small(index):
         # Less readable
         # x = self.levels[0].thickness * (int(index / self.levels[0].chunk_size) % self.levels[0].modulo)
         # x+= self.levels[2].thickness * (int(index / self.levels[2].chunk_size) % self.levels[2].modulo)
@@ -240,7 +220,8 @@ class DDVTileLayout:
         y = (index // 100) % 1000 + 1018 * ((index // 10000000) % 10)  # + 10342 * ((index // 300000000) % 4)
         return x, y
 
-    def position_on_screen_big(self, index):
+    @staticmethod
+    def position_on_screen_big(index):
         # 10654 * 3 + 486 padding = 32448
         x = index % 100 + 106 * ((index // 100000) % 100) + 10654 * ((index // 100000000) % 3) + \
             32448 * (index // 1200000000)  # % 9 #this will continue tile columns indefinitely (8 needed 4 human genome)
@@ -260,8 +241,8 @@ class DDVTileLayout:
             total_progress += contig.title_padding + len(contig.seq) + contig.tail_padding
 
     def draw_title(self, total_progress, contig):
-        upper_left = self.position_on_screen_big(total_progress)
-        bottom_right = self.position_on_screen_big(total_progress + contig.title_padding - 2)
+        upper_left = self.position_on_screen(total_progress)
+        bottom_right = self.position_on_screen(total_progress + contig.title_padding - 2)
         width, height = bottom_right[0] - upper_left[0], bottom_right[1] - upper_left[1]
 
         font_size = 9
@@ -281,6 +262,14 @@ class DDVTileLayout:
             # since this level is square, there's no point in rotating it
             font_size = 380 * 2  # doesn't really need to be 10x larger than the rows
             title_width = 50 // 2
+            if self.use_fat_headers:
+                # TODO add reset_padding from next contig, just in case there's unused space on this level
+                tiles_spanned = math.ceil((len(contig.seq) + contig.tail_padding) / self.levels[4].chunk_size)
+                title_width *= tiles_spanned  # Twice the size, but you have 3 tile columns to fill, also limited by 'width'
+                title_lines = 1
+                upper_left[1] -= self.levels[3].thickness  # above the start of the coordinate grid
+                height = self.levels[3].thickness
+                width = self.levels[4].thickness * tiles_spanned  # spans 3 full Tiles, or one full Page width
 
         font = ImageFont.truetype("tahoma.ttf", font_size)
         txt = Image.new('RGBA', (width, height))
@@ -427,6 +416,20 @@ def multi_line_height(font, multi_line_title, txt):
     sum_line_spacing = ImageDraw.Draw(txt).multiline_textsize(multi_line_title, font)[1]
     descender = font.getsize('y')[1] - font.getsize('A')[1]
     return sum_line_spacing + descender
+
+
+def pretty_contig_name(contig, title_width, title_lines):
+    """Since textwrap.wrap break on whitespace, it's important to make sure there's whitespace
+    where there should be.  Contig names don't tend to be pretty."""
+    pretty_name = contig.name.replace('_', ' ').replace('|', ' ').replace('chromosome chromosome', 'chromosome')
+    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)
+    pretty_name = regex.sub(r'([^:]*\S):(\S[^:]*)', r'\1: \2', pretty_name)  # don't ask
+    if title_width < 20:
+        # For small spaces, cram every last bit into the line labels, there's not much room
+        pretty_name = pretty_name[:title_width] + '\n' + pretty_name[title_width:title_width * 2]
+    else:
+        pretty_name = '\n'.join(textwrap.wrap(pretty_name, title_width)[:title_lines])  # approximate width
+    return pretty_name
 
 
 if __name__ == '__main__':
