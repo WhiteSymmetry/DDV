@@ -57,7 +57,7 @@ class Contig:
 
 class DDVTileLayout:
     def __init__(self):
-        self.use_fat_headers = True  # For large chromosomes, do you change the layout to allow for
+        self.use_fat_headers = False  # For large chromosomes, do you change the layout to allow for
         # ...titles that are outside of the nucleotide coordinate grid?
         self.image = None
         self.draw = None
@@ -90,11 +90,11 @@ class DDVTileLayout:
         print("Read contigs :", datetime.now() - start_time)
         self.prepare_image(self.image_length)
         print("Initialized Image:", datetime.now() - start_time, "\n")
-        try:
-            self.draw_nucleotides()
-            print("\nDrew Nucleotides:", datetime.now() - start_time)
-        except Exception as e:
-            print('Encountered exception while drawing nucleotides:', '\n', str(e))
+        # try:
+        self.draw_nucleotides()
+        print("\nDrew Nucleotides:", datetime.now() - start_time)
+        # except Exception as e:
+        #     print('Encountered exception while drawing nucleotides:', '\n', str(e))
         try:
             if len(self.contigs) > 1:
                 self.draw_titles()
@@ -127,6 +127,7 @@ class DDVTileLayout:
                 print('\r', str(total_progress / self.image_length * 100)[:6], '% done:', contig.name,
                       end="")  # pseudo progress bar
             total_progress += contig.tail_padding  # add trailing white space after the contig sequence body
+        print()
 
     def read_contigs(self, input_file_name):
         multipart_file = False
@@ -198,7 +199,8 @@ class DDVTileLayout:
 
 
     def position_on_screen(self, index):
-        """ Readable unoptimized version:"""
+        """ Readable unoptimized version:
+        Maps a nucleotide index to an x,y coordinate based on the rules set in self.levels"""
         xy = [0, 0]
         if self.use_fat_headers:
             xy[1] = self.levels[5].padding  # padding comes before, not after
@@ -306,6 +308,8 @@ class DDVTileLayout:
             if coordinate_in_chunk > 1:
                 # not cumulative, just take the max size for either x or y
                 width_height[part] = max(width_height[part], level.thickness * coordinate_in_chunk)
+        if self.use_fat_headers:  # extra margin at the top of the image for a title
+            width_height[1] += self.levels[5].padding
         return width_height
 
     def generate_html(self, input_file_name, output_folder, output_file_name):
@@ -434,20 +438,29 @@ def pretty_contig_name(contig, title_width, title_lines):
     return pretty_name
 
 
-if __name__ == '__main__':
-    # input_file_name, output_file_name = 'sequence.fa', 'output.png'
+if __name__ == "__main__":
+    from ParallelGenomeLayout import ParallelLayout
 
-    layout = DDVTileLayout()
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa', '', 'ch20-2.png')
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa', '', 'non-chromosomal.png')
-    # layout.process_file('Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa', '', 'chr1 Human.png')
-    # layout.process_file('Human selenoproteins.fa', '', 'selenoproteins.png')
-    # layout.process_file('multi_part_layout.fa', '', 'multi_part_layout.png')
-    # layout.process_file('CYUI01000001-CYUI01015997.fasta', '', 'susie3.png')
-    folder = '.'
-    image = sys.argv[1][:sys.argv[1].rfind('.')] + '.png'
+    # input_file_name, output_file_name = "sequence.fa", "output.png"
+
+    # layout.process_file("Animalia_Mammalia_Homo_Sapiens_GRCH38_chr20.fa", ".", "ch20-2.png")
+    # layout.process_file("Animalia_Mammalia_Homo_Sapiens_GRCH38_nonchromosomal.fa", ".", "non-chromosomal.png")
+    # layout.process_file("Animalia_Mammalia_Homo_Sapiens_GRCH38_chr1.fa", ".", "chr1 Human.png")
+    # layout.process_file("Human selenoproteins.fa", ".", "selenoproteins.png")
+    # layout.process_file("multi_part_layout.fa", ".", "multi_part_layout.png")
+    # layout.process_file("CYUI01000001-CYUI01015997.fasta", ".", "susie3.png")
+    folder = "."
+    image = sys.argv[1][:sys.argv[1].rfind(".")] + ".png"
     if len(sys.argv) >= 4:
         folder, image = sys.argv[2], sys.argv[3]
     if len(sys.argv) == 3:
         image = sys.argv[2]
-    layout.process_file(sys.argv[1], folder, image)
+
+    if len(sys.argv) > 4:  # 3 column layout
+        layout = ParallelLayout()
+        layout.process_file(sys.argv[1], folder, image, *sys.argv[4:])
+    else:
+        layout = DDVTileLayout()
+        layout.process_file(sys.argv[1], folder, image)
+
+
