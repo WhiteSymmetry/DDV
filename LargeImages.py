@@ -176,13 +176,15 @@ class DDVTileLayout:
             if next_segment_length + min_gap < current_level.chunk_size:
                 # give a full level of blank space just in case the previous
                 title_padding = max(min_gap, self.levels[i - 1].chunk_size)
+                if title_padding > self.levels[3].chunk_size:  # Special case for full tile, don't need to go that big
+                    title_padding = self.tile_label_size
+                if next_segment_length + title_padding > current_level.chunk_size:
+                    continue  # adding the title pushed the above comparison over the edge, step up one level
                 space_remaining = current_level.chunk_size - total_progress % current_level.chunk_size
                 # sequence comes right up to the edge.  There should always be >= 1 full gap
                 reset_level = current_level  # bigger reset when close to filling chunk_size
                 if next_segment_length + title_padding < space_remaining:
                     reset_level = self.levels[i - 1]
-                if title_padding > self.levels[3].chunk_size:  # Special case for full tile, don't need to go that big
-                    title_padding = self.tile_label_size
                     # reset_level = self.levels[i - 1]
                 reset_padding = 0
                 if total_progress != 0:  # fill out the remainder so we can start at the beginning
