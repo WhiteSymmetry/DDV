@@ -2817,7 +2817,15 @@ This DNA data visualization interface was generated with <a href='https://github
             }
             else
             {
-                run_external_processing(sender, e, true);
+                try
+                {
+                    MessageBox.Show("Before running DeepZoom on an already generated image, please make sure that the generated PNG is in the same folder as DDV.exe and that it is named the same as the FASTA file you selected or the same name as the name Override you selected.\n\nYou also need to have an already generated embed.html in the same folder as well.\n\nThere is currently no error handling on this, so missing the proper files will crash the program.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    run_external_processing(sender, e, true);
+                }
+                catch
+                {
+                    MessageBoxShow("Could not find the proper image and/or embed files! Processing aborted...");
+                }
             }
         }
 	}
