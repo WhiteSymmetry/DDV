@@ -57,8 +57,9 @@ class Contig:
 
 class DDVTileLayout:
     def __init__(self):
-        self.use_fat_headers = False  # For large chromosomes, do you change the layout to allow for
-        # ...titles that are outside of the nucleotide coordinate grid?
+        # use_fat_headers: For large chromosomes in multipart files, do you change the layout to allow for titles that
+        # are outside of the nucleotide coordinate grid?
+        self.use_fat_headers = False  # Can only be changed in code.
         self.image = None
         self.draw = None
         self.pixels = None
@@ -90,11 +91,11 @@ class DDVTileLayout:
         print("Read contigs :", datetime.now() - start_time)
         self.prepare_image(self.image_length)
         print("Initialized Image:", datetime.now() - start_time, "\n")
-        # try:
-        self.draw_nucleotides()
-        print("\nDrew Nucleotides:", datetime.now() - start_time)
-        # except Exception as e:
-        #     print('Encountered exception while drawing nucleotides:', '\n', str(e))
+        try:  # These try catch statements ensure we get at least some output.  These jobs can take hours
+            self.draw_nucleotides()
+            print("\nDrew Nucleotides:", datetime.now() - start_time)
+        except Exception as e:
+            print('Encountered exception while drawing nucleotides:', '\n', str(e))
         try:
             if len(self.contigs) > 1:
                 self.draw_titles()
@@ -130,7 +131,6 @@ class DDVTileLayout:
         print()
 
     def read_contigs(self, input_file_name):
-        multipart_file = False
         self.contigs = []
         total_progress = 0
         current_name = ""
@@ -334,6 +334,7 @@ class DDVTileLayout:
             var layout_levels = """ + self.levels_json() + """;
             var ContigSpacingJSON = """ + self.contig_json() + """;
             var multipart_file = """ + str(len(self.contigs) > 1).lower() + """;
+            var use_fat_headers = """ + str(self.use_fat_headers).lower() + """;
             var includeDensity = false;
 
             var usa='refseq_fetch:""" + input_file_name + """';
@@ -451,14 +452,15 @@ if __name__ == "__main__":
     # layout.process_file("CYUI01000001-CYUI01015997.fasta", ".", "susie3.png")
     folder = "."
     image = sys.argv[1][:sys.argv[1].rfind(".")] + ".png"
-    if len(sys.argv) >= 4:
+    n_arguments = len(sys.argv)
+    if n_arguments >= 4:
         folder, image = sys.argv[2], sys.argv[3]
-    if len(sys.argv) == 3:
+    if n_arguments == 3:
         image = sys.argv[2]
 
-    if len(sys.argv) > 4:  # 3 column layout
-        layout = ParallelLayout()
-        layout.process_file(sys.argv[1], folder, image, *sys.argv[4:])
+    if n_arguments > 4:  # Parallel genome column layout
+        layout = ParallelLayout(n_arguments - 3)
+        layout.process_file(sys.argv[1], folder, image, sys.argv[4:])
     else:
         layout = DDVTileLayout()
         layout.process_file(sys.argv[1], folder, image)

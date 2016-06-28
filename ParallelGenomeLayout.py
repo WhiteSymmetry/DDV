@@ -1,27 +1,29 @@
 from datetime import datetime
+from math import floor
 
 from LargeImages import DDVTileLayout, LayoutLevel
 
 
 class ParallelLayout(DDVTileLayout):
-    def __init__(self):
+    def __init__(self, n_genomes):
         super(ParallelLayout, self).__init__()
+        self.use_fat_headers = False  # This layout is best used on one chromosome at a time.
         self.genome_processed = 0
         # modify layout with an additional bundled column layer
+        columns = self.levels[2]
+        new_width = columns.thickness * n_genomes + columns.padding * 2
         self.levels = self.levels[:2]  # trim off the others
-        self.levels.append(LayoutLevel("ColumnInRow", 32, levels=self.levels))  # [2]
-        self.levels[2].thickness = 330  # 100+6+100+6+100+18 = 330  #total row width of 10,560 vs original 10,600
-        self.levels[2].padding = 330 - 100
-        self.column_offset = 106  # steps inside a column bundle, not exactly the same as bundles steps because of ...
-        # ... inter bundle padding of 18 pixels
+        self.levels.append(LayoutLevel("ColumnInRow", floor(10600 / new_width), levels=self.levels))  # [2]
+        self.levels[2].thickness = new_width  # 100+6+100+6+100+18 = 330  #total row width of 10,560 vs original 10,600
+        self.levels[2].padding = new_width - (columns.thickness - columns.padding)
+        self.column_offset = columns.thickness  # steps inside a column bundle, not exactly the same as bundles steps
+        # because of inter bundle padding of 18 pixels
         self.levels.append(LayoutLevel("RowInTile", 10, levels=self.levels))  # [3]
         self.levels.append(LayoutLevel("XInTile", 3, levels=self.levels))  # [4]
         self.levels.append(LayoutLevel("YInTile", 99, levels=self.levels))  # [5]
 
 
-    def process_file(self, file1, output_folder, output_file_name, file2=None, file3=None):
-        file2 = file1 if file2 is None else file2
-        file3 = file1 if file3 is None else file3
+    def process_file(self, file1, output_folder, output_file_name, additional_files=[]):
         start_time = datetime.now()
         self.image_length = self.read_contigs(file1)
         print("Read first sequence :", datetime.now() - start_time)
@@ -31,14 +33,11 @@ class ParallelLayout(DDVTileLayout):
         print("Drew First File:", file1, datetime.now() - start_time)
 
         # Do inner work for two other files
-        self.genome_processed = 1
-        self.read_contigs(file2)
-        self.draw_nucleotides()
-        print("Drew Second File:", file2, datetime.now() - start_time)
-        self.genome_processed = 2
-        self.read_contigs(file3)
-        self.draw_nucleotides()
-        print("Drew Third File:", file3, datetime.now() - start_time)
+        for filename in additional_files:
+            self.genome_processed += 1
+            self.read_contigs(filename)
+            self.draw_nucleotides()
+            print("Drew Additional File:", filename, datetime.now() - start_time)
 
         self.generate_html(file1, output_folder, output_file_name)
         self.output_image(output_folder, output_file_name)
